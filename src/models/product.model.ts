@@ -8,7 +8,7 @@ interface IProductContainer {
   allocated: number;
 }
 
-export interface IProduct {
+export interface IProduct extends mongoose.Document {
   code: string;
   name: string;
   cost?: number;

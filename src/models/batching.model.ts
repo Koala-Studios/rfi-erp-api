@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export interface IBatching {
+export interface IBatching extends mongoose.Document {
   product_id: string;
   quantity: number;
   date_created: Date;
