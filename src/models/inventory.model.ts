@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-interface Inventory_Container {
+interface IInventoryContainer {
     batch_code:string;
     on_hand:number;
     in_transit:number;
@@ -13,7 +13,7 @@ interface Inventory_Container {
 export interface IInventory extends mongoose.Document {
     code:string;
     name:string;
-    stock?:[Inventory_Container];
+    stock?:[IInventoryContainer];
     reorder_amount?:number;
     suppliers?:[string];
     last_supplier?:string;

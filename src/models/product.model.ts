@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-interface Product_Container {
+interface IProductContainer {
   batch_code: string;
   on_hand: number;
   in_transit: number;
@@ -11,8 +11,8 @@ interface Product_Container {
 export interface IProduct {
   code: string;
   name: string;
-  cost: number;
-  stock?: [Product_Container];
+  cost?: number;
+  stock?: [IProductContainer];
   customers: [string];
   status: number;
   fda_status?: number;
