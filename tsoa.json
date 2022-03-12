@@ -1,0 +1,23 @@
+{
+	"entryFile": "./src/app.ts",
+	"controllerPathGlobs": ["src/controllers/*", "src/controllers/project/*"],
+	"spec": {
+		"outputDirectory": "./",
+		"specVersion": 3,
+		"securityDefinitions": {
+			"jwt": {
+				"type": "apiKey",
+				"name": "Authorization",
+				"in": "header"
+			}
+		},
+		"consumes": ["application/json"],
+		"produces": ["application/json"]
+	},
+	"routes": {
+		"entryFile": "./src/app.ts",
+		"basePath": "/",
+		"routesDir": "./src",
+		"authenticationModule": "./src/middlewares/authentication"
+	}
+}
