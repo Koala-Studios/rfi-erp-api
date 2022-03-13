@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 
 interface IInventoryContainer {
+    supplier_id:string;
     batch_code:string;
     on_hand:number;
     in_transit:number;
@@ -16,7 +17,6 @@ export interface IInventory extends mongoose.Document {
     stock?:[IInventoryContainer];
     reorder_amount?:number;
     suppliers?:[string];
-    last_supplier?:string;
     fda_status?:number;
     cpl_hazard?:string;
     fema_number?:number;
@@ -31,6 +31,7 @@ const inventorySchema = new mongoose.Schema({
     name:String,
     stock:[
         {
+            supplier_id:String,
             batch_code:String,
             on_hand:Number,
             in_transit:Number,
@@ -41,7 +42,6 @@ const inventorySchema = new mongoose.Schema({
     ],
     reorder_amount:Number,
     suppliers:[String],
-    last_supplier:String,
     fda_status:Number,
     cpl_hazard:String,
     fema_number:Number,
