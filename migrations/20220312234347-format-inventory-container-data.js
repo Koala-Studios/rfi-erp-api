@@ -3,7 +3,7 @@ module.exports = {
     // TODO write your migration here.
     // See https://github.com/seppevs/migrate-mongo/#creating-a-new-migration-script
     // Example:
-    await await db.collection("Inventory").updateMany(
+    await db.collection("Inventory").updateMany(
     {},
     {
       $rename: {
@@ -20,18 +20,23 @@ module.exports = {
         EU_STATUS: "eu_status",
         ORGANIC: "organic",
         KOSHER: "kosher",
-      },
-      $set: {
+      }
+    });
+
+    await db.collection("Inventory").updateMany(
+      {},
+      [ {"$set": {
         stock: [
           {
-              on_hand: "$quantity",
+              on_hand:  "$quantity",
               supplier_id: "$suppliers",
               batch_code: "OLDSTOCK",
               price: "$price",
           }
         ],
-      },
-    });
+      }
+    }]
+  )
   },
 
   async down(db, client) {
