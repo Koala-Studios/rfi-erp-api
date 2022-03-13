@@ -51,7 +51,7 @@ interface signinResponse {
 @Route("auth")
 @Tags("Identity")
 export class IdentityController extends Controller {
-	@Post("signup")
+	@Post("newuser")
 	@SuccessResponse(status.CREATED, reply.success)
 	public async signUp(@Body() req: signupRequest): Promise<void> {
 		console.log(req);
@@ -99,13 +99,18 @@ export class IdentityController extends Controller {
 		return;
 	}
 
-	@Post("signin")
+	@Post("login")
 	@SuccessResponse(status.OK, reply.success)
 	public async signIn(@Body() req: signinRequest): Promise<signinResponse> {
+		
+		
 		if (!req.username || !req.password) {
 			this.setStatus(status.BAD_REQUEST);
 			return;
 		}
+		
+		
+		console.log(req.username, req.password);
 
 		let user = await User.findOne({
 			$or: [
@@ -113,6 +118,8 @@ export class IdentityController extends Controller {
 				{ username: req.username.toLowerCase() },
 			],
 		});
+
+		// console.log(user);
 
 		if (!user) {
 			this.setStatus(status.UNAUTHORIZED);

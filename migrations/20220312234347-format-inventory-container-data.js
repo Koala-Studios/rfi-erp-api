@@ -4,48 +4,49 @@ module.exports = {
     // See https://github.com/seppevs/migrate-mongo/#creating-a-new-migration-script
     // Example:
     await db.collection("Inventory").updateMany(
-    {},
-    {
-      $rename: {
-        NAME: "name",
-        QTY: "quantity",
-        CODE: "product_id",
-        PRICE: "price",
-        REORDER_AMT: "reorder_amount",
-        SUPPLIERS: "suppliers",
-        FDA_STATUS: "fda_status",
-        CPL_HAZARD: "cpl_hazard",
-        TTB_STATUS: "ttb_status",
-        EU_STATUS: "eu_status",
-        ORGANIC: "organic",
-        KOSHER: "kosher",
-        INVENTORY_VALUE: "inventory_value",
-        FEMA_NUMBER: "fema_number",
-        CAS: "cas"
-      },
-      $unset: {
-        REORDER: "",
-        ALLOCATED: "",
-        LOCATION: "",
-        ID: "",
-        LAST_SUPPLIER:""
-      }
-    });
-
-    await db.collection("Inventory").updateMany(
       {},
-      [ {"$set": {
-        stock: [
-          {
-              on_hand:  "$quantity",
+      {
+        $rename: {
+          NAME: "name",
+          QTY: "quantity",
+          CODE: "product_id",
+          PRICE: "price",
+          REORDER_AMT: "reorder_amount",
+          SUPPLIERS: "suppliers",
+          FDA_STATUS: "fda_status",
+          CPL_HAZARD: "cpl_hazard",
+          TTB_STATUS: "ttb_status",
+          EU_STATUS: "eu_status",
+          ORGANIC: "organic",
+          KOSHER: "kosher",
+          INVENTORY_VALUE: "inventory_value",
+          FEMA_NUMBER: "fema_number",
+          CAS: "cas",
+        },
+        $unset: {
+          REORDER: "",
+          ALLOCATED: "",
+          LOCATION: "",
+          ID: "",
+          LAST_SUPPLIER: "",
+        },
+      }
+    );
+
+    await db.collection("Inventory").updateMany({}, [
+      {
+        $set: {
+          stock: [
+            {
+              on_hand: "$quantity",
               supplier_id: "$suppliers",
               batch_code: "OLDSTOCK",
               price: "$price",
-          }
-        ],
-      }
-    }]
-  )
+            },
+          ],
+        },
+      },
+    ]);
   },
 
   async down(db, client) {

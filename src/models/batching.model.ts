@@ -9,11 +9,13 @@ export interface IBatching extends mongoose.Document {
 }
 
 const batchingSchema = new mongoose.Schema({
-  product_id: String,
+  product_id:String,
   quantity: Number,
   date_created: Date,
   batch_code: String,
   status: Number,
 });
+
+
 
 export default mongoose.model<IBatching>("Batching", batchingSchema);
