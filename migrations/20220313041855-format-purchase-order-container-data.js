@@ -2,18 +2,14 @@ module.exports = {
   async up(db, client) {
     // TODO write your migration here.
     // See https://github.com/seppevs/migrate-mongo/#creating-a-new-migration-script
-    // Example:
-    
-    let inserted_codes = [];
-
-    db.createCollection("Purchase Order New");
+    const inserted_codes = [];
     await db
       .collection("Purchase Order")
       .find()
-      .forEach(async function (PurchaseOrder) {
-        if (inserted_codes.includes((PurchaseOrder.OCODE).toString())) {
-          console.log("this code exists", PurchaseOrder.OCODE)
-          await db.collection("Production Order New").updateOne(
+      .forEach(function (PurchaseOrder) {
+        if (inserted_codes.includes((PurchaseOrder.OCODE))) {
+          console.log('test!')
+          db.collection("Production Order New").updateOne(
             { order_code: PurchaseOrder.OCODE },
             {
               $push: {
@@ -27,7 +23,7 @@ module.exports = {
             }
           );
         } else {
-          await db.collection("Purchase Order New").insertOne({
+          db.collection("Purchase Order New").insertOne({
             supplier: PurchaseOrder.SUPPLIER,
             date_purchased: PurchaseOrder.DATE_PURCHASED,
             order_code: PurchaseOrder.OCODE,
@@ -40,8 +36,7 @@ module.exports = {
               },
             ],
           });
-          inserted_codes.push(PurchaseOrder.OCODE);
-          console.log(inserted_codes);
+          inserted_codes.push((PurchaseOrder.OCODE).toString().trim());
         }
         // const result = await db.collection("Purchase Order New").findOne({ "order_code" : {$regex : PurchaseOrder.OCODE} },async function(err, result) {
         //   if (err) {
