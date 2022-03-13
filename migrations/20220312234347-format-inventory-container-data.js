@@ -13,13 +13,22 @@ module.exports = {
         PRICE: "price",
         REORDER_AMT: "reorder_amount",
         SUPPLIERS: "suppliers",
-        LAST_SUPPLIER: "last_supplier",
         FDA_STATUS: "fda_status",
         CPL_HAZARD: "cpl_hazard",
         TTB_STATUS: "ttb_status",
         EU_STATUS: "eu_status",
         ORGANIC: "organic",
         KOSHER: "kosher",
+        INVENTORY_VALUE: "inventory_value",
+        FEMA_NUMBER: "fema_number",
+        CAS: "cas"
+      },
+      $unset: {
+        REORDER: "",
+        ALLOCATED: "",
+        LOCATION: "",
+        ID: "",
+        LAST_SUPPLIER:""
       }
     });
 
