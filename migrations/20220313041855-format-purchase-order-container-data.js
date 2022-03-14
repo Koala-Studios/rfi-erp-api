@@ -3,80 +3,51 @@ module.exports = {
     // TODO write your migration here.
     // See https://github.com/seppevs/migrate-mongo/#creating-a-new-migration-script
     const inserted_codes = [];
+    await db.renameCollection("Purchase Order","Purchase Order Old");
+    //db.createCollection("Purchase Order");
     await db
-      .collection("Purchase Order")
+      .collection("Purchase Order Old")
       .find()
-      .forEach(function (PurchaseOrder) {
-        if (inserted_codes.includes((PurchaseOrder.OCODE))) {
-          console.log('test!')
-          db.collection("Production Order New").updateOne(
-            { order_code: PurchaseOrder.OCODE },
-            {
-              $push: {
-                $order_items: {
-                  amount: PurchaseOrder.AMOUNT,
-                  price: PurchaseOrder.PRICE,
-                  status: PurchaseOrder.STATUS,
-                  date_arrived: PurchaseOrder.DATE_ARRIVED,
-                },
-              },
-            }
-          );
-        } else {
-          db.collection("Purchase Order New").insertOne({
+      .forEach(async function (PurchaseOrder) {
+        if(!inserted_codes.includes(PurchaseOrder.OCODE))
+        {
+          db.collection("Purchase Order").insertOne({
             supplier: PurchaseOrder.SUPPLIER,
-            date_purchased: PurchaseOrder.DATE_PURCHASED,
+            date_purchased: new Date(PurchaseOrder.DATE_PURCHASED),
             order_code: PurchaseOrder.OCODE,
-            order_items: [
-              {
-                amount: PurchaseOrder.AMOUNT,
-                price: PurchaseOrder.PRICE,
-                status: PurchaseOrder.STATUS,
-                date_arrived: PurchaseOrder.DATE_ARRIVED,
-              },
-            ],
+            order_items: [],
           });
-          inserted_codes.push((PurchaseOrder.OCODE).toString().trim());
+
+          inserted_codes.push(PurchaseOrder.OCODE);
         }
-        // const result = await db.collection("Purchase Order New").findOne({ "order_code" : {$regex : PurchaseOrder.OCODE} },async function(err, result) {
-        //   if (err) {
-        //     console.log(err);
-        //   }
-        //   console.log(result)
-        //   if (result) {
-        //     await db.collection("Production Order New").updateOne(
-        //       { order_code: PurchaseOrder.OCODE },
-        //       {
-        //         $push: {
-        //           $order_items: {
-        //             amount: PurchaseOrder.AMOUNT,
-        //             price: PurchaseOrder.PRICE,
-        //             status: PurchaseOrder.STATUS,
-        //             date_arrived: PurchaseOrder.DATE_ARRIVED,
-        //           },
-        //         },
-        //       }
-        //     );
-        //   } else {
-        //     await db.collection("Purchase Order New").insertOne({
-        //       supplier: PurchaseOrder.SUPPLIER,
-        //       date_purchased: PurchaseOrder.DATE_PURCHASED,
-        //       order_code: PurchaseOrder.OCODE,
-        //       order_items: [
-        //         {
-        //           amount: PurchaseOrder.AMOUNT,
-        //           price: PurchaseOrder.PRICE,
-        //           status: PurchaseOrder.STATUS,
-        //           date_arrived: PurchaseOrder.DATE_ARRIVED,
-        //         },
-        //       ],
-        //     });
-        //   }
-        // });
       });
-  },
+
+      await db
+      .collection("Purchase Order Old")
+      .find()
+      .forEach(async function (PurchaseOrder) {
+      db.collection("Purchase Order").updateOne(
+        { order_code: PurchaseOrder.OCODE },
+        {
+          $push: {
+            order_items: {
+              product_code: PurchaseOrder.CODE,
+              amount: parseFloat(PurchaseOrder.AMOUNT),
+              price: parseFloat(PurchaseOrder.PRICE),
+              status: parseInt(PurchaseOrder.STATUS),
+              date_arrived: new Date(PurchaseOrder.DATE_ARRIVED),
+            }
+          }
+        }
+      );
+      });
+
+      //const test = await db.collection("Purchase Order").aggregate({},[{$group: { _id: null, totalSize: { $sum: { $size: "$order_items"}} }}])
+      //console.log(test, "THIS IS THE TOTAL");
+    },
 
   async down(db, client) {
-    db.collection("Purchase Order New").drop();
+    await db.collection("Purchase Order").drop();
+    await db.renameCollection("Purchase Order Old", "Purchase Order");
   },
 };
