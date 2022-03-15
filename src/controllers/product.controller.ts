@@ -24,13 +24,23 @@ interface ICreateProductRequest{
 @Security("jwt")
 export class ProductController extends Controller {
     @Get("list")
-    @SuccessResponse(status.OK, reply.success)
-    public async listProduct(@Request() req: eRequest) {
-        //filters: all
-        const _Product = await Product.find({});
-        this.setStatus(status.OK);
-        return Product;
-    }
+  @SuccessResponse(status.OK, reply.success)
+  public async listProduct(
+    @Request() req: eRequest,
+    @Query() page: string,
+    @Query() count: string
+  ) {
+    const _page = parseInt(<string>page);
+    const _count = parseInt(<string>count);
+
+    const _products = await Product.find()
+      .sort({date_created:-1})
+      .skip(_page * _count)
+      .limit(_count);
+
+    this.setStatus(status.OK);
+    return _products;
+  }
 
     @Post("create")
     @SuccessResponse(status.CREATED, reply.success)
