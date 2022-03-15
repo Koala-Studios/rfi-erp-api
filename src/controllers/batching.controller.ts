@@ -39,9 +39,6 @@ export class BatchingController extends Controller {
       .skip(_page * _count)
       .limit(_count);
 
-
-
-
     this.setStatus(status.OK);
     return _batching;
   }
