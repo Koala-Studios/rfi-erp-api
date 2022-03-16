@@ -4,7 +4,6 @@ module.exports = {
     // See https://github.com/seppevs/migrate-mongo/#creating-a-new-migration-script
     const inserted_codes = [];
     await db.renameCollection("Purchase Order","Purchase Order Old");
-    //db.createCollection("Purchase Order");
     await db
       .collection("Purchase Order Old")
       .find()
