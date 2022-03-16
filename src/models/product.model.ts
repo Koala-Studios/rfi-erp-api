@@ -14,7 +14,7 @@ export interface IProduct extends mongoose.Document {
   cost?: number;
   stock?: [IProductContainer];
   customers: [string];
-  status: number;
+  status: string;
   fda_status?: number;
   cpl_hazard?: string;
   fema_number?: number;
@@ -39,7 +39,7 @@ const productSchema = new mongoose.Schema({
     },
   ],
   customers: [String],
-  status: Number,
+  status: String,
   fda_status: Number,
   cpl_hazard: String,
   fema_number: Number,
