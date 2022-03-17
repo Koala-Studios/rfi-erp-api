@@ -1,20 +1,31 @@
 module.exports = {
   async up(db, client) {
-    // await db
-    //   .collection("Batching")
-    //   .find()
-    //   .forEach(async function (InventoryItem) {
-    //       db.collection("batchings").insertOne({
-    //         batch_code: InventoryItem.batch_code,
-    //         date_created: new Date(InventoryItem.date_created),
-    //         product_code: InventoryItem.product_code,
-    //         quantity: parseFloat(InventoryItem.quantity),
-    //         status: parseInt(InventoryItem.status),
-    //       });
-    //   });
+    await db
+      .collection("Batching")
+      .find()
+      .forEach(async function (InventoryItem) {
+          db.collection("batchings").insertOne({
+            batch_code: InventoryItem.BATCH_CODE,
+            date_created: new Date(InventoryItem.DATE_CREATED),
+            product_code: InventoryItem.PRODUCT_CODE,
+            quantity: parseFloat(InventoryItem.QTY),
+            status: parseInt(InventoryItem.STATUS),
+          });
+      });
+
+      await db
+      .collection("products")
+      .find()
+      .forEach(function (Product) {
+            db.collection("batchings").updateMany(
+              { product_code: Product.product_code }, 
+              { $set: { "product_id": Product._id } }
+            );
+      });
+      
   },
 
   async down(db, client) {
-    // db.dropCollection("batchings");
+    db.dropCollection("batchings");
   },
 };

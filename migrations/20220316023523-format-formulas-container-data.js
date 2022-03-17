@@ -1,8 +1,17 @@
-const { fileURLToPath } = require("url");
-
 module.exports = {
   async up(db, client) {
     const inserted_codes = [];
+
+    await db
+    .collection("inventories")
+    .find()
+    .forEach(function (Material) {
+          db.collection("Development").updateMany(
+            { material_code: Material.product_code }, 
+            { $set: { "material_id": Material._id } }
+          );
+    });
+
     await db
       .collection("Development")
       .find()
@@ -32,14 +41,28 @@ module.exports = {
               material_code: formula.MATERIAL_CODE,
               amount: parseFloat(formula.QTY),
               notes: formula.NOTES,
+              material_id: formula.material_id
             }
           }
-        }
-      );
-      });
-    },
+        });
+    });
+
+    await db
+    .collection("products")
+    .find()
+    .forEach(function (Product) {
+          db.collection("formulas").updateMany(
+            { product_code: Product.product_code }, 
+            { $set: { "product_id": Product._id } }
+            //{ $unset: { product_code } }
+          );
+    });
+  },
 
   async down(db, client) {
     await db.collection("formulas").drop();
+    db
+    .collection("Development")
+    .updateMany({},{ $unset: {material_id: ""  } });
   },
 };

@@ -1,57 +1,37 @@
 module.exports = {
   async up(db, client) {
-    // TODO write your migration here.
-    // See https://github.com/seppevs/migrate-mongo/#creating-a-new-migration-script
-    // Example:
-    await db.collection("Inventory").updateMany(
-      {},
-      {
-        $rename: {
-          NAME: "name",
-          QTY: "quantity",
-          CODE: "product_id",
-          PRICE: "price",
-          REORDER_AMT: "reorder_amount",
-          SUPPLIERS: "suppliers",
-          FDA_STATUS: "fda_status",
-          CPL_HAZARD: "cpl_hazard",
-          TTB_STATUS: "ttb_status",
-          EU_STATUS: "eu_status",
-          ORGANIC: "organic",
-          KOSHER: "kosher",
-          INVENTORY_VALUE: "inventory_value",
-          FEMA_NUMBER: "fema_number",
-          CAS: "cas",
-        },
-        $unset: {
-          REORDER: "",
-          ALLOCATED: "",
-          LOCATION: "",
-          ID: "",
-          LAST_SUPPLIER: "",
-        },
-      }
-    );
 
-    await db.collection("Inventory").updateMany({}, [
-      {
-        $set: {
-          stock: [
-            {
-              on_hand: "$quantity",
-              supplier_id: "$suppliers",
+    await db
+      .collection("Inventory")
+      .find()
+      .forEach(async function (InventoryItem) {
+          db.collection("inventories").insertOne({
+            cpl_hazard: InventoryItem.CPL_HAZARD,
+            eu_status:  InventoryItem.EU_STATUS,
+            fda_status: InventoryItem.FDA_STATUS,
+            kosher: InventoryItem.KOSHER,
+            name: InventoryItem.NAME,
+            organic: InventoryItem.ORGANIC,
+            price: parseFloat(InventoryItem.PRICE),
+            product_id:InventoryItem.CODE,
+            quantity: parseFloat(InventoryItem.QTY),
+            reorder_amount: parseFloat(InventoryItem.REORDER_AMT),
+            stock:[ {
+              on_hand: parseFloat(InventoryItem.QTY),
+              supplier_id: parseInt(InventoryItem.SUPPLIERS),
               batch_code: "OLDSTOCK",
-              price: "$price",
-            },
-          ],
-        },
-      },
-    ]);
+              price: parseFloat(InventoryItem.PRICE)
+            }],
+            suppliers: [parseInt(InventoryItem.SUPPLIERS)],
+            ttb_status: InventoryItem.TTB_STATUS,
+            fema_number: InventoryItem.FEMA_NUMBER,
+            inventory_value: parseFloat(InventoryItem.INVENTORY_VALUE),
+            cas: InventoryItem.CAS
+          });
+      });
   },
 
   async down(db, client) {
-    // TODO write the statements to rollback your migration (if possible)
-    // Example:
-    // await db.collection('albums').updateOne({artist: 'The Beatles'}, {$set: {blacklisted: false}});
-  },
+    db.collection("inventories").drop();
+  }
 };

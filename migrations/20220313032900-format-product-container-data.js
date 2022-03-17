@@ -3,37 +3,33 @@ module.exports = {
     // TODO write your migration here.
     // See https://github.com/seppevs/migrate-mongo/#creating-a-new-migration-script
     // Example:
-    await db.collection("Product").updateMany(
-    {},
-    {
-      $rename: {
-        NAME: "name",
-        PRODUCT_CODE: "product_code",
-        REC_DOSE_RATE: "rec_dose_rate",
-        COST: "cost",
-        PRICE: "price",
-        FDA_STATUS: "fda_status",
-        CPL_HAZARD: "cpl_hazard",
-        FEMA_NUMBER: "fema_number",
-        TTB_STATUS: "ttb_status",
-        EU_STATUS: "eu_status",
-        ORGANIC: "organic",
-        KOSHER: "kosher",
-        STATUS: "status",
-        VERSIONS: "versions",
-        APPROVED_VERSION: "approved_version",
-        DATE_CREATED: "date_created"
-      },
-      $unset: {
-        ID: "",
-        STOCK: "",
-      }
+    await db
+    .collection("Product")
+    .find()
+    .forEach(async function (Product) {
+        db.collection("products").insertOne({
+          product_code: Product.PRODUCT_CODE,
+          name: Product.NAME,
+          versions: parseInt(Product.VERSIONS),
+          approved_version: parseInt(Product.APPROVED_VERSION),
+          cost: parseFloat(Product.COST),
+          cpl_hazard: [],
+          date_created: new Date(Product.DATE_CREATED),
+          eu_status: parseInt(Product.EU_STATUS),
+          fda_status: parseInt(Product.FDA_STATUS),
+          rec_dose_rate: parseFloat(Product.REC_DOSE_RATE),
+          status: parseInt(Product.STATUS),
+          ttb_status: parseInt(Product.TTB_STATUS),
+          fda_ratings: parseInt(Product.FDA_RATINGS),
+          fema_number: parseInt(Product.fema_number),
+          cas_number: Product.cas_number,
+          organic: null,
+          kosher: null,
+        });
     });
   },
 
   async down(db, client) {
-    // TODO write the statements to rollback your migration (if possible)
-    // Example:
-    // await db.collection('albums').updateOne({artist: 'The Beatles'}, {$set: {blacklisted: false}});
+    db.dropCollection("products");
   },
 };
