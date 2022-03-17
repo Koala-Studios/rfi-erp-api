@@ -18,7 +18,6 @@ interface ICreateProductRequest{
     name:string;
 }
 
-
 @Route("products")
 @Tags("Products")
 @Security("jwt")
@@ -33,44 +32,26 @@ export class ProductController extends Controller {
     const _page = parseInt(<string>page);
     const _count = parseInt(<string>count);
 
-    const _products = await Product.find({status:"4"})
+    const _products = await Product.find({status:4})
       .sort({date_created:-1})
       .skip(_page * _count)
       .limit(_count);
 
-    console.log(_products)
-
     this.setStatus(status.OK);
     return _products;
-  }
-
-    @Post("create")
-    @SuccessResponse(status.CREATED, reply.success)
-    public async addProduct(@Request() req: eRequest,@Body() body: ICreateProductRequest) {
-        
-        const _Product = new Product(<IProduct>{
-            name:body.name
-        });
-
-        _Product.save();
-
-        this.setStatus(status.CREATED);
-        return Product;
-    }
-
-    @Post("delete")
-    @SuccessResponse(status.OK, reply.success)
-    public async deleteProduct( @Query() productId: string){
-
-        Product.deleteOne({_id:productId});
-
-    }
-
-    @Put("edit")
-    @SuccessResponse(status.OK, reply.success)
-    public async editProduct(){
-
-    }
-   
+  }  
   
+  @Get("get")
+  @SuccessResponse(status.OK, reply.success)
+  public async getProduct(
+    @Request() req: eRequest,
+    @Query() id: string,
+  ) {
+
+    const _product = await Product.findById(id);
+    console.log(_product,id)
+
+    this.setStatus(status.OK);
+    return _product;
+  }  
 }

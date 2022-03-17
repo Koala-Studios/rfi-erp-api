@@ -54,7 +54,6 @@ export class IdentityController extends Controller {
 	@Post("newuser")
 	@SuccessResponse(status.CREATED, reply.success)
 	public async signUp(@Body() req: signupRequest): Promise<void> {
-		console.log(req);
 		if (
 			!req.email ||
 			!req.password ||
@@ -118,8 +117,6 @@ export class IdentityController extends Controller {
 				{ username: req.username.toLowerCase() },
 			],
 		});
-
-		// console.log(user);
 
 		if (!user) {
 			this.setStatus(status.UNAUTHORIZED);
