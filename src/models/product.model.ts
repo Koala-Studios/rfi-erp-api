@@ -9,6 +9,7 @@ interface IProductContainer {
 }
 
 export interface IProduct extends mongoose.Document {
+  name:string;
   code: string;
   cost?: number;
   stock?: [IProductContainer];
@@ -25,6 +26,7 @@ export interface IProduct extends mongoose.Document {
 }
 
 const productSchema = new mongoose.Schema({
+  name:String,
   code: String,
   cost: Number,
   stock: [
