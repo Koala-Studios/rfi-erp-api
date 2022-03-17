@@ -7,7 +7,7 @@ module.exports = {
     .find()
     .forEach(function (Material) {
           db.collection("Purchase Order").updateMany(
-            { product_code: Material.product_code }, 
+            { CODE: Material.product_id }, 
             { $set: { "material_id": Material._id } }
           );
     });
@@ -53,8 +53,8 @@ module.exports = {
 
   async down(db, client) {
     db.dropCollection("purchases");
-    db.collection("Purchase Order").updateMany({},
-      { unset: { material_id : "" } }
-    )
+
+    await db.collection("Purchase Order")
+    .updateMany({},{ $unset: {material_id: ""  } });
   },
 };

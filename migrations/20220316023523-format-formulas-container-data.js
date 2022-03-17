@@ -7,7 +7,7 @@ module.exports = {
     .find()
     .forEach(function (Material) {
           db.collection("Development").updateMany(
-            { material_code: Material.product_code }, 
+            { MATERIAL_CODE: Material.product_id }, 
             { $set: { "material_id": Material._id } }
           );
     });
