@@ -40,9 +40,6 @@ module.exports = {
         }
       );
       });
-
-      //const test = await db.collection("Purchase Order").aggregate({},[{$group: { _id: null, totalSize: { $sum: { $size: "$order_items"}} }}])
-      //console.log(test, "THIS IS THE TOTAL");
     },
 
   async down(db, client) {

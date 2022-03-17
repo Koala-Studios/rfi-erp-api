@@ -14,6 +14,8 @@ module.exports = {
   },
 
   async down(db, client) {
-    //cry
+    db
+    .collection("formulas")
+    .updateMany({},{ $unset: {product_id: ""  } });
   }
 };
