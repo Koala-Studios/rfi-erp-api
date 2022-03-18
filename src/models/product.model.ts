@@ -10,13 +10,13 @@ interface IProductContainer {
 
 export interface IProduct extends mongoose.Document {
   code: string;
+  name: string;
   cost?: number;
   stock?: [IProductContainer];
   customers: [string];
   status: number;
   fda_status?: number;
   cpl_hazard?: string;
-  fema_number?: number;
   ttb_status?: string;
   eu_status?: number;
   organic?: boolean;
@@ -26,6 +26,7 @@ export interface IProduct extends mongoose.Document {
 
 const productSchema = new mongoose.Schema({
   code: String,
+  name: String,
   cost: Number,
   stock: [
     {
@@ -40,7 +41,6 @@ const productSchema = new mongoose.Schema({
   status: Number,
   fda_status: Number,
   cpl_hazard: String,
-  fema_number: Number,
   ttb_status: String,
   eu_status: Number,
   organic: Boolean,

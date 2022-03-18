@@ -4,7 +4,6 @@ interface IInventoryContainer {
     supplier_id:string;
     batch_code:string;
     on_hand:number;
-    in_transit:number;
     on_order:number;
     allocated:number;
     price:number;
@@ -14,6 +13,7 @@ interface IInventoryContainer {
 export interface IInventory extends mongoose.Document {
     code:string;
     name:string;
+    average_cost:number;
     stock?:[IInventoryContainer];
     reorder_amount?:number;
     suppliers?:[string];
@@ -29,6 +29,7 @@ export interface IInventory extends mongoose.Document {
 const inventorySchema = new mongoose.Schema({
     code:String,
     name:String,
+    average_cost:Number,
     stock:[
         {
             supplier_id:String,
