@@ -1,49 +1,33 @@
 import Formula, { IFormula } from "../models/formula.model";
 
-interface ICalculatedForecast {
-  materials: { material_id: string; amount: number }[];
+interface IForecast {
+   product_code: string; amount: number ;
 }
 
-export const calculateMaterials = async (
-  test:{ product_id, amount }[]): Promise<ICalculatedForecast> => {
-  let _calculatedForecast: ICalculatedForecast = {
-    materials: [
-      {
-        material_id: "RM0001",
-        amount: 100,
-      },
-      {
-        material_id: "RM0002",
-        amount: 200,
-      },
-      {
-        material_id: "RM0003",
-        amount: 300,
-      },
-    ],
-  };
+export const calculateMaterials = async (products:IForecast[]): Promise<IForecast[]> => {
+  let _calculatedForecast: IForecast[] = await recursiveFinder(products);
 
   return _calculatedForecast;
 };
-export const calculateMaterialsR = async ([
-  { product_id, amount },
-]): Promise<ICalculatedForecast> => {
-  let _calculatedForecast: ICalculatedForecast = {
-    materials: [
-      {
-        material_id: "RM0001",
-        amount: 200,
-      },
-      {
-        material_id: "RM0001",
-        amount: 200,
-      },
-      {
-        material_id: "RM0001",
-        amount: 200,
-      },
-    ],
-  };
 
-  return _calculatedForecast;
-};
+const recursiveFinder = async (products:IForecast[]) => {
+  const materialTypes = ["FL","FK","FE","SM"];
+  let rawIngredients:IForecast[] = [];
+  let recursedIngredients:IForecast[] = [];
+  products.forEach(async product => {
+    const formula = await Formula.findOne({product_code : product.product_code});
+    formula.formula_items.forEach(async ingredient => {
+      if(materialTypes.some(substring => ingredient.material_code.includes(substring))) {
+        recursedIngredients = await recursiveFinder([{product_code: ingredient.material_code, amount: product.amount*ingredient.amount}])
+      } else {
+        rawIngredients.push({product_code: ingredient.material_code, amount: product.amount*ingredient.amount})
+      }
+    });
+  });
+  if(recursedIngredients.length > 0) {
+    rawIngredients = rawIngredients.concat(recursedIngredients);
+  }
+  return rawIngredients;
+}
+
+
