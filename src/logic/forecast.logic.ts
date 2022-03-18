@@ -4,9 +4,8 @@ interface ICalculatedForecast {
   materials: { material_id: string; amount: number }[];
 }
 
-export const calculateMaterials = async ([
-  { product_id, amount },
-]): Promise<ICalculatedForecast> => {
+export const calculateMaterials = async (
+  test:{ product_id, amount }[]): Promise<ICalculatedForecast> => {
   let _calculatedForecast: ICalculatedForecast = {
     materials: [
       {

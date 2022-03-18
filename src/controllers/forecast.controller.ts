@@ -15,16 +15,16 @@ import { calculateMaterials } from "../logic/forecast.logic";
 import { reply, status } from "./config.status";
 
 interface calculateForecastRequest {
-    products:[{
+    products:{
         product_id:string;
         amount:number;
-    }]
+    }[]
 }
 
 @Route("forecast")
 @Tags("Forecast")
 @Security("jwt")
-export class FormulaController extends Controller {
+export class ForecastController extends Controller {
   @Post("calculate")
   @SuccessResponse(status.OK, reply.success)
   public async calculateForecast(
