@@ -16,7 +16,7 @@ import { reply, status } from "./config.status";
 
 interface calculateForecastRequest {
     products:{
-        product_id:string;
+        product_code:string;
         amount:number;
     }[]
 }
