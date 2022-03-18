@@ -10,11 +10,13 @@ export const calculateMaterials = async(
 ):Promise<IForecast[]> => {
   
   let rawIngredients: IForecast[] = [];  
-
+  let rawIngredientsFinal: IForecast[] = [];
   for (let i = 0; i < products.length; i++) {
     rawIngredients = [...rawIngredients,...await recursiveFinder(products[i])];
   }
-
+  rawIngredients = Array.from(rawIngredients.reduce(
+    (m, {product_code, amount}) => m.set(product_code, (m.get(product_code) || 0) + amount), new Map
+  ), ([product_code, amount]) => ({product_code, amount}));
   return rawIngredients
 };
 
