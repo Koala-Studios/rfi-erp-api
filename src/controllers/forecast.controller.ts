@@ -11,14 +11,11 @@ import { Route } from "@tsoa/runtime";
 import { Request } from "@tsoa/runtime";
 import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
-import { calculateMaterials } from "../logic/forecast.logic";
+import { calculateMaterials, IForecast } from "../logic/forecast.logic";
 import { reply, status } from "./config.status";
 
 interface calculateForecastRequest {
-    products:{
-        product_code:string;
-        amount:number;
-    }[]
+    products:IForecast[]
 }
 
 @Route("forecast")
@@ -30,9 +27,11 @@ export class ForecastController extends Controller {
   public async calculateForecast(
     @Body() req: calculateForecastRequest
   ) {
-
+    console.log(req);
     const _forecast = await calculateMaterials(req.products);
     
+console.log(_forecast)
+
     this.setStatus(status.OK);
     return _forecast;
   }
