@@ -1,6 +1,6 @@
 import Formula, { IFormula } from "../models/formula.model";
 
-interface IForecast {
+export interface IForecast {
    product_code: string; amount: number ;
 }
 
