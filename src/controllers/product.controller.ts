@@ -26,16 +26,16 @@ export class ProductController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async listProduct(
     @Request() req: eRequest,
+    @Query() approved: boolean,
     @Query() page: string,
     @Query() count: string
   ) {
     const _page = parseInt(<string>page);
     const _count = parseInt(<string>count);
-
-    const _products = await Product.find({status:4})
-      .sort({date_created:-1})
-      .skip(_page * _count)
-      .limit(_count);
+    const _products = await Product.find(approved ? {status:4} : {status: {$ne: 4}})
+    .sort({date_created:-1})
+    .skip((_page-1) * _count)
+    .limit(_count);
 
     this.setStatus(status.OK);
     return _products;
