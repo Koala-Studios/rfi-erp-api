@@ -11,20 +11,16 @@ import { Route } from "@tsoa/runtime";
 import { Request } from "@tsoa/runtime";
 import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
-import Product, {IProduct} from "../models/product.model";
+import Supplier, {ISupplier} from "../models/supplier.model";
 import { reply, status } from "./config.status";
 
-interface ICreateProductRequest{
-    name:string;
-}
-
-@Route("products")
-@Tags("Products")
+@Route("suppliers")
+@Tags("Suppliers")
 @Security("jwt")
-export class ProductController extends Controller {
+export class SupplierController extends Controller {
     @Get("list")
   @SuccessResponse(status.OK, reply.success)
-  public async listProduct(
+  public async listSupplier(
     @Request() req: eRequest,
     @Query() page: string,
     @Query() count: string
@@ -32,26 +28,24 @@ export class ProductController extends Controller {
     const _page = parseInt(<string>page);
     const _count = parseInt(<string>count);
 
-    const _products = await Product.find({status:4})
-      .sort({date_created:-1})
+    const _suppliers = await Supplier.find()
       .skip((_page-1) * _count)
       .limit(_count);
-
     this.setStatus(status.OK);
-    return _products;
+    return _suppliers;
   }  
   
   @Get("get")
   @SuccessResponse(status.OK, reply.success)
-  public async getProduct(
+  public async getSupplier(
     @Request() req: eRequest,
     @Query() id: string,
   ) {
 
-    const _product = await Product.findById(id);
-    console.log(_product,id)
+    const _supplier = await Supplier.findById(id);
+    console.log(_supplier,id)
 
     this.setStatus(status.OK);
-    return _product;
+    return _supplier;
   }  
 }

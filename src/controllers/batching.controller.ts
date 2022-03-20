@@ -36,7 +36,7 @@ export class BatchingController extends Controller {
 
     const _batching = await Batching.find()
       .sort({date_created:-1})
-      .skip(_page * _count)
+      .skip((_page-1) * _count)
       .limit(_count);
 
     this.setStatus(status.OK);
