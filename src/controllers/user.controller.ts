@@ -8,6 +8,7 @@ import {
 	SuccessResponse,
 } from "@tsoa/runtime";
 import { Request as eRequest } from "express";
+import { Query } from "tsoa";
 import User, { INotification, IUser } from "../models/user.model";
 import { reply, status } from "./config.status";
 
@@ -49,6 +50,25 @@ export class UserController extends Controller {
 		this.setStatus(status.OK);
 		return user;
 	}
+
+	@Get("list")
+	@SuccessResponse(status.OK, reply.success)
+	public async listUsers(
+	  @Request() req: eRequest,
+	  @Query() page: string,
+	  @Query() count: string
+	) {
+	  const _page = parseInt(<string>page);
+	  const _count = parseInt(<string>count);
+  
+	  const _users = await User.find()
+		.sort({date_created:-1})
+		.skip((_page-1) * _count)
+		.limit(_count);
+  
+	  this.setStatus(status.OK);
+	  return _users;
+	}  
 }
 
 export const createNotification = async (
