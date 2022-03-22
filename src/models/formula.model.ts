@@ -1,17 +1,17 @@
 
 import mongoose from "mongoose";
 
+export interface IFormulaItem {
+  material_code: string;
+  amount: number;
+  notes: string;
+}
+
 export interface IFormula extends mongoose.Document{
     product_code: string;
     version: number;
     date_created: Date;
-    formula_items: [
-      {
-        material_code: string;
-        amount: number;
-        notes: string;
-      }
-    ];
+    formula_items: IFormulaItem[];
   }
 
 const formulaSchema = new mongoose.Schema({

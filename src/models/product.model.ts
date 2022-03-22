@@ -22,6 +22,7 @@ export interface IProduct extends mongoose.Document {
   organic?: boolean;
   kosher?: boolean;
   versions?: number;
+  approved_version?: number;
 }
 
 const productSchema = new mongoose.Schema({
@@ -45,7 +46,8 @@ const productSchema = new mongoose.Schema({
   eu_status: Number,
   organic: Boolean,
   kosher: Boolean,
-  versions: Number
+  versions: Number,
+  approved_version: Number
 });
 
 export default mongoose.model<IProduct>("Product", productSchema);
