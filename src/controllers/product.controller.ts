@@ -12,7 +12,7 @@ import { Request } from "@tsoa/runtime";
 import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import Product, {IProduct} from "../models/product.model";
-import { reply, status } from "./config.status";
+import { reply, status } from "../config/config.status";
 
 interface ICreateProductRequest{
     name:string;

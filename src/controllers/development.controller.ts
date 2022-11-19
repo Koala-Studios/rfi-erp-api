@@ -14,18 +14,9 @@ import logger from "../logger/logger";
 import { IDevelopment } from "../models/development.model";
 import Formula, { IFormula, IFormulaItem } from "../models/formula.model";
 import Product from "../models/product.model";
-import { reply, status } from "./config.status";
-
-
-interface IDevelopmentSubmitRequest {
-    yield?:number;
-    formula_items: IFormulaItem[];
-    product_id: string;
-    approved: boolean;
-}
-
-
-
+import { reply, status } from "../config/config.status";
+import { submitFormula } from "../logic/development.logic";
+import { IDevelopmentSubmitInfo } from "../logic/interfaces.logic";
 
 @Route("development")
 @Tags("Development")
@@ -33,35 +24,15 @@ interface IDevelopmentSubmitRequest {
 export class DevelopmentController extends Controller {
   @Post("submit")
   @SuccessResponse(status.OK, reply.success)
-  public async submitFormula(
-    @Request() req: IDevelopmentSubmitRequest
+  public async submitFormulaRequest(
+    @Request() req: IDevelopmentSubmitInfo
   ) {
-    //TODO: implement check for FDA status in ingredients vs in product
-    let product = await Product.findById(req.product_id);
-    //!If product is already approved
-    if(product.status == 4) {
-        this.setStatus(status.FORBIDDEN);
-        this.setHeader("Product is already approved!");
-        return;
-    }
-    product.versions+= 1;
-    //*If flavorist is setting product as ready for approval
-    if(req.approved) {
-        product.status = 3;
-        this.setHeader("Formula Submitted & Ready For Approval!");
-    } else {
-        this.setHeader("Formula Submitted!");
-    }
-    const newDevelopment = new Formula(<IFormula>{
-        product_code: product.code,
-        version: product.versions,
-        date_created: new Date(),
-        formula_items: req.formula_items
-    });
-    newDevelopment.save();
-    product.save();
+    
+    const _res = await submitFormula(req);
 
-    this.setStatus(status.OK);
-    return newDevelopment;
+    this.setStatus(_res.status);
+    this.setHeader(_res.message);
+
+    return _res.data;
   }
 }

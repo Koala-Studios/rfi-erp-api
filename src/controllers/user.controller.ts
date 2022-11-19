@@ -10,7 +10,7 @@ import {
 import { Request as eRequest } from "express";
 import { Query } from "tsoa";
 import User, { INotification, IUser } from "../models/user.model";
-import { reply, status } from "./config.status";
+import { reply, status } from "../config/config.status";
 
 interface IGetUserResponse {
 	email: string;

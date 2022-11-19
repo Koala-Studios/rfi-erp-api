@@ -10,7 +10,7 @@ import jwt from "jsonwebtoken";
 import config from "../config/config";
 import Identity, { IIdentity } from "../models/identity.model";
 import User, { INotification, IUser } from "../models/user.model";
-import { reply, status } from "./config.status";
+import { reply, status } from "../config/config.status";
 import { Request as eRequest, Response } from "express";
 import { Request } from "@tsoa/runtime";
 import { Security } from "@tsoa/runtime";

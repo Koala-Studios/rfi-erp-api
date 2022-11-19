@@ -12,7 +12,7 @@ import { Request } from "@tsoa/runtime";
 import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import Supplier, {ISupplier} from "../models/supplier.model";
-import { reply, status } from "./config.status";
+import { reply, status } from "../config/config.status";
 
 @Route("suppliers")
 @Tags("Suppliers")

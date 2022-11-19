@@ -12,7 +12,7 @@ import { Request } from "@tsoa/runtime";
 import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import Inventory, {IInventory} from "../models/inventory.model";
-import { reply, status } from "./config.status";
+import { reply, status } from "../config/config.status";
 
 interface ICreateInventoryRequest{
     name:string;
