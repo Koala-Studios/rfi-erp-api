@@ -109,7 +109,7 @@ export class IdentityController extends Controller {
 		}
 		
 		
-		console.log(req.username, req.password);
+		// console.log(req.username, req.password);
 
 		let user = await User.findOne({
 			$or: [

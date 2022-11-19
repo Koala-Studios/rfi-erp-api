@@ -1,12 +1,23 @@
 import mongoose from 'mongoose'
 
 interface IInventoryContainer {
-    supplier_id:string;
     batch_code:string;
+    supplier_id:string;
     on_hand:number;
     on_order:number;
+    quarantined:number;
     allocated:number;
     price:number;
+}
+
+interface IRegulatoryContainer {
+    fda_status?:number;
+    cpl_hazard?:string;
+    fema_number?:number;
+    ttb_status?:string;
+    eu_status?:number;
+    organic?:boolean;
+    kosher?:boolean;
 }
 
 
@@ -17,13 +28,8 @@ export interface IInventory extends mongoose.Document {
     stock?:[IInventoryContainer];
     reorder_amount?:number;
     suppliers?:[string];
-    fda_status?:number;
-    cpl_hazard?:string;
-    fema_number?:number;
-    ttb_status?:string;
-    eu_status?:number;
-    organic?:boolean;
-    kosher?:boolean;
+    regulatory: IRegulatoryContainer;
+    cas_number?:string;
 }
 
 const inventorySchema = new mongoose.Schema({
@@ -37,19 +43,25 @@ const inventorySchema = new mongoose.Schema({
             on_hand:Number,
             in_transit:Number,
             on_order:Number,
+            on_hold:Number,
+            quarantined:Number,
             allocated:Number,
             price:Number,
         }
     ],
     reorder_amount:Number,
     suppliers:[String],
-    fda_status:Number,
-    cpl_hazard:String,
-    fema_number:Number,
-    ttb_status:String,
-    eu_status:Number,
-    organic:Boolean,
-    kosher:Boolean,
+    regulatory:
+        {
+            fda_status:Number,
+            cpl_hazard:String,
+            fema_number:Number,
+            ttb_status:String,
+            eu_status:Number,
+            organic:Boolean,
+            kosher:Boolean,
+        },
+    cas_number: String,
 });
 
-export default mongoose.model<IInventory>("Inventory", inventorySchema);
+export default mongoose.model<IInventory>("Inventory", inventorySchema,'inventory');

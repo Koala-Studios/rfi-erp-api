@@ -3,11 +3,11 @@ module.exports = {
     const inserted_codes = [];
 
     await db
-    .collection("inventories")
+    .collection("inventory")
     .find()
     .forEach(function (Material) {
           db.collection("Purchase Order").updateMany(
-            { CODE: Material.product_id }, 
+            { CODE: Material.product_code }, 
             { $set: { "material_id": Material._id } }
           );
     });

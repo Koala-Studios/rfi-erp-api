@@ -43,7 +43,19 @@ export class SupplierController extends Controller {
   ) {
 
     const _supplier = await Supplier.findById(id);
-    console.log(_supplier,id)
+    // console.log(_supplier,id)
+
+    this.setStatus(status.OK);
+    return _supplier;
+  }
+
+  @Post("create")
+  @SuccessResponse(status.OK, reply.success)
+  public async createSupplier(
+    @Request() req: ISupplier
+  ) {
+
+    const _supplier = await Supplier.create(req);
 
     this.setStatus(status.OK);
     return _supplier;

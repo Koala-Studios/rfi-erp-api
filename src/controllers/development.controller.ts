@@ -17,7 +17,7 @@ import Product from "../models/product.model";
 import { reply, status } from "./config.status";
 
 
-interface IFormulaSubmitRequest {
+interface IDevelopmentSubmitRequest {
     yield?:number;
     formula_items: IFormulaItem[];
     product_id: string;
@@ -27,14 +27,14 @@ interface IFormulaSubmitRequest {
 
 
 
-@Route("formula")
-@Tags("Formula")
+@Route("development")
+@Tags("Development")
 @Security("jwt")
-export class FormulaController extends Controller {
+export class DevelopmentController extends Controller {
   @Post("submit")
   @SuccessResponse(status.OK, reply.success)
-  public async postFormula(
-    @Request() req: IFormulaSubmitRequest
+  public async submitFormula(
+    @Request() req: IDevelopmentSubmitRequest
   ) {
     //TODO: implement check for FDA status in ingredients vs in product
     let product = await Product.findById(req.product_id);
@@ -47,9 +47,10 @@ export class FormulaController extends Controller {
     product.versions+= 1;
     //*If flavorist is setting product as ready for approval
     if(req.approved) {
-        product.approved_version = product.versions;
         product.status = 3;
-        this.setHeader("Formula Submitted & Approved!");
+        this.setHeader("Formula Submitted & Ready For Approval!");
+    } else {
+        this.setHeader("Formula Submitted!");
     }
     const newDevelopment = new Formula(<IFormula>{
         product_code: product.code,
@@ -61,7 +62,6 @@ export class FormulaController extends Controller {
     product.save();
 
     this.setStatus(status.OK);
-    this.setHeader("Formula Submitted!");
     return newDevelopment;
   }
 }

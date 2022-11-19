@@ -2,12 +2,12 @@ module.exports = {
   async up(db, client) {
     const inserted_codes = [];
     await db
-    .collection("products")
+    .collection("inventory")
     .find()
-    .forEach(function (Product) {
+    .forEach(function (Inventory) {
           db.collection("formulas").updateMany(
-            { product_code: Product.product_code }, 
-            { $set: { "product_id": Product._id } }
+            { product_code: Inventory.product_code }, 
+            { $set: { "product_id": Inventory._id } }
           );
     });
   },

@@ -27,9 +27,10 @@ export class InventoryController extends Controller {
     @SuccessResponse(status.OK, reply.success)
     public async listInventory(@Request() req: eRequest) {
         //filters: all
-        const _inventory = await Inventory.find({});
+        const _inventory = await Inventory.find({}).limit(100);
         this.setStatus(status.OK);
-        return Inventory;
+        // console.log(_inventory);
+        return _inventory;
     }
 
     @Post("create")

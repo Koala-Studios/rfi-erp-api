@@ -13,7 +13,7 @@ import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import Batching, { IBatching } from "../models/Batching.model";
 import { reply, status } from "./config.status";
-
+import Inventory, {IInventory} from "../models/inventory.model";
 interface ICreateBatchingRequest {
   quantity: number;
   batch_code: string;
@@ -38,6 +38,16 @@ export class BatchingController extends Controller {
       .sort({date_created:-1})
       .skip((_page-1) * _count)
       .limit(_count);
+
+    
+    for (let index = 0; index < _batching.length; index++) {
+      const material_id =  _batching[index].product_id;
+
+      const product = await Inventory.findOne({_id: material_id})
+      // console.log(material_id, material.name)
+      _batching[index].product_name = product.name;
+    }
+
 
     this.setStatus(status.OK);
     return _batching;

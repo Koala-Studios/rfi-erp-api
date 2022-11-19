@@ -3,11 +3,11 @@ module.exports = {
     const inserted_codes = [];
 
     await db
-    .collection("inventories")
+    .collection("inventory")
     .find()
     .forEach(function (Material) {
           db.collection("Development").updateMany(
-            { MATERIAL_CODE: Material.product_id }, 
+            { MATERIAL_CODE: Material.product_code }, 
             { $set: { "material_id": Material._id } }
           );
     });
@@ -48,13 +48,12 @@ module.exports = {
     });
 
     await db
-    .collection("products")
+    .collection("inventory")
     .find()
-    .forEach(function (Product) {
+    .forEach(function (Inventory) {
           db.collection("formulas").updateMany(
-            { product_code: Product.product_code }, 
-            { $set: { "product_id": Product._id } }
-            //{ $unset: { product_code } }
+            { product_code: Inventory.product_code }, 
+            { $set: { "product_id": Inventory._id} }
           );
     });
   },
