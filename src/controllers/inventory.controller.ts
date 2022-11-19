@@ -44,7 +44,7 @@ export class InventoryController extends Controller {
         _inventory.save();
 
         this.setStatus(status.CREATED);
-        return Inventory;
+        return _inventory;
     }
 
     @Post("delete")

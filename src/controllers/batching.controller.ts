@@ -34,9 +34,10 @@ export class BatchingController extends Controller {
     const _res = await listBatching(_page,_count);
 
     this.setStatus(_res.status);
-    this.setHeader(_res.message);
     return _res.data;
   }
+
+
 
   @Post("create")
   @SuccessResponse(status.CREATED, reply.success)
@@ -47,7 +48,6 @@ export class BatchingController extends Controller {
     const _res = await createBatching(body);
 
     this.setStatus(_res.status);
-    this.setHeader(_res.message);
     return _res.data;
   }
 

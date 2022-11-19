@@ -31,7 +31,6 @@ export class FormulaController extends Controller {
     const _res = await getFormula(product_id);
     
     this.setStatus(_res.status);
-    this.setHeader(_res.message);
 
     return _res.data;
   }

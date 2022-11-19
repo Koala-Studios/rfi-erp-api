@@ -31,7 +31,6 @@ export class DevelopmentController extends Controller {
     const _res = await submitFormula(req);
 
     this.setStatus(_res.status);
-    this.setHeader(_res.message);
 
     return _res.data;
   }

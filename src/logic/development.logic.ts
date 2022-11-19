@@ -16,7 +16,7 @@ export const submitFormula = async (submitInfo: IDevelopmentSubmitInfo):Promise<
     if(product.status == 4) {
         _status = status.FORBIDDEN;
         _message = "Product is already approved!";
-        return {message:_message,status:_status,data:null};
+        return {status:_status,data:{message:_message,res:null}};
     }
 
     product.versions+= 1;
@@ -41,5 +41,5 @@ export const submitFormula = async (submitInfo: IDevelopmentSubmitInfo):Promise<
 
     _status = status.OK;
 
-    return {status:_status, message:_message, data:newDevelopment};
+    return {status:_status, data:{message:_message,res:newDevelopment}};
 }

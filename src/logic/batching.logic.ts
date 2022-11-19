@@ -20,7 +20,7 @@ export const listBatching = async (page:number, count:number):Promise<ILogicResp
       _batching[index].product_name = product.name;
     }
 
-    return {status:status.OK, message:null, data:_batching};
+    return {status:status.OK, data:{message:null, res:_batching}};
 }
 
 export const createBatching = async (createInfo:ICreateBatchingInfo):Promise<ILogicResponse> => {
@@ -35,6 +35,6 @@ export const createBatching = async (createInfo:ICreateBatchingInfo):Promise<ILo
   
       _batching.save();
   
-      return {status:status.CREATED, message:"Batching Created", data:_batching};
+      return {status:status.CREATED, data:{message:"Batch Created", res:_batching}};
 
 }

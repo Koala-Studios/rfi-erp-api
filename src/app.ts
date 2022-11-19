@@ -28,6 +28,6 @@ passport.use(passportMiddleware);
 RegisterRoutes(app);
 
 //SwaggerUI
-app.use("/doc", swaggerUI.serve, swaggerUI.setup(swaggerDoc));
+app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerDoc));
 
 export default app;

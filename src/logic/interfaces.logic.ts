@@ -3,8 +3,9 @@ import { IFormulaItem } from "../models/formula.model";
 export interface ILogicResponse {
 
     status:number;
-    message:string; 
-    data:any;
+    data:{
+        message:string; 
+        res:any};
 }
 
 export interface IDevelopmentSubmitInfo {

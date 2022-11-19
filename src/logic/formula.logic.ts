@@ -13,7 +13,7 @@ export const getFormula = async (product_id):Promise<ILogicResponse> => {
     const _formula = await Formula.findOne({product_id :test_product_id,  $max: "version"})
     if(!_formula) {
         _status = status.OK;
-      return {status:_status,message:"No Formula Found", data:null};
+      return {status:_status, data:{message:"No Formula Found",res:null}};
     }
 
     for (let index = 0; index < _formula.formula_items.length; index++) {
@@ -24,5 +24,5 @@ export const getFormula = async (product_id):Promise<ILogicResponse> => {
     }
     _status = status.OK;
 
-    return {status:_status,message:"Formula Found", data:_formula};
+    return {status:_status, data:{message:"Formula Found",res:_formula}};
 }
