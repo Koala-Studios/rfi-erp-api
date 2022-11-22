@@ -25,10 +25,9 @@ export class FormulaController extends Controller {
   public async getFormulaRequest(
     @Request() req: eRequest,
     @Query() product_id: string,
-    // @Query() version: string,
+    @Query() version: string,
   ) {
-    
-    const _res = await getFormula(product_id);
+    const _res = await getFormula(product_id, version);
     
     this.setStatus(_res.status);
 

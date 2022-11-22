@@ -1,7 +1,7 @@
 module.exports = {
   async up(db, client) {
     //!UNCOMMENT THIS ON FIRST RUN
-    await db.renameCollection("Inventory", "OldInventory");
+    // await db.renameCollection("Inventory", "OldInventory");
 
     await db
       .collection("OldInventory")
@@ -43,6 +43,6 @@ module.exports = {
     }
   },
   async down(db, client) {
-    db.collection("inventories").drop();
+    db.collection("inventory").drop();
   },
 };
