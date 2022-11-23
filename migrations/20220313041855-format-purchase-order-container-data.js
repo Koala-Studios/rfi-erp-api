@@ -43,7 +43,7 @@ module.exports = {
               price: parseFloat(PurchaseOrder.PRICE),
               status: parseInt(PurchaseOrder.STATUS),
               date_arrived: new Date(PurchaseOrder.DATE_ARRIVED),
-              material_id: PurchaseOrder.material_id
+              product_id: PurchaseOrder.material_id
             }
           }
         }

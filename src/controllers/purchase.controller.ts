@@ -25,7 +25,7 @@ export class PurchaseController extends Controller {
     public async listPurchases(@Request() req: eRequest) {
         //filters: all
         const _purchase_order = await PurchaseOrder.find({}).limit(25); 
-        console.log(_purchase_order)
+        // console.log(_purchase_order)
         this.setStatus(status.OK);
         return _purchase_order;
     }
