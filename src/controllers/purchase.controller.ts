@@ -11,7 +11,7 @@ import { Route } from "@tsoa/runtime";
 import { Request } from "@tsoa/runtime";
 import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
-import PurchaseOrder, {IPurchaseOrder} from "../models/purchace-order.model";
+import PurchaseOrder, {IPurchaseOrder} from "../models/purchase-order.model";
 import { reply, status } from "../config/config.status";
 
 
