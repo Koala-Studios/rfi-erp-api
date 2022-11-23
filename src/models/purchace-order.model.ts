@@ -32,4 +32,4 @@ const purchaseOrderSchema = new mongoose.Schema({
     },
 });
 
-export default mongoose.model<IPurchaseOrder>("Purchase Order", purchaseOrderSchema);
+export default mongoose.model<IPurchaseOrder>("Purchase Order", purchaseOrderSchema, 'purchases');
