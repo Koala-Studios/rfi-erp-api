@@ -42,7 +42,7 @@ export class ProjectController extends Controller {
     @Query() id: string,
   ) {
     // console.log(_product,id)
-    const _projects = await Project.findOne({ id });
+    const _projects = await Project.findById(id);
     this.setStatus(status.OK);
     return {status:status.OK, data:{message:"Project Details",res: _projects }};
   }
