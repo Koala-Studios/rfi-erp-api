@@ -11,12 +11,8 @@ import { Route } from "@tsoa/runtime";
 import { Request } from "@tsoa/runtime";
 import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
-import Product, {IProduct} from "../models/product.model";
+import Project, {IProject} from "../models/project.model";
 import { reply, status } from "../config/config.status";
-
-interface ICreateProductRequest{
-    name:string;
-}
 
 @Route("projects")
 @Tags("Projects")
@@ -26,19 +22,17 @@ export class ProjectController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async listProject(
     @Request() req: eRequest,
-    @Query() approved: boolean,
     @Query() page: string,
     @Query() count: string
   ) {
     const _page = parseInt(<string>page);
     const _count = parseInt(<string>count);
-    // const _products = await Product.find(approved ? {is_raw_mat:false, status:4} : {is_raw_mat:false, status: {$ne: 4}})
-    // .sort({date_created:-1})
-    // .skip((_page-1) * _count)
-    // .limit(25);
-    // console.log(_products)
+    const _projects = await Project.find()
+    .sort({date_created:-1})
+    .skip((_page-1) * _count)
+    .limit(25);
     this.setStatus(status.OK);
-    return [];
+    return _projects;
   }  
   
   @Get("get")
@@ -48,8 +42,8 @@ export class ProjectController extends Controller {
     @Query() id: string,
   ) {
     // console.log(_product,id)
-
+    const _projects = await Project.findOne({ id });
     this.setStatus(status.OK);
-    return {status:status.OK, data:{message:"Project Details",res:[]}};
+    return {status:status.OK, data:{message:"Project Details",res: _projects }};
   }
 }
