@@ -1,10 +1,13 @@
 import mongoose from "mongoose";
 
 interface IOrderItem {
-  product_id: string;
+  product_code: string;
   amount: number;
   price: number;
   status: number;
+  material_id: string;
+  material_name:string;
+  lot_number:string;
 }
 
 export interface IPurchaseOrder extends mongoose.Document {
@@ -26,13 +29,13 @@ const purchaseOrderSchema = new mongoose.Schema({
     status: Number,
     order_items: 
     [{
-        product_id: String,
         amount: Number,
-        received: Number,
-        supplier: String,
         price: Number,
         status: Number,
-        date_purchased: Date,
+        material_id: String,
+        product_code: String,
+        material_name: String,
+        lot_number:String,
     }],
 });
 
