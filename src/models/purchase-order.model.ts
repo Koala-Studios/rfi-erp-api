@@ -25,7 +25,7 @@ const purchaseOrderSchema = new mongoose.Schema({
     order_code: String,
     status: Number,
     order_items: 
-    {
+    [{
         product_id: String,
         amount: Number,
         received: Number,
@@ -33,7 +33,7 @@ const purchaseOrderSchema = new mongoose.Schema({
         price: Number,
         status: Number,
         date_purchased: Date,
-    },
+    }],
 });
 
 export default mongoose.model<IPurchaseOrder>("Purchase Order", purchaseOrderSchema, 'purchases');
