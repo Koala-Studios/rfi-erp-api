@@ -42,13 +42,11 @@ export class ProjectController extends Controller {
   @Get("get")
   @SuccessResponse(status.OK, reply.success)
   public async getProject(@Request() req: eRequest, @Query() id: string) {
-    // console.log(_product,id)
-    const _projects = await Project.findById(id);
+    let ObjectId = require("mongodb").ObjectId;
+    const project_id = new ObjectId(id);
+    const _project = await Project.findById(project_id);
     this.setStatus(status.OK);
-    return {
-      status: status.OK,
-      data: { message: "Project Details", res: _projects },
-    };
+    return _project;
   }
 
   @Post("create")
