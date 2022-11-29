@@ -31,6 +31,7 @@ export interface IProject extends mongoose.Document {
 
 const projectSchema = new mongoose.Schema({
   start_date: Date,
+  due_date: Date,
   finish_date: Date,
   project_code: String,
   name: String,
@@ -52,7 +53,12 @@ const projectSchema = new mongoose.Schema({
       product_name: String,
       product_status: String,
       notes: String,
-      target_cost: Number,
+      target_price: Number,
+      assigned_user: {
+        _id: String,
+         email: String,
+         username: String
+        }
     },
   ],
 });

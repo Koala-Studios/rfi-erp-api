@@ -2,7 +2,10 @@ import mongoose from 'mongoose'
 
 interface IInventoryContainer {
     batch_code:string;
+    cont_amount:Number,
     supplier_id:string;
+    exp_date: Date;
+    received_date: Date;
     on_hand:number;
     on_order:number;
     quarantined:number;
@@ -40,6 +43,9 @@ const inventorySchema = new mongoose.Schema({
         {
             supplier_id:String,
             batch_code:String,
+            cont_amount:Number,
+            exp_date: Date,
+            received_date: Date,
             on_hand:Number,
             in_transit:Number,
             on_order:Number,

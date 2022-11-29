@@ -15,8 +15,8 @@ import { IDevelopment } from "../models/development.model";
 import Formula, { IFormula, IFormulaItem } from "../models/formula.model";
 import Product from "../models/product.model";
 import { reply, status } from "../config/config.status";
-import { submitFormula } from "../logic/development.logic";
-import { IDevelopmentSubmitInfo } from "../logic/interfaces.logic";
+import { submitFormula } from "../logic/formula.logic";
+import { IFormulaSubmitInfo } from "../logic/interfaces.logic";
 
 @Route("development")
 @Tags("Development")
@@ -25,7 +25,7 @@ export class DevelopmentController extends Controller {
   @Post("submit")
   @SuccessResponse(status.OK, reply.success)
   public async submitFormulaRequest(
-    @Request() req: IDevelopmentSubmitInfo
+    @Request() req: IFormulaSubmitInfo
   ) {
     
     const _res = await submitFormula(req);

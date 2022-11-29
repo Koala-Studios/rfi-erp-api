@@ -19,7 +19,7 @@ export interface IListResponse {
   totalCount: number;
 }
 
-export interface IDevelopmentSubmitInfo {
+export interface IFormulaSubmitInfo {
   yield?: number;
   formula_items: IFormulaItem[];
   product_id: string;
