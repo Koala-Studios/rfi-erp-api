@@ -13,6 +13,7 @@ import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import Project, { IProject } from "../models/project.model";
 import { reply, status } from "../config/config.status";
+import { listProject } from "../logic/project.logic";
 
 interface ICreateProjectRequest {
   project_name: string;
@@ -24,24 +25,26 @@ interface ICreateProjectRequest {
 export class ProjectController extends Controller {
   @Get("list")
   @SuccessResponse(status.OK, reply.success)
-  public async listProject(
+  public async listProjectRequest(
     @Request() req: eRequest,
     @Query() page: string,
     @Query() count: string
   ) {
     const _page = parseInt(<string>page);
     const _count = parseInt(<string>count);
-    const _projects = await Project.find()
-      .sort({ date_created: -1 })
-      .skip((_page - 1) * _count)
-      .limit(25);
-    this.setStatus(status.OK);
-    return _projects;
+
+    const res = await listProject({ page: _page, count: _count, filter: "" });
+    this.setStatus(res.status);
+    console.log(res.data);
+    return res.data;
   }
 
   @Get("get")
   @SuccessResponse(status.OK, reply.success)
-  public async getProject(@Request() req: eRequest, @Query() id: string) {
+  public async getProjectRequest(
+    @Request() req: eRequest,
+    @Query() id: string
+  ) {
     let ObjectId = require("mongodb").ObjectId;
     const project_id = new ObjectId(id);
     const _project = await Project.findById(project_id);
@@ -51,7 +54,7 @@ export class ProjectController extends Controller {
 
   @Post("create")
   @SuccessResponse(status.CREATED, reply.success)
-  public async createProject(
+  public async createProjectRequest(
     @Request() req: eRequest,
     @Body() body: ICreateProjectRequest
   ) {

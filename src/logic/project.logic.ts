@@ -11,10 +11,13 @@ export const listProject = async (
     leanWithId: true,
   };
 
-  const listResult = Project.paginate({}, listOptions, (err, result) => {});
+  const list = await Project.paginate(
+    {},
+    { page: listParams.page, limit: listParams.count, leanWithId: true }
+  );
 
   return {
     status: status.OK,
-    data: { message: "Formula Found", res: listResult },
+    data: { message: "", res: list },
   };
 };
