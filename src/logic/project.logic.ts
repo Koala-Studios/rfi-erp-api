@@ -55,8 +55,6 @@ export const disapproveFlavor = async (placeholder):Promise<ILogicResponse> => {
 export const acceptFlavor = async (placeholder):Promise<ILogicResponse> => {
   //set flavor status to accepted
   //update product's customers to include project customer 
-
-
   return {status: null, data:{message: null,res: null}};
 }
 

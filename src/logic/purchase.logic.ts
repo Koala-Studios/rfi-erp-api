@@ -103,3 +103,13 @@ export const getPO = async (po_id):Promise<ILogicResponse> => {
 
     return {status:_status, data:{message:"Purchase Order",res:_purchase_order[0]}};
 }
+
+
+export const updatePurchaseItem = async (placeholder):Promise<ILogicResponse> => {
+
+    //remember there's 
+    //send to QC or receive into inventory
+
+    return {status: null, data:{message: null,res: null}};
+}
+
