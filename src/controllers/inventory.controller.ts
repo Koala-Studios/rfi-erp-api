@@ -11,55 +11,57 @@ import { Route } from "@tsoa/runtime";
 import { Request } from "@tsoa/runtime";
 import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
-import Inventory, {IInventory} from "../models/inventory.model";
+import Inventory, { IInventory } from "../models/inventory.model";
 import { reply, status } from "../config/config.status";
+import { listInventory } from "../logic/inventory.logic";
 
-interface ICreateInventoryRequest{
-    name:string;
+interface ICreateInventoryRequest {
+  name: string;
 }
-
 
 @Route("inventory")
 @Tags("Inventory")
 @Security("jwt")
 export class InventoryController extends Controller {
-    @Get("list")
-    @SuccessResponse(status.OK, reply.success)
-    public async listInventory(@Request() req: eRequest) {
-        //filters: all
-        const _inventory = await Inventory.find({}).limit(100);
-        this.setStatus(status.OK);
-        // console.log(_inventory);
-        return _inventory;
-    }
+  @Get("list")
+  @SuccessResponse(status.OK, reply.success)
+  public async listInventoryRequest(
+    @Request() req: eRequest,
+    @Query() page: string,
+    @Query() count: string
+  ) {
+    const _page = parseInt(<string>page);
+    const _count = parseInt(<string>count);
 
-    @Post("create")
-    @SuccessResponse(status.CREATED, reply.success)
-    public async addInventory(@Request() req: eRequest,@Body() body: ICreateInventoryRequest) {
-        
-        const _inventory = new Inventory(<IInventory>{
-            name:body.name
-        });
+    const res = await listInventory({ page: _page, count: _count, filter: "" });
+    this.setStatus(res.status);
 
-        _inventory.save();
+    return res.data;
+  }
 
-        this.setStatus(status.CREATED);
-        return _inventory;
-    }
+  @Post("create")
+  @SuccessResponse(status.CREATED, reply.success)
+  public async addInventory(
+    @Request() req: eRequest,
+    @Body() body: ICreateInventoryRequest
+  ) {
+    const _inventory = new Inventory(<IInventory>{
+      name: body.name,
+    });
 
-    @Post("delete")
-    @SuccessResponse(status.OK, reply.success)
-    public async deleteInventory( @Query() inventoryId: string){
+    _inventory.save();
 
-        Inventory.deleteOne({_id:inventoryId});
+    this.setStatus(status.CREATED);
+    return _inventory;
+  }
 
-    }
+  @Post("delete")
+  @SuccessResponse(status.OK, reply.success)
+  public async deleteInventory(@Query() inventoryId: string) {
+    Inventory.deleteOne({ _id: inventoryId });
+  }
 
-    @Put("edit")
-    @SuccessResponse(status.OK, reply.success)
-    public async editInventory(){
-
-    }
-   
-  
+  @Put("edit")
+  @SuccessResponse(status.OK, reply.success)
+  public async editInventory() {}
 }

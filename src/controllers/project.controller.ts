@@ -35,7 +35,6 @@ export class ProjectController extends Controller {
 
     const res = await listProject({ page: _page, count: _count, filter: "" });
     this.setStatus(res.status);
-    console.log(res.data);
     return res.data;
   }
 
