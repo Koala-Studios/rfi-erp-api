@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import paginate from "mongoose-paginate-v2";
 
 export interface ICustomer extends mongoose.Document {
   name:string;
@@ -30,4 +31,6 @@ const customerSchema = new mongoose.Schema({
     lead_time: String,
 });
 
-export default mongoose.model<ICustomer>("Customer", customerSchema);
+customerSchema.plugin(paginate);
+
+export default mongoose.model<ICustomer, mongoose.PaginateModel<ICustomer>>("Customer", customerSchema);

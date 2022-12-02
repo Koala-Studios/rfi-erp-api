@@ -13,7 +13,7 @@ import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import PurchaseOrder, {IPurchaseOrder} from "../models/purchase-order.model";
 import { reply, status } from "../config/config.status";
-import { getPO } from "../logic/purchase.logic";
+import { getPO, listPurchases } from "../logic/purchase.logic";
 
 
 
@@ -23,11 +23,20 @@ import { getPO } from "../logic/purchase.logic";
 export class PurchaseController extends Controller {
     @Get("list")
     @SuccessResponse(status.OK, reply.success)
-    public async listPurchases(@Request() req: eRequest) {
-        //filters: all
-        const _purchase_order = await PurchaseOrder.find({}).limit(25); 
-        this.setStatus(status.OK);
-        return _purchase_order;
+    public async listPurchasesRequest(
+    @Request() req: eRequest,
+    @Query() page: string,
+    @Query() count: string
+  ) {
+      const _page = parseInt(<string>page);
+      const _count = parseInt(<string>count);
+      //filters: all
+      const res = await listPurchases({
+        page: _page,
+        count: _count,
+        filter: "" });
+      this.setStatus(res.status);
+      return res.data;
     }
 
 

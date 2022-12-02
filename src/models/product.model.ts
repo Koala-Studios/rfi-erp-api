@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import paginate from "mongoose-paginate-v2";
 
 interface IProductContainer {
   batch_code: string;
@@ -66,4 +67,6 @@ const productSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model<IProduct>("Product", productSchema,'inventory');
+productSchema.plugin(paginate);
+
+export default mongoose.model<IProduct, mongoose.PaginateModel<IProduct>>("Product", productSchema,'inventory');

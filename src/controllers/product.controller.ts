@@ -13,6 +13,7 @@ import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import Product, {IProduct} from "../models/product.model";
 import { reply, status } from "../config/config.status";
+import { listProduct } from "../logic/product.logic";
 
 interface ICreateProductRequest{
     name:string;
@@ -24,22 +25,21 @@ interface ICreateProductRequest{
 export class ProductController extends Controller {
     @Get("list")
   @SuccessResponse(status.OK, reply.success)
-  public async listProduct(
+  public async listProductRequest(
     @Request() req: eRequest,
-    @Query() approved: boolean,
     @Query() page: string,
     @Query() count: string
   ) {
     const _page = parseInt(<string>page);
     const _count = parseInt(<string>count);
-    const _products = await Product.find(approved ? {is_raw_mat:false, status:4} : {is_raw_mat:false, status: {$ne: 4}})
-    .sort({date_created:-1})
-    .skip((_page-1) * _count)
-    .limit(25);
-    // console.log(_products)
-    this.setStatus(status.OK);
-    return _products;
-  }  
+
+    const res = await listProduct({
+      page: _page,
+      count: _count,
+      filter: "" });
+    this.setStatus(res.status);
+    return res.data;
+  }
   
   @Get("get")
   @SuccessResponse(status.OK, reply.success)

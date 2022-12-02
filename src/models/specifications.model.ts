@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import paginate from "mongoose-paginate-v2";
 
 export interface ISpecs extends mongoose.Document {
   generated_date:Date,
@@ -41,4 +42,6 @@ const specsSchema = new mongoose.Schema({
 
 });
 
-export default mongoose.model<ISpecs>("Specifications", specsSchema);
+specsSchema.plugin(paginate);
+
+export default mongoose.model<ISpecs, mongoose.PaginateModel<ISpecs>>("Specifications", specsSchema);

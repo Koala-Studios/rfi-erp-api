@@ -13,6 +13,7 @@ import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import Supplier, {ISupplier} from "../models/supplier.model";
 import { reply, status } from "../config/config.status";
+import { listSupplier } from "../logic/supplier.logic";
 
 @Route("suppliers")
 @Tags("Suppliers")
@@ -20,7 +21,7 @@ import { reply, status } from "../config/config.status";
 export class SupplierController extends Controller {
     @Get("list")
   @SuccessResponse(status.OK, reply.success)
-  public async listSupplier(
+  public async listSupplierRequest(
     @Request() req: eRequest,
     @Query() page: string,
     @Query() count: string
@@ -28,16 +29,17 @@ export class SupplierController extends Controller {
     const _page = parseInt(<string>page);
     const _count = parseInt(<string>count);
 
-    const _suppliers = await Supplier.find()
-      .skip((_page-1) * _count)
-      .limit(_count);
-    this.setStatus(status.OK);
-    return _suppliers;
+    const res = await listSupplier({
+      page: _page,
+      count: _count,
+      filter: "" });
+    this.setStatus(res.status);
+    return res.data;
   }  
   
   @Get("get")
   @SuccessResponse(status.OK, reply.success)
-  public async getSupplier(
+  public async getSupplierRequest(
     @Request() req: eRequest,
     @Query() id: string,
   ) {
@@ -51,7 +53,7 @@ export class SupplierController extends Controller {
 
   @Post("create")
   @SuccessResponse(status.OK, reply.success)
-  public async createSupplier(
+  public async createSupplierRequest(
     @Request() req: ISupplier
   ) {
 

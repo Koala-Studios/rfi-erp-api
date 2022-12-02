@@ -15,6 +15,8 @@ import Formula, { IFormula } from "../models/formula.model";
 import Inventory from "../models/inventory.model";
 import { reply, status } from "../config/config.status";
 import { getFormula } from "../logic/formula.logic";
+import { submitFormula } from "../logic/formula.logic";
+import { IFormulaSubmitInfo } from "../logic/interfaces.logic";
 var ObjectId = require('mongodb').ObjectId; 
 @Route("formula")
 @Tags("Formula")
@@ -29,6 +31,19 @@ export class FormulaController extends Controller {
   ) {
     const _res = await getFormula(product_id, version);
     
+    this.setStatus(_res.status);
+
+    return _res.data;
+  }
+
+  @Post("submit")
+  @SuccessResponse(status.OK, reply.success)
+  public async submitFormulaRequest(
+    @Request() req: IFormulaSubmitInfo
+  ) {
+    
+    const _res = await submitFormula(req);
+
     this.setStatus(_res.status);
 
     return _res.data;

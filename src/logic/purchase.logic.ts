@@ -1,10 +1,26 @@
-import { ILogicResponse } from "./interfaces.logic";
 import { reply, status } from "../config/config.status";
 import PurchaseOrder, { IPurchaseOrder } from "../models/purchase-order.model";
 import Inventory from "../models/inventory.model";
 import mongoose from "mongoose";
+import { IListParams, IListResponse, ILogicResponse } from "./interfaces.logic";
+let ObjectId = require('mongodb').ObjectId;
 
-let ObjectId = require('mongodb').ObjectId; 
+
+export const listPurchases = async (
+    listParams: IListParams
+  ): Promise<ILogicResponse> => {
+    const list = await PurchaseOrder.paginate(
+      {},
+      { page: listParams.page, limit: listParams.count, leanWithId: true }
+    );
+  
+    return {
+      status: status.OK,
+      data: { message: "", res: list },
+    };
+  };
+
+
 export const getPO = async (po_id):Promise<ILogicResponse> => {
 
     let _status:number;

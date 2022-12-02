@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import paginate from "mongoose-paginate-v2";
 
 interface IForecastProduct {
     product_id: string;
@@ -25,4 +26,6 @@ const forecastSchema = new mongoose.Schema({
     },
 });
 
-export default mongoose.model<IForecast>("Forecast", forecastSchema, 'forecast');
+forecastSchema.plugin(paginate);
+
+export default mongoose.model<IForecast, mongoose.PaginateModel<IForecast>>("Forecast", forecastSchema, 'forecast');

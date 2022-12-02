@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import paginate from "mongoose-paginate-v2";
 
 export interface INotification {
 	_id: string;
@@ -54,4 +55,8 @@ userSchema.pre<IUser>("save", async function (next) {
 	next();
 });
 
-export default mongoose.model<IUser>("User", userSchema);
+
+userSchema.plugin(paginate);
+
+
+export default mongoose.model<IUser, mongoose.PaginateModel<IUser>>("User", userSchema);

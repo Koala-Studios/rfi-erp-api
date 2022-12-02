@@ -1,5 +1,6 @@
 
 import mongoose from "mongoose";
+import paginate from "mongoose-paginate-v2";
 
 interface ICountItem {
   product_id: string;
@@ -25,4 +26,6 @@ const stockCountSchema = new mongoose.Schema({
     status: Number,
 });
 
-export default mongoose.model<IStockCount>("Stock Count", stockCountSchema);
+stockCountSchema.plugin(paginate);
+
+export default mongoose.model<IStockCount, mongoose.PaginateModel<IStockCount>>("Stock Count", stockCountSchema);

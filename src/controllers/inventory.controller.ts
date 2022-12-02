@@ -41,7 +41,7 @@ export class InventoryController extends Controller {
 
   @Post("create")
   @SuccessResponse(status.CREATED, reply.success)
-  public async addInventory(
+  public async createInventoryRequest(
     @Request() req: eRequest,
     @Body() body: ICreateInventoryRequest
   ) {

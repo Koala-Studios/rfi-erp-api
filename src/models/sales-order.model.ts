@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import paginate from "mongoose-paginate-v2";
 
 interface IOrderItem {
   product_code: string;
@@ -42,4 +43,6 @@ const salesOrderSchema = new mongoose.Schema({
     }],
 });
 
-export default mongoose.model<ISalesOrder>("Sales Order", salesOrderSchema, 'sales');
+salesOrderSchema.plugin(paginate);
+
+export default mongoose.model<ISalesOrder, mongoose.PaginateModel<ISalesOrder>>("Sales Order", salesOrderSchema, 'sales');

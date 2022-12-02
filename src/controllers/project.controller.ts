@@ -33,7 +33,10 @@ export class ProjectController extends Controller {
     const _page = parseInt(<string>page);
     const _count = parseInt(<string>count);
 
-    const res = await listProject({ page: _page, count: _count, filter: "" });
+    const res = await listProject({
+      page: _page,
+      count: _count,
+      filter: "" });
     this.setStatus(res.status);
     return res.data;
   }
