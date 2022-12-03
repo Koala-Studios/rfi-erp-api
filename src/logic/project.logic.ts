@@ -16,10 +16,28 @@ export const listProject = async (
   };
 };
 
+
+//?FOR THE PROJECT OVERALL
 export const updateProject = async (placeholder): Promise<ILogicResponse> => {
   //If user changes project fields or they add flavors to the sample request
   return { status: null, data: { message: null, res: null } };
 };
+
+
+export const sendProject = async (placeholder): Promise<ILogicResponse> => {
+  //If user changes project fields or they add flavors to the sample request
+  return { status: null, data: { message: null, res: null } };
+};
+
+
+export const iterateProject = async (placeholder): Promise<ILogicResponse> => {
+  //iteration for after receiving feedback
+  return { status: null, data: { message: null, res: null } };
+};
+
+
+
+//?FOR INDIVIDUAL FLAVOR SAMPLES
 
 export const updateFlavor = async (placeholder): Promise<ILogicResponse> => {
   //If a flavor from the request is updated (user is assigned to it, or a new formula is assigned to it, etc)
@@ -61,6 +79,13 @@ export const declineFlavor = async (placeholder): Promise<ILogicResponse> => {
   //clone formula and save clone (if they like the formula but customer doesn't, most likely for future use essentially lol), then revert formula status to in progress
   //revert formula status to in progress (if they don't like the formula and customer wants minor changes)
   //remove formula from flavor & assign a new one (most likely if customer doesn't like the sent flavor whatsoever lol)
+
+  return { status: null, data: { message: null, res: null } };
+};
+
+//Cancel a flavor within a project sample request
+export const cancelFlavor = async (placeholder): Promise<ILogicResponse> => {
+  //set flavor status to cancelled (nothing happens to formula)
 
   return { status: null, data: { message: null, res: null } };
 };

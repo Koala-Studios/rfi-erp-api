@@ -31,10 +31,12 @@ export class BatchingController extends Controller {
     const _page = parseInt(<string>page);
     const _count = parseInt(<string>count);
 
-    const _res = await listBatching(_page,_count);
-
-    this.setStatus(_res.status);
-    return _res.data;
+    const res = await listBatching({
+      page: _page,
+      count: _count,
+      filter: "" });
+    this.setStatus(res.status);
+    return res.data;
   }
 
 

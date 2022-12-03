@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import paginate from "mongoose-paginate-v2";
 
 export interface IBatching extends mongoose.Document {
   product_id: string;
@@ -18,6 +19,8 @@ const batchingSchema = new mongoose.Schema({
   status: Number,
 });
 
+batchingSchema.plugin(paginate);
 
 
-export default mongoose.model<IBatching>("Batching", batchingSchema);
+
+export default mongoose.model<IBatching, mongoose.PaginateModel<IBatching>>("Batching", batchingSchema);
