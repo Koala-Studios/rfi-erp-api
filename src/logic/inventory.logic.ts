@@ -22,3 +22,27 @@ export const listInventory = async (
     data: { message: "", res: list },
   };
 };
+
+export const calculateAvailable = async (product_id) => {
+  const product = await Inventory.findById(product_id);
+  console.log(product)
+  if(product) {
+    for(let i = 0; i < product!.stock.length; i++) {
+      
+    }
+  } 
+}
+
+
+export const inventoryLookup = async (value) => {
+  const searchValue = value.toString();
+  const list = await Inventory.find(
+    {$or: [
+      {product_code:   searchValue },
+      {name: new RegExp('^' + searchValue)}]
+    }).limit(15);
+
+      console.log(list)
+    return {status: status.OK,
+      data: { message: "", res: list }};
+}

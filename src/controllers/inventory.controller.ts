@@ -13,7 +13,7 @@ import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import Inventory, { IInventory } from "../models/inventory.model";
 import { reply, status } from "../config/config.status";
-import { listInventory } from "../logic/inventory.logic";
+import { inventoryLookup, listInventory } from "../logic/inventory.logic";
 
 interface ICreateInventoryRequest {
   name: string;
@@ -34,6 +34,18 @@ export class InventoryController extends Controller {
     const _count = parseInt(<string>count);
 
     const res = await listInventory({ page: _page, count: _count, filter: "" });
+    this.setStatus(res.status);
+
+    return res.data;
+  }
+
+  @Get("lookup")
+  @SuccessResponse(status.OK, reply.success)
+  public async inventoryLookupRequest(
+    @Request() req: eRequest,
+    @Query() string: string
+  ) {
+    const res = await inventoryLookup(string);
     this.setStatus(res.status);
 
     return res.data;
@@ -65,3 +77,5 @@ export class InventoryController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async editInventory() {}
 }
+
+

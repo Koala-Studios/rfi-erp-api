@@ -28,15 +28,15 @@ export class ProductController extends Controller {
   public async listProductRequest(
     @Request() req: eRequest,
     @Query() page: string,
-    @Query() count: string
+    @Query() count: string,
+    @Query() approved?: boolean,
   ) {
     const _page = parseInt(<string>page);
     const _count = parseInt(<string>count);
-
     const res = await listProduct({
       page: _page,
       count: _count,
-      filter: "" });
+      filter: "" }, approved);
     this.setStatus(res.status);
     return res.data;
   }

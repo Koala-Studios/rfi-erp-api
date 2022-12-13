@@ -7,6 +7,7 @@ interface IInventoryContainer {
   supplier_id: string;
   exp_date: Date;
   received_date: Date;
+  on_hold: number;
   on_hand: number;
   on_order: number;
   quarantined: number;
@@ -25,7 +26,7 @@ interface IRegulatoryContainer {
 }
 
 export interface IInventory extends mongoose.Document {
-  code: string;
+  product_code: string;
   name: string;
   average_cost: number;
   stock?: [IInventoryContainer];
@@ -36,7 +37,7 @@ export interface IInventory extends mongoose.Document {
 }
 
 const inventorySchema = new mongoose.Schema({
-  code: String,
+  product_code: String,
   name: String,
   average_cost: Number,
   stock: [

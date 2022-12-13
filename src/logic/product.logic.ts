@@ -3,7 +3,7 @@ import { IListParams, IListResponse, ILogicResponse } from "./interfaces.logic";
 import { reply, status } from "../config/config.status";
 
 export const listProduct = async (
-  listParams: IListParams
+  listParams: IListParams, approved = null
 ): Promise<ILogicResponse> => {
 
     //TODO: Add filters to the query with pagination
@@ -24,8 +24,8 @@ export const listProduct = async (
     .limit(25);
     */
   const list = await Product.paginate(
-    {},
-    { page: listParams.page, limit: listParams.count, leanWithId: true }
+    { is_raw_mat:false, status: approved ? 4 : {$ne: 4}}, //filters
+    { page: listParams.page, limit: listParams.count, leanWithId: true}
   );
 
   return {
