@@ -29,6 +29,8 @@ export interface IInventory extends mongoose.Document {
   product_code: string;
   name: string;
   average_cost: number;
+  for_sale:boolean,
+  is_raw:boolean,
   stock?: [IInventoryContainer];
   reorder_amount?: number;
   suppliers?: [string];
@@ -40,6 +42,8 @@ const inventorySchema = new mongoose.Schema({
   product_code: String,
   name: String,
   average_cost: Number,
+  for_sale:Boolean,
+  is_raw:Boolean,
   stock: [
     {
       supplier_id: String,
