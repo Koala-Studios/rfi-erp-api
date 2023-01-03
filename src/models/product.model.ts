@@ -22,6 +22,8 @@ interface IRegulatoryContainer {
 
 export interface IProduct extends mongoose.Document {
   name:string;
+  description:string;
+  rating:number;
   code: string;
   is_raw_mat?: boolean,
   cost?: number;
