@@ -1,6 +1,7 @@
 import Product, { IProduct } from "../models/product.model";
 import { IListParams, IListResponse, ILogicResponse } from "./interfaces.logic";
 import { reply, status } from "../config/config.status";
+import { createBOM } from "./batching.logic";
 
 export const listProduct = async (
   listParams: IListParams, approved = null
@@ -25,9 +26,8 @@ export const listProduct = async (
     */
   const list = await Product.paginate(
     { is_raw_mat:false, status: approved ? 4 : {$ne: 4}}, //filters
-    { page: listParams.page, limit: listParams.count, leanWithId: true}
+    { page: listParams.page, limit: 500, leanWithId: true}
   );
-
   return {
     status: status.OK,
     data: { message: "", res: list },

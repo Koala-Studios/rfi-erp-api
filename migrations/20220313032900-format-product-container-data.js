@@ -8,6 +8,8 @@ module.exports = {
         db.collection("inventory").insertOne({
           product_code: Product.PRODUCT_CODE,
           name: Product.NAME,
+          
+          date_created: new Date(Product.DATE_CREATED),
           is_raw_mat: false,
           for_sale: true,
           versions: parseInt(Product.VERSIONS),

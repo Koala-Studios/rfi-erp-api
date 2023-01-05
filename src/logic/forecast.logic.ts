@@ -1,4 +1,5 @@
 import Formula, { IFormula } from "../models/formula.model";
+import Inventory, { IInventory } from "../models/inventory.model";
 
 export interface IForecast {
   product_code: string;
@@ -17,20 +18,26 @@ export const calculateMaterials = async(
   rawIngredients = Array.from(rawIngredients.reduce(
     (m, {product_code, amount}) => m.set(product_code, (m.get(product_code) || 0) + amount), new Map
   ), ([product_code, amount]) => ({product_code, amount}));
+
+
   return rawIngredients
 };
 
 const recursiveFinder = async (product: IForecast) => {
-  const materialTypes = ["FL", "FK", "FE", "SM"];
-
+  const materialTypes = ["FL", "FK", "FE", "SM"]; //TODO: make this modular
+  const avoidRecursionMatTypes = ["FK"];
   let rawIngredients: IForecast[] = [];
   
   const formula = await Formula.findOne({ product_code: product.product_code, $max: "version"});
-
+  console.log(formula)
   const f = formula.formula_items;
 
-  for (let i = 0; i < f.length; i++) {
-    if (materialTypes.some((substring) => f[i].material_code.startsWith(substring))) {
+  for (let i = 0; i < f.length; i++) { //TODO: INCOMPLETE
+    if (materialTypes.some((substring) => f[i].material_code.startsWith(substring))) { //if not a raw material.
+      if((avoidRecursionMatTypes.some((substring) => f[i].material_code.startsWith(substring)))) {
+        const inv_material = await Inventory.findOne({id: f[i].material_id});
+
+      }
       rawIngredients = [
         ...rawIngredients,
         ...await recursiveFinder({
@@ -49,3 +56,8 @@ const recursiveFinder = async (product: IForecast) => {
 
   return rawIngredients;
 };
+
+
+const materialStockFinder = async (product: IForecast) => {
+  return null;
+}

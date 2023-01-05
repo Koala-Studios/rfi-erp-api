@@ -49,7 +49,6 @@ export class ProductController extends Controller {
   ) {
 
     const _product = await Product.findById(id);
-    // console.log(_product,id)
 
     this.setStatus(status.OK);
     return _product;

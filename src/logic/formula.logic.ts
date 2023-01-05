@@ -106,7 +106,6 @@ export const getFormula = async (product_id, version):Promise<ILogicResponse> =>
       return {status:_status, data:{message:"No Formula Found",res:null}};
     }
     _status = status.OK;
-
     return {status:_status, data:{message:"Formula Found",res:_formula[0]}};
 }
 

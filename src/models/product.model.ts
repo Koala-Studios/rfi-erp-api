@@ -3,10 +3,16 @@ import paginate from "mongoose-paginate-v2";
 
 interface IProductContainer {
   batch_code: string;
+  cont_amount: Number;
+  supplier_id: string;
+  exp_date: Date;
+  received_date: Date;
+  on_hold: number;
   on_hand: number;
-  in_transit: number;
-  on_order: number;
+  on_transit: number;
+  quarantined: number;
   allocated: number;
+  price: number;
 }
 
 interface IRegulatoryContainer {
@@ -24,10 +30,10 @@ export interface IProduct extends mongoose.Document {
   name:string;
   description:string;
   rating:number;
-  code: string;
+  product_code: string;
   is_raw_mat?: boolean,
   cost?: number;
-  stock?: [IProductContainer];
+  stock?: IProductContainer;
   customers: [string];
   regulatory:IRegulatoryContainer;
   versions?: number;
@@ -38,7 +44,7 @@ export interface IProduct extends mongoose.Document {
 
 const productSchema = new mongoose.Schema({
   name:String,
-  code: String,
+  product_code: String,
   cost: Number,
   is_raw_mat:Boolean,
   versions: Number,

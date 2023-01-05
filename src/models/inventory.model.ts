@@ -31,7 +31,7 @@ export interface IInventory extends mongoose.Document {
   average_cost: number;
   for_sale:boolean,
   is_raw:boolean,
-  stock?: [IInventoryContainer];
+  stock?: IInventoryContainer;
   reorder_amount?: number;
   suppliers?: [string];
   regulatory: IRegulatoryContainer;

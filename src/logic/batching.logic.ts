@@ -2,6 +2,7 @@ import { ICreateBatchingInfo, IListParams, ILogicResponse } from "./interfaces.l
 import { reply, status } from "../config/config.status";
 import Inventory from "../models/inventory.model";
 import Batching, { IBatching } from "../models/Batching.model";
+import Formula, { IFormula } from "../models/formula.model";
 
 //TODO:LISTING PARAMETER GENERALIZING
 export const listBatching = async (
@@ -41,3 +42,62 @@ export const createBatching = async (createInfo:ICreateBatchingInfo):Promise<ILo
       return {status:status.CREATED, data:{message:"Batch Created", res:_batching}};
 
 }
+
+export const createBOM = async (product_code:string, amount:number):Promise<ILogicResponse> => {
+  const materials = await recursiveFinder({product_code, amount})
+
+  console.log(materials, 'THIS IS FINAL')
+  return {status:status.CREATED, data:{message:"Batch Created", res: materials}};
+}
+
+
+const recursiveFinder = async (product: {product_code:string, amount:number}) => {
+  const materialTypes = ["FL", "FK", "FE", "SM"]; //TODO: make this modular
+  const avoidRecursionMatTypes = ["FK"];
+  let rawIngredients: {product_code:string, amount:number}[] = [];
+  
+  const formula = await Formula.findOne({ product_code: product.product_code, $max: "version"});
+  // console.log(formula)
+  const f = formula.formula_items;
+
+  for (let i = 0; i < f.length; i++) { //TODO: INCOMPLETE
+    if (materialTypes.some((substring) => f[i].material_code.startsWith(substring))) { //if not a raw material.
+      if((avoidRecursionMatTypes.some((substring) => f[i].material_code.startsWith(substring)))) {
+        const inv_material = await Inventory.findOne({product_code: f[i].material_code});
+        if(inv_material.stock[0].on_hand - inv_material.stock[0].allocated >= (product.amount * f[i].amount) / 100) { //!MIGRATE TO REMOVE ARRAY AND GET RID OF THESE [0]'s
+          // console.log(inv_material.stock[0].on_hand,  inv_material.stock[0].allocated, (product.amount * f[i].amount) / 100, 'HAS ENOUGH' )
+          rawIngredients.push({
+            product_code: f[i].material_code,
+            amount: (product.amount * f[i].amount) / 100,
+          });
+        } else {
+          // console.log(inv_material.stock[0].on_hand,  inv_material.stock[0].allocated, (product.amount * f[i].amount) / 100, 'HAS NOT ENOUGH' + f[i].material_code )
+          rawIngredients = [
+            ...rawIngredients,
+            ...await recursiveFinder({
+                product_code: f[i].material_code,
+                amount: (product.amount * f[i].amount) / 100,
+              }
+            ),
+          ];
+        }
+      } else {
+        rawIngredients = [
+          ...rawIngredients,
+          ...await recursiveFinder({
+              product_code: f[i].material_code,
+              amount: (product.amount * f[i].amount) / 100,
+            }
+          ),
+        ];
+      }
+    } else {
+      rawIngredients.push({
+        product_code: f[i].material_code,
+        amount: (product.amount * f[i].amount) / 100,
+      });
+    }
+  }
+
+  return rawIngredients;
+};

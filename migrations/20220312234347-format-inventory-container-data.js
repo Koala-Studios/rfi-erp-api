@@ -14,14 +14,13 @@ module.exports = {
             is_raw_mat: checkIfRaw(InventoryItem.CODE),
             for_sale: false,
             cost: parseFloat(InventoryItem.PRICE),
-            stock: [
+            stock: 
               {
                 on_hand: parseFloat(InventoryItem.QTY),
-                supplier_id: parseInt(InventoryItem.SUPPLIERS),
-                batch_code: "OLDSTOCK",
-                cost: parseFloat(InventoryItem.PRICE),
-              },
-            ],
+                allocated: 0,
+                on_order:0,
+              }
+            ,
             reorder_amount: parseFloat(InventoryItem.REORDER_AMT),
             suppliers: [parseInt(InventoryItem.SUPPLIERS)],
             regulatory: {
