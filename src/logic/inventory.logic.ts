@@ -23,16 +23,6 @@ export const listInventory = async (
   };
 };
 
-export const calculateAvailable = async (product_id) => {
-  const product = await Inventory.findById(product_id);
-  console.log(product)
-  if(product) {
-    for(let i = 0; i < product!.stock.length; i++) {
-      
-    }
-  } 
-}
-
 
 export const inventoryLookup = async (s_value, f_sale) => {
   const searchValue = s_value.toString();

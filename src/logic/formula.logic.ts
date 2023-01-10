@@ -138,7 +138,7 @@ export const submitFormula = async (submitInfo: IFormulaSubmitInfo):Promise<ILog
     }
     
     const newDevelopment = new Formula(<IFormula>{
-        product_code: product.code,
+        product_code: product.product_code,
         version: product.versions,
         date_created: new Date(),
         formula_items: submitInfo.formula_items
