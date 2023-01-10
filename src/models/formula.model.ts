@@ -13,6 +13,7 @@ export interface IFormulaItem {
 export interface IFormula extends mongoose.Document{
     product_code: string;
     version: number;
+    yield:number;
     date_created: Date;
     formula_items: IFormulaItem[];
     product_id: string;

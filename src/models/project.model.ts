@@ -16,6 +16,7 @@ interface IProjectItem {
 export interface IProject extends mongoose.Document {
   start_date: Date;
   finish_date: Date;
+  due_date: Date;
   project_code: string;
   name: string;
   status: string;
