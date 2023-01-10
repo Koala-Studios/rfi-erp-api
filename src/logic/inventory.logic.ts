@@ -26,16 +26,14 @@ export const listInventory = async (
 
 export const inventoryLookup = async (s_value, f_sale) => {
   const searchValue = s_value.toString();
-  const list = await Inventory.find(
-    {
-      for_sale: f_sale, 
-      $or: [
-      {product_code:   new RegExp('^' + searchValue) },
-      {name: new RegExp(searchValue)}
-      ]
-    }).limit(15);
+  const list = await Inventory.find({
+    for_sale: f_sale,
+    $or: [
+      { product_code: new RegExp("^" + searchValue) },
+      { name: new RegExp(searchValue) },
+    ],
+  }).limit(15);
 
-    console.log(list)
-    return {status: status.OK,
-      data: { message: "", res: list }};
-}
+  console.log(list);
+  return { status: status.OK, data: { message: "", res: list } };
+};

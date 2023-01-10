@@ -14,6 +14,7 @@ import logger from "../logger/logger";
 import Project, { IProject } from "../models/project.model";
 import { reply, status } from "../config/config.status";
 import { listProject } from "../logic/project.logic";
+import { ObjectId } from "mongodb";
 
 interface ICreateProjectRequest {
   project_name: string;
@@ -36,7 +37,8 @@ export class ProjectController extends Controller {
     const res = await listProject({
       page: _page,
       count: _count,
-      filter: "" });
+      filter: "",
+    });
     this.setStatus(res.status);
     return res.data;
   }
@@ -47,10 +49,9 @@ export class ProjectController extends Controller {
     @Request() req: eRequest,
     @Query() id: string
   ) {
-    let ObjectId = require("mongodb").ObjectId;
-    const project_id = new ObjectId(id);
-    const _project = await Project.findById(project_id);
+    const _project = await Project.findById(id);
     this.setStatus(status.OK);
+    console.log(_project);
     return _project;
   }
 
@@ -58,17 +59,28 @@ export class ProjectController extends Controller {
   @SuccessResponse(status.CREATED, reply.success)
   public async createProjectRequest(
     @Request() req: eRequest,
-    @Body() body: ICreateProjectRequest
+    @Body() body: IProject
   ) {
-    console.log(body);
-
-    const newProject = new Project(<IProject>{
-      name: body.project_name,
-    });
+    const mongoose = require("mongoose");
+    body._id = new mongoose.Types.ObjectId();
+    const newProject = new Project(body);
 
     newProject.save();
-    console.log(newProject);
+    console.log("create", newProject);
     this.setStatus(status.CREATED);
-    return newProject;
+    return newProject._id;
+  }
+
+  @Post("update")
+  @SuccessResponse(status.OK, reply.success)
+  public async updateProjectRequest(
+    @Request() req: eRequest,
+    @Body() p: IProject
+  ) {
+    console.log("update", p);
+    await Project.findOneAndUpdate({ _id: p._id }, p);
+
+    this.setStatus(status.OK);
+    return true;
   }
 }
