@@ -134,6 +134,7 @@ export const submitFormula = async (
   const newDevelopment = new Formula(<IFormula>{
     product_code: product.product_code,
     version: product.versions,
+    yield: submitInfo.yield,
     date_created: new Date(),
     formula_items: submitInfo.formula_items,
   });
