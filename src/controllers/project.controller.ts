@@ -15,6 +15,7 @@ import Project, { IProject } from "../models/project.model";
 import { reply, status } from "../config/config.status";
 import { listProject } from "../logic/project.logic";
 import { ObjectId } from "mongodb";
+import { Deprecated } from "tsoa";
 
 interface ICreateProjectRequest {
   project_name: string;
