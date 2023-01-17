@@ -52,19 +52,6 @@ export class CustomerController extends Controller {
     return res;
   }
 
-  @Post("create")
-  @SuccessResponse(status.OK, reply.success)
-  public async createCustomerRequest(
-    @Request() req: eRequest,
-    @Body() body: ICustomer
-  ) {
-    body._id = new mongoose.Types.ObjectId();
-    const newCustomer = await Customer.create(body);
-
-    this.setStatus(status.CREATED);
-    return newCustomer._id;
-  }
-
   @Get("lookup")
   @SuccessResponse(status.OK, reply.success)
   public async customerLookupRequest(
@@ -76,4 +63,35 @@ export class CustomerController extends Controller {
 
     return res.data;
   }
+
+  
+@Post("create")
+@SuccessResponse(status.CREATED, reply.success)
+public async createCustomerRequest(
+  @Request() req: eRequest,
+  @Body() body: ICustomer
+) {
+  const mongoose = require("mongoose");
+  body._id = new mongoose.Types.ObjectId();
+  const newCustomer = new Customer(body);
+  newCustomer.save();
+  console.log("create", newCustomer);
+  this.setStatus(status.CREATED);
+  return newCustomer._id;
+}
+
+@Post("update")
+@SuccessResponse(status.OK, reply.success)
+public async updateCustomerRequest(
+  @Request() req: eRequest,
+  @Body() c: ICustomer
+) {
+  console.log("update", c);
+  await Customer.findOneAndUpdate({ _id: c._id }, c);
+
+  this.setStatus(status.OK);
+  return true;
+}
+
+
 }

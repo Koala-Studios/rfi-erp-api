@@ -21,7 +21,7 @@ const supplierSchema = new mongoose.Schema({
     phone: String,
     email: String,
     lead_time: String,
-});
+}, { timestamps: true });
 
 supplierSchema.plugin(paginate);
 

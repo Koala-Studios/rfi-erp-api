@@ -1,4 +1,7 @@
 import { Tags } from "@tsoa/runtime";
+import { Post } from "@tsoa/runtime";
+import { Put } from "@tsoa/runtime";
+import { Body } from "@tsoa/runtime";
 import {
   Controller,
   Get,
@@ -11,7 +14,7 @@ import { Request as eRequest } from "express";
 import { Query } from "tsoa";
 import User, { INotification, IUser } from "../models/user.model";
 import { reply, status } from "../config/config.status";
-import { userLookup } from "../logic/user.logic";
+import { listUser, userLookup } from "../logic/user.logic";
 
 interface IGetUserResponse {
   email: string;
@@ -24,7 +27,6 @@ interface IGetUserResponse {
 
 //TODO:Implement
 export const resetUserPassword = () => {};
-export const getUserRooms = () => {};
 export const getUserProjects = () => {};
 
 @Route("user")
@@ -54,7 +56,7 @@ export class UserController extends Controller {
 
   @Get("list")
   @SuccessResponse(status.OK, reply.success)
-  public async listUsers(
+  public async listUserRequest(
     @Request() req: eRequest,
     @Query() page: string,
     @Query() count: string
@@ -62,13 +64,13 @@ export class UserController extends Controller {
     const _page = parseInt(<string>page);
     const _count = parseInt(<string>count);
 
-    const _users = await User.find()
-      .sort({ date_created: -1 })
-      .skip((_page - 1) * _count)
-      .limit(_count);
-
-    this.setStatus(status.OK);
-    return _users;
+    const res = await listUser({
+      page: _page,
+      count: _count,
+      filter: "",
+    });
+    this.setStatus(res.status);
+    return res.data;
   }
 
   @Get("lookup")
@@ -82,4 +84,35 @@ export class UserController extends Controller {
 
     return res.data;
   }
+
+  @Post("create")
+  @SuccessResponse(status.CREATED, reply.success)
+  public async createUserRequest(
+    @Request() req: eRequest,
+    @Body() body: IUser
+  ) {
+    const mongoose = require("mongoose");
+    body._id = new mongoose.Types.ObjectId();
+    const newUser = new User(body);
+
+    newUser.save();
+    console.log("create", newUser);
+    this.setStatus(status.CREATED);
+    return newUser._id;
+  }
+
+  @Post("update")
+  @SuccessResponse(status.OK, reply.success)
+  public async updateUserRequest(
+    @Request() req: eRequest,
+    @Body() u: IUser
+  ) {
+    console.log("update", u);
+    await User.findOneAndUpdate({ _id: u._id }, u);
+
+    this.setStatus(status.OK);
+    return true;
+  }
+
+
 }
