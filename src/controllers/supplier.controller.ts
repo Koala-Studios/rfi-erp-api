@@ -51,15 +51,34 @@ export class SupplierController extends Controller {
     return _supplier;
   }
 
+  
   @Post("create")
-  @SuccessResponse(status.OK, reply.success)
+  @SuccessResponse(status.CREATED, reply.success)
   public async createSupplierRequest(
-    @Request() req: ISupplier
+    @Request() req: eRequest,
+    @Body() body: ISupplier
   ) {
+    const mongoose = require("mongoose");
+    body._id = new mongoose.Types.ObjectId();
+    const newSupplier = new Supplier(body);
+    newSupplier.save();
+    console.log("create", newSupplier);
+    this.setStatus(status.CREATED);
+    return newSupplier._id;
+  }
 
-    const _supplier = await Supplier.create(req);
+  @Post("update")
+  @SuccessResponse(status.OK, reply.success)
+  public async updateSupplierRequest(
+    @Request() req: eRequest,
+    @Body() s: ISupplier
+  ) {
+    console.log("update", s);
+    await Supplier.findOneAndUpdate({ _id: s._id }, s);
 
     this.setStatus(status.OK);
-    return _supplier;
-  }  
+    return true;
+  }
+
+
 }
