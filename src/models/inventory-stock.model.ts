@@ -1,56 +1,104 @@
+import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
 import paginate from "mongoose-paginate-v2";
+import aggregatePaginate = require("mongoose-aggregate-paginate-v2");
+
+export interface IStockExtension {
+  extension_date:Date;
+  passed:boolean;
+}
+
+export interface IQCTest {
+  test_date:Date;
+  passed:boolean;
+}
+
+interface IInventoryStockGrouped {
+  _id: {product_id:string , product_code:string },
+  product_code: string,
+  name:  string,
+  average_cost: number,
+  received_amount: number,
+  used_amount: number,
+  allocated_amount: number,
+  quarantined_containers: number,
+  items:[IInventoryStock]
+}
+// items: [{
+//    _id: string,
+//    name:  string,
+//    unit_cost: number,
+//    received_amount: number,
+//    used_amount: number,
+//    allocated_amount: number,
+//    quarantined_containers: number,
+//    received_date:Date,
+//    expiry_date: Date,
+//    supplier_code: string,
+//    supplier_id: string,
+//    supplier_sku: string,
+//    notes: string,
+//    extensions: 
+//    qc_tests: 
+//  }]
+
+
 
 export interface IInventoryStock extends mongoose.Document {
   product_id:string;
   product_code: string;
   name: string;
-  average_cost: number;
-  for_sale:boolean,
-  is_raw:boolean,
-  supplier: string;
-  cas_number?: string;
+  unit_cost: number;
+  container_size:number;
+  received_amount:number;
+  used_amount: number;
+  allocated_amount: number;
+  quarantined_containers: number;
+  
+  lot_number:string;
+
+  supplier_code:string;
+  supplier_id:ObjectId;
+  supplier_sku:ObjectId;
+
+  received_date:Date;
+  expiry_date:Date;
+  notes:string;
+  extensions: [IStockExtension];
+  qc_tests:[IQCTest]
 }
 
-const inventorySchema = new mongoose.Schema({
+const inventoryStockSchema = new mongoose.Schema({
+  product_id:ObjectId,
   product_code: String,
   name: String,
-  average_cost: Number,
-  for_sale:Boolean,
-  is_raw:Boolean,
-  stock: 
-    {
-      supplier_id: String,
-      batch_code: String,
-      cont_amount: Number,
-      exp_date: Date,
-      received_date: Date,
-      on_hand: Number,
-      in_transit: Number,
-      on_order: Number,
-      on_hold: Number,
-      quarantined: Number,
-      allocated: Number,
-      price: Number,
-    },
-  reorder_amount: Number,
-  suppliers: [String],
-  regulatory: {
-    fda_status: Number,
-    cpl_hazard: String,
-    fema_number: Number,
-    ttb_status: String,
-    eu_status: Number,
-    organic: Boolean,
-    kosher: Boolean,
-  },
-  cas_number: String,
+  unit_cost: Number,
+  container_size:Number,
+  received_amount:Number,
+  used_amount: Number,
+  allocated_amount: Number,
+  quarantined_containers: Number,
+  lot_number:String,
+  expiry_date:Date,
+  notes:String,
+  extensions: [{
+    extension_date:Date,
+    passed:Boolean
+  }],
+  qc_tests: [{
+    test_date:Date,
+    passed:Boolean
+  }],
+
 });
 
-inventorySchema.plugin(paginate);
+inventoryStockSchema.plugin(paginate);
+inventoryStockSchema.plugin(aggregatePaginate);
 
-export default mongoose.model<IInventory, mongoose.PaginateModel<IInventory>>(
-  "Inventory",
-  inventorySchema,
-  "inventory"
+
+
+export default mongoose.model<IInventoryStock, mongoose.AggregatePaginateModel<IInventoryStock>>(
+  "InventoryStock",
+  inventoryStockSchema,
+  "inventory_stock"
 );

@@ -1,18 +1,13 @@
 import mongoose from "mongoose";
 import paginate from "mongoose-paginate-v2";
 
-interface IInventoryContainer {
-  batch_code: string;
-  cont_amount: Number;
-  supplier_id: string;
-  exp_date: Date;
-  received_date: Date;
+interface IStockSummary {
   on_hold: number;
   on_hand: number;
   on_order: number;
   quarantined: number;
   allocated: number;
-  price: number;
+  average_price: number;
 }
 
 interface IRegulatoryContainer {
@@ -31,7 +26,7 @@ export interface IInventory extends mongoose.Document {
   average_cost: number;
   for_sale:boolean,
   is_raw:boolean,
-  stock?: IInventoryContainer;
+  stock?: IStockSummary;
   reorder_amount?: number;
   suppliers?: [string];
   regulatory: IRegulatoryContainer;
@@ -44,22 +39,15 @@ const inventorySchema = new mongoose.Schema({
   average_cost: Number,
   for_sale:Boolean,
   is_raw:Boolean,
-  stock: [
+  stock: 
     {
-      supplier_id: String,
-      batch_code: String,
-      cont_amount: Number,
-      exp_date: Date,
-      received_date: Date,
-      on_hand: Number,
-      in_transit: Number,
-      on_order: Number,
       on_hold: Number,
+      on_hand: Number,
+      on_order: Number,
       quarantined: Number,
       allocated: Number,
-      price: Number,
+      average_price: Number,
     },
-  ],
   reorder_amount: Number,
   suppliers: [String],
   regulatory: {
