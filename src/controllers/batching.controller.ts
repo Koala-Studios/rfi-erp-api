@@ -26,20 +26,22 @@ export class BatchingController extends Controller {
   public async listBatchingRequest(
     @Request() req: eRequest,
     @Query() page: string,
-    @Query() count: string
+    @Query() count: string,
+    @Query() query: string
   ) {
     const _page = parseInt(<string>page);
     const _count = parseInt(<string>count);
 
+    console.log(JSON.parse(query));
+
     const res = await listBatching({
       page: _page,
       count: _count,
-      filter: "" });
+      filter: query,
+    });
     this.setStatus(res.status);
     return res.data;
   }
-
-
 
   @Post("create")
   @SuccessResponse(status.CREATED, reply.success)
