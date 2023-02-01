@@ -15,4 +15,11 @@ export const listSupplier = async (
       status: status.OK,
       data: { message: "", res: list },
     };
-  };
+};
+
+export const supplierLookup = async (s_value) => {
+  const searchValue = s_value.toString();
+  const list = await Supplier.find({ name: new RegExp(searchValue) }).limit(15);
+
+  return { status: status.OK, data: { message: "", res: list } };
+};

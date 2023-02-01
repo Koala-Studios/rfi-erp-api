@@ -47,7 +47,7 @@ export const getPO = async (po_id):Promise<ILogicResponse> => {
                             "$expr" : {
                                 "$in" : [
                                     "$_id",
-                                    "$$ingredients.material_id"
+                                    "$$ingredients.product_id"
                                 ]
                             }
                         }
@@ -77,7 +77,7 @@ export const getPO = async (po_id):Promise<ILogicResponse> => {
                                                     "cond" : {
                                                         "$eq" : [
                                                             "$$mb._id",
-                                                            "$$this.material_id"
+                                                            "$$this.product_id"
                                                         ]
                                                     },
                                                     "as" : "mb"
@@ -91,7 +91,7 @@ export const getPO = async (po_id):Promise<ILogicResponse> => {
                                     "$mergeObjects" : [
                                         "$$this",
                                         {
-                                            "material_name" : "$$m.name"
+                                            "product_name" : "$$m.name"
                                         }
                                     ]
                                 }

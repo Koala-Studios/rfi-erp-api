@@ -1,25 +1,35 @@
+let ObjectId = require('mongodb').ObjectId;
+
 module.exports = {
   async up(db, client) {
     const inserted_codes = [];
 
+      db.dropCollection("purchases", function (err, res) {
+        if (err) {
+          console.log("purchases table doesn't exist")
+        }
+      })
     
-    db.dropCollection("purchases");
-    await db
+
+    const orders = await db
       .collection("Purchase Order")
       .find()
-      .forEach(async function (PurchaseOrder) {
+      .toArray();
+      for ( const PurchaseOrder of orders) {
         if(!inserted_codes.includes(PurchaseOrder.OCODE))
         {
+          const supplier_id = await db.collection("suppliers").findOne({"name": PurchaseOrder.SUPPLIER})
+
           db.collection("purchases").insertOne({
-            supplier: PurchaseOrder.SUPPLIER,
-            date_purchased: new Date(PurchaseOrder.DATE_PURCHASED),
+            supplier:{ id: supplier_id? supplier_id : 'ERROR' ,name: PurchaseOrder.SUPPLIER },
+            date_purchased: PurchaseOrder.DATE_PURCHASED,
             order_code: PurchaseOrder.OCODE,
             order_items: [],
           });
 
           inserted_codes.push(PurchaseOrder.OCODE);
         }
-      });
+      };
 
       await db
       .collection("Purchase Order")
@@ -30,6 +40,7 @@ module.exports = {
         {
           $push: {
             order_items: {
+              _id: new ObjectId(),
               product_code: PurchaseOrder.CODE,
               product_id: PurchaseOrder.material_id,
               purchased_amount: parseFloat(PurchaseOrder.AMOUNT),
@@ -45,6 +56,6 @@ module.exports = {
     },
 
   async down(db, client) {
-    //try not to go back lmao..
+    db.dropCollection("purchases");
 }
 }

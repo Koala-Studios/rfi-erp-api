@@ -14,18 +14,23 @@ export interface IPurchaseOrder extends mongoose.Document {
     date_purchased: Date;
     date_arrived?: Date;
     order_code: string;
-    supplier_id: string;
-    supplier_name: string;
+    supplier: {
+        supplier_id: string;
+        name: string;
+    }
     status: number;
     order_items: [IOrderItem];
+    notes:string;
 }
 
 const purchaseOrderSchema = new mongoose.Schema({
 
     date_purchased: Date,
     date_arrived: Date,
-    supplier_id: String,
-    supplier_name: String,
+    supplier: {
+        supplier_id: ObjectId,
+        name: String,
+    },
     order_code: String,
     status: Number,
     order_items: 
@@ -36,6 +41,7 @@ const purchaseOrderSchema = new mongoose.Schema({
         received_amount: Number,
         unit_price: Number
     }],
+    notes:String
 });
 
 purchaseOrderSchema.plugin(paginate);

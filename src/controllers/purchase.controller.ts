@@ -53,4 +53,36 @@ export class PurchaseController extends Controller {
       console.log(_res)
       return _res.data;
     }
+
+
+    
+  @Post("create")
+  @SuccessResponse(status.CREATED, reply.success)
+  public async createPurchaseRequest(
+    @Request() req: eRequest,
+    @Body() body: IPurchaseOrder
+  ) {
+    const mongoose = require("mongoose");
+    body._id = new mongoose.Types.ObjectId();
+    const newPurchase = new PurchaseOrder(body);
+
+    newPurchase.save();
+    console.log("create", newPurchase);
+    this.setStatus(status.CREATED);
+    return newPurchase._id;
+  }
+
+  @Post("update")
+  @SuccessResponse(status.OK, reply.success)
+  public async updatePurchaseRequest(
+    @Request() req: eRequest,
+    @Body() p: IPurchaseOrder
+  ) {
+    console.log("update", p);
+    await PurchaseOrder.findOneAndUpdate({ _id: p._id }, p);
+
+    this.setStatus(status.OK);
+    return true;
+  }
 }
+
