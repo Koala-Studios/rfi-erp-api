@@ -1,14 +1,13 @@
+import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
 import paginate from "mongoose-paginate-v2";
 
 interface IOrderItem {
+  product_id: ObjectId;
   product_code: string;
-  amount: number;
-  price: number;
-  status: number;
-  material_id: string;
-  material_name:string;
-  lot_number:string;
+  purchased_amount: number;
+  received_amount: number;
+  unit_price: number;
 }
 
 export interface IPurchaseOrder extends mongoose.Document {
@@ -22,6 +21,7 @@ export interface IPurchaseOrder extends mongoose.Document {
 }
 
 const purchaseOrderSchema = new mongoose.Schema({
+
     date_purchased: Date,
     date_arrived: Date,
     supplier_id: String,
@@ -30,13 +30,11 @@ const purchaseOrderSchema = new mongoose.Schema({
     status: Number,
     order_items: 
     [{
-        amount: Number,
-        price: Number,
-        status: Number,
-        material_id: String,
+        product_id:ObjectId,
         product_code: String,
-        material_name: String,
-        lot_number:String,
+        purchased_amount: Number,
+        received_amount: Number,
+        unit_price: Number
     }],
 });
 
