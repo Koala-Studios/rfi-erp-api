@@ -31,6 +31,7 @@ export interface IInventory extends mongoose.Document {
   suppliers?: [string];
   regulatory: IRegulatoryContainer;
   cas_number?: string;
+  product_type:{ name:string, _id:string }
 }
 
 const inventorySchema = new mongoose.Schema({
@@ -60,6 +61,7 @@ const inventorySchema = new mongoose.Schema({
     kosher: Boolean,
   },
   cas_number: String,
+  product_type:{ name:String, _id:String }
 });
 
 inventorySchema.plugin(paginate);

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import paginate from "mongoose-paginate-v2";
+import { ICustomer } from "./customer.model";
 
 interface IProductContainer {
   batch_code: string;
@@ -13,9 +14,11 @@ interface IProductContainer {
   quarantined: number;
   allocated: number;
   price: number;
+  for_sale:boolean;
+  is_raw:boolean;
 }
 
-interface IRegulatoryContainer {
+interface IRegulatory {
   fda_status?:number;
   cpl_hazard?:string;
   fema_number?:number;
@@ -25,21 +28,27 @@ interface IRegulatoryContainer {
   kosher?:boolean;
 }
 
+export interface IProductCustomerItem {
+  _id: string;
+  name: string;
+}
 
 export interface IProduct extends mongoose.Document {
+  for_sale: boolean;
   name:string;
   description:string;
   rating:number;
   product_code: string;
-  is_raw_mat?: boolean,
+  is_raw?: boolean,
   cost?: number;
   stock?: IProductContainer;
-  customers: [string];
-  regulatory:IRegulatoryContainer;
+  customers: IProductCustomerItem[];
+  regulatory:IRegulatory;
   versions?: number;
   status: number;
   approved_version?: number;
   rec_dose_rate?:number;
+  product_type:{ name:string, _id:string }
 }
 
 const productSchema = new mongoose.Schema({
@@ -73,6 +82,7 @@ const productSchema = new mongoose.Schema({
     organic: Boolean,
     kosher: Boolean, 
   },
+  product_type:{ name:String, _id:String }
 });
 
 productSchema.plugin(paginate);
