@@ -28,12 +28,19 @@ export class InventoryController extends Controller {
   public async listInventoryRequest(
     @Request() req: eRequest,
     @Query() page: string,
-    @Query() count: string
+    @Query() count: string,
+    @Query() query: string
   ) {
     const _page = parseInt(<string>page);
     const _count = parseInt(<string>count);
 
-    const res = await listInventory({ page: _page, count: _count, filter: "" });
+    console.log(query, JSON.parse(query));
+
+    const res = await listInventory({
+      page: _page,
+      count: _count,
+      filter: query,
+    });
     this.setStatus(res.status);
 
     return res.data;
@@ -46,7 +53,7 @@ export class InventoryController extends Controller {
     @Query() search_value: string,
     @Query() for_sale: boolean
   ) {
-    const res = await inventoryLookup(search_value,for_sale);
+    const res = await inventoryLookup(search_value, for_sale);
     this.setStatus(res.status);
 
     return res.data;
@@ -78,5 +85,3 @@ export class InventoryController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async editInventory() {}
 }
-
-

@@ -1,6 +1,7 @@
 import Inventory, { IInventory } from "../models/inventory.model";
 import { IListParams, IListResponse, ILogicResponse } from "./interfaces.logic";
 import { reply, status } from "../config/config.status";
+import { FilterQuery } from "mongoose";
 
 // export const listInventory = async():Promise<IInventory[]> => {
 //     //filters: all
@@ -12,17 +13,19 @@ import { reply, status } from "../config/config.status";
 export const listInventory = async (
   listParams: IListParams
 ): Promise<ILogicResponse> => {
-  const list = await Inventory.paginate(
-    {},
-    { page: listParams.page, limit: listParams.count, leanWithId: true }
-  );
+  const query = JSON.parse(listParams.filter) as FilterQuery<IInventory>;
+
+  const list = await Inventory.paginate(query, {
+    page: listParams.page,
+    limit: listParams.count,
+    leanWithId: true,
+  });
 
   return {
     status: status.OK,
-    data: { message: "", res: list },
+    data: { message: null, res: list },
   };
 };
-
 
 export const inventoryLookup = async (s_value, f_sale) => {
   const searchValue = s_value.toString();
