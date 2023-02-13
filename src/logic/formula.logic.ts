@@ -106,50 +106,55 @@ export const getFormula = async (
 };
 
 export const submitFormula = async (
-  submitInfo: IFormulaSubmitInfo
+  formula: IFormula,
+  approved:boolean,
 ): Promise<ILogicResponse> => {
   let _status: number;
   let _message: string;
 
   //TODO: implement check for FDA status in ingredients vs in product
-  let product = await Product.findById(submitInfo.product_id);
+  let product = await Product.findById(formula.product_id);
 
   //!If product is already approved
   if (product.status == 4) {
     _status = status.FORBIDDEN;
     _message = "Product is already approved!";
-    return { status: _status, data: { message: _message, res: null } };
+    return { status: _status, data: { message: _message, res: product } };
   }
 
   product.versions += 1;
 
   //*If flavorist is setting product as ready for approval
-  if (submitInfo.approved) {
+  if (approved) {
     product.status = 3;
-    _message = "Formula Submitted & Ready For Approval!";
+    _message = "Formula Submitted & Ready For Manager Approval!";
   } else {
     _message = "Formula Submitted!";
   }
 
   const newDevelopment = new Formula(<IFormula>{
+    product_id: product._id,
     product_code: product.product_code,
     version: product.versions,
-    yield: submitInfo.yield,
+    yield: formula.yield,
+    base_hundred:formula.base_hundred,
     date_created: new Date(),
-    formula_items: submitInfo.formula_items,
+    formula_items: formula.formula_items,
   });
 
+
+  console.log(newDevelopment, product, 'TEST SUBMIT')
   newDevelopment.save();
   product.save();
 
   _status = status.OK;
 
-  return { status: _status, data: { message: _message, res: newDevelopment } };
+  return { status: _status, data: { message: _message, res: product } };
 };
 
 //R&D Manager Approval
 export const approveFormula = async (
-  submitInfo: IFormulaSubmitInfo
+  formula: IFormulaSubmitInfo
 ): Promise<ILogicResponse> => {
   return { status: null, data: { message: null, res: null } };
 };

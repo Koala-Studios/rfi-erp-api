@@ -14,6 +14,8 @@ import logger from "../logger/logger";
 import Product, {IProduct} from "../models/product.model";
 import { reply, status } from "../config/config.status";
 import { listProduct } from "../logic/product.logic";
+import ProductType, {IProductType} from "../models/product-type.model";
+import { generateProductCode } from "../logic/utils";
 
 interface ICreateProductRequest{
     name:string;
@@ -52,5 +54,38 @@ export class ProductController extends Controller {
 
     this.setStatus(status.OK);
     return _product;
+  }
+
+  
+  @Post("create")
+  @SuccessResponse(status.CREATED, reply.success)
+  public async createProductRequest(
+    @Request() req: eRequest,
+    @Body() body: IProduct
+  ) {
+    const mongoose = require("mongoose");
+    const product_type = await ProductType.findOne({_id: body.product_type._id });
+    body._id = new mongoose.Types.ObjectId();    
+    const product_code = await generateProductCode(product_type)
+    body.product_code = product_code;//TODO: MAKING SURE NO DUPLICATES PROPERLY!
+    body.for_sale = product_type.for_sale;
+    body.is_raw = product_type.is_raw;
+    const newProduct = new Product(body);
+    newProduct.save();
+    this.setStatus(status.CREATED);
+    return newProduct._id;
+  }
+
+  @Post("update")
+  @SuccessResponse(status.OK, reply.success)
+  public async updateProjectRequest(
+    @Request() req: eRequest,
+    @Body() p: IProduct
+  ) {
+    console.log("update", p);
+    await Product.findOneAndUpdate({ _id: p._id }, p);
+
+    this.setStatus(status.OK);
+    return true;
   }
 }

@@ -25,8 +25,8 @@ export const listProduct = async (
     .limit(25);
     */
   const list = await Product.paginate(
-    { is_raw_mat:false, status: approved ? 4 : {$ne: 4}}, //filters
-    { page: listParams.page, limit: 500, leanWithId: true}
+    { is_raw:false, status: approved ? 4 : {$ne: 4}}, //filters
+    { page: listParams.page, limit: 20, leanWithId: true}
   );
   return {
     status: status.OK,

@@ -11,13 +11,17 @@ interface IOrderItem {
   product_name:string;
   lot_number:string;
 }
+interface ISalesCustomer {
+    _id:string,
+    name:string;
+}
 
 export interface ISalesOrder extends mongoose.Document {
     date_of_purchase: Date;
     date_sent?: Date;
     order_code: string;
-    customer_id: string;
-    customer_name: string;
+    shipping_code:string;
+    customer: ISalesCustomer;
     notes: string;
     status: number;
     order_items: [IOrderItem];
@@ -26,8 +30,8 @@ export interface ISalesOrder extends mongoose.Document {
 const salesOrderSchema = new mongoose.Schema({
     date_purchased: Date,
     date_arrived: Date,
-    customer_id: String,
-    customer_name: String,
+    customer:{ _id:String, name:String},
+    shipping_code:String,
     order_code: String,
     status: Number,
     order_items: 

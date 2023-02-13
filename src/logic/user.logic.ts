@@ -22,7 +22,7 @@ export const listUser = async (
 
 export const userLookup = async (s_value) => {
   const searchValue = s_value.toString();
-  const list = await User.find({ name: new RegExp(searchValue) }).limit(15);
+  const list = await User.find({ name: new RegExp(searchValue,"i") }).limit(15);
 
   return { status: status.OK, data: { message: "", res: list } };
 };

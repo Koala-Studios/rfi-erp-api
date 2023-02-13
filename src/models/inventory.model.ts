@@ -1,25 +1,21 @@
 import mongoose from "mongoose";
 import paginate from "mongoose-paginate-v2";
 
-interface IInventoryContainer {
-  batch_code: string;
-  cont_amount: Number;
-  supplier_id: string;
-  exp_date: Date;
-  received_date: Date;
+interface IStockSummary {
   on_hold: number;
   on_hand: number;
   on_order: number;
   quarantined: number;
   allocated: number;
-  price: number;
+  average_price: number;
+  reorder_amount: number | null;
 }
 
 interface IRegulatoryContainer {
   fda_status?: number;
-  cpl_hazard?: string;
+  cpl_hazard?: [];
   fema_number?: number;
-  ttb_status?: string;
+  ttb_status?: number;
   eu_status?: number;
   organic?: boolean;
   kosher?: boolean;
@@ -31,11 +27,11 @@ export interface IInventory extends mongoose.Document {
   average_cost: number;
   for_sale:boolean,
   is_raw:boolean,
-  stock?: IInventoryContainer;
-  reorder_amount?: number;
+  stock: IStockSummary;
   suppliers?: [string];
   regulatory: IRegulatoryContainer;
   cas_number?: string;
+  product_type:{ name:string, _id:string }
 }
 
 const inventorySchema = new mongoose.Schema({
@@ -44,34 +40,28 @@ const inventorySchema = new mongoose.Schema({
   average_cost: Number,
   for_sale:Boolean,
   is_raw:Boolean,
-  stock: [
+  stock: 
     {
-      supplier_id: String,
-      batch_code: String,
-      cont_amount: Number,
-      exp_date: Date,
-      received_date: Date,
-      on_hand: Number,
-      in_transit: Number,
-      on_order: Number,
       on_hold: Number,
+      on_hand: Number,
+      on_order: Number,
       quarantined: Number,
       allocated: Number,
-      price: Number,
+      average_price: Number,
+      reorder_amount: Number
     },
-  ],
-  reorder_amount: Number,
   suppliers: [String],
   regulatory: {
     fda_status: Number,
-    cpl_hazard: String,
+    cpl_hazard: [],
     fema_number: Number,
-    ttb_status: String,
+    ttb_status: Number,
     eu_status: Number,
     organic: Boolean,
     kosher: Boolean,
   },
   cas_number: String,
+  product_type:{ name:String, _id:String }
 });
 
 inventorySchema.plugin(paginate);

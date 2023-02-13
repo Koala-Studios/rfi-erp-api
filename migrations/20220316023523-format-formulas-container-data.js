@@ -22,9 +22,10 @@ module.exports = {
           db.collection("formulas").insertOne({
             product_code: formula.PRODUCT_CODE,
             version: parseInt(formula.VERSION),
-            date_created: new Date()
+            date_created: new Date(),
+            base_hundred:true,
+            yield:1.00
           });
-
           inserted_codes.push([formula.PRODUCT_CODE, formula.VERSION]);
         }
       });
@@ -60,8 +61,5 @@ module.exports = {
 
   async down(db, client) {
     await db.collection("formulas").drop();
-    db
-    .collection("Development")
-    .updateMany({},{ $unset: {material_id: ""  } });
   },
 };

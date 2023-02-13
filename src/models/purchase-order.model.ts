@@ -1,43 +1,68 @@
+import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
 import paginate from "mongoose-paginate-v2";
 
 interface IOrderItem {
+  _id:ObjectId,
+  product_id: ObjectId;
   product_code: string;
-  amount: number;
-  price: number;
-  status: number;
-  material_id: string;
-  material_name:string;
-  lot_number:string;
+  purchased_amount: number;
+  received_amount: number;
+  unit_price: number;
 }
+
+export const orderStatus = {
+	AWAITING_SHIPPING: 1,
+	AWAITING_ARRIVAL: 2,
+	PARTIALLY_RECEIVED: 3,
+	RECEIVED: 4,
+	ABANDONED: 5,
+	DRAFT: 6,
+};
+
+
+export interface IOrderItemProcess extends IOrderItem {
+    lot_number:string,
+    process_amount:number,
+    container_size:number,
+    expiry_date:Date,
+  }
 
 export interface IPurchaseOrder extends mongoose.Document {
     date_purchased: Date;
     date_arrived?: Date;
     order_code: string;
-    supplier_id: string;
-    supplier_name: string;
+    shipping_code:string;
+    supplier: {
+        supplier_id: string;
+        name: string;
+    }
     status: number;
     order_items: [IOrderItem];
+    notes:string;
 }
 
 const purchaseOrderSchema = new mongoose.Schema({
+
     date_purchased: Date,
     date_arrived: Date,
-    supplier_id: String,
-    supplier_name: String,
+    shipping_code:String,
+    supplier: {
+        supplier_id: ObjectId,
+        name: String,
+    },
     order_code: String,
     status: Number,
     order_items: 
     [{
-        amount: Number,
-        price: Number,
-        status: Number,
-        material_id: String,
+        _id:ObjectId,
+        product_id:ObjectId,
         product_code: String,
-        material_name: String,
-        lot_number:String,
+        purchased_amount: Number,
+        received_amount: Number,
+        unit_price: Number
     }],
+    notes:String
 });
 
 purchaseOrderSchema.plugin(paginate);

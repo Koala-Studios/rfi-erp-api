@@ -13,7 +13,7 @@ import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import Supplier, {ISupplier} from "../models/supplier.model";
 import { reply, status } from "../config/config.status";
-import { listSupplier } from "../logic/supplier.logic";
+import { listSupplier, supplierLookup } from "../logic/supplier.logic";
 
 @Route("suppliers")
 @Tags("Suppliers")
@@ -50,6 +50,20 @@ export class SupplierController extends Controller {
     this.setStatus(status.OK);
     return _supplier;
   }
+
+
+  @Get("lookup")
+  @SuccessResponse(status.OK, reply.success)
+  public async supplierLookupRequest(
+    @Request() req: eRequest,
+    @Query() search_value: string
+  ) {
+    const res = await supplierLookup(search_value);
+    this.setStatus(res.status);
+
+    return res.data;
+  }
+
 
   
   @Post("create")

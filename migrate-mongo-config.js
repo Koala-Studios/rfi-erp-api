@@ -6,7 +6,7 @@ const config = {
     url: "mongodb://localhost:27017",
 
     // TODO Change this to your database name:
-    databaseName: "rfi_db",
+    databaseName: "rfi_db_2",
 
     options: {
       useNewUrlParser: true, // removes a deprecation warning when connecting

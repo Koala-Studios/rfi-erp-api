@@ -1,3 +1,4 @@
+
 module.exports = {
   async up(db, client) {
     await db
@@ -8,43 +9,46 @@ module.exports = {
         db.collection("inventory").insertOne({
           product_code: Product.PRODUCT_CODE,
           name: Product.NAME,
-          
+          description: "",
+          average_cost: parseFloat(Product.COST),
+          rating: null,
           date_created: new Date(Product.DATE_CREATED),
-          is_raw_mat: false,
           for_sale: true,
+          is_raw: false,
           versions: parseInt(Product.VERSIONS),
           approved_version: parseInt(Product.APPROVED_VERSION),
           status: parseInt(Product.STATUS),
-          rec_dose_rate: parseFloat(Product.REC_DOSE_RATE),
-          cost: parseFloat(Product.COST),
-          stock:[ {
+          rec_dose_rate: 0,
+          stock:{
             on_hand: parseFloat(0),
             on_order: parseFloat(0),
-            quarantine: parseFloat(0),
             allocated: parseFloat(0),
-            batch_code: "OLDSTOCK",
-            cost: parseFloat(Product.Cost)
-          }],
+            on_hold: parseFloat(0),
+            quarantined: parseFloat(0),
+            average_price: parseFloat(Product.COST)
+          },
+          customers:[],
           regulatory:
           {
             cpl_hazard: [],
-            kosher: null,
-            organic: null,
+            kosher: true,
+            organic: false,
             eu_status: parseInt(Product.EU_STATUS),
             ttb_status: parseInt(Product.TTB_STATUS),
             fda_status: parseInt(Product.FDA_RATINGS),
             fema_number: parseInt(Product.fema_number),
-          },
-          cas_number: Product.cas_number
+          }
+          //product_type added on later migration
         });
       } else {
         db.collection("inventory").findOneAndUpdate({product_code: { $eq: Product.PRODUCT_CODE} },
           { $set: {
+          rating:null,
           versions: parseInt(Product.VERSIONS),
           approved_version: parseInt(Product.APPROVED_VERSION),
           status: parseInt(Product.STATUS),
           rec_dose_rate: parseFloat(Product.REC_DOSE_RATE),
-        } });
+        } }, { $unset : {suppliers:''}});
       }
     });
   },
