@@ -8,13 +8,14 @@ interface IStockSummary {
   quarantined: number;
   allocated: number;
   average_price: number;
+  reorder_amount: number | null;
 }
 
 interface IRegulatoryContainer {
   fda_status?: number;
-  cpl_hazard?: string;
+  cpl_hazard?: [];
   fema_number?: number;
-  ttb_status?: string;
+  ttb_status?: number;
   eu_status?: number;
   organic?: boolean;
   kosher?: boolean;
@@ -26,8 +27,7 @@ export interface IInventory extends mongoose.Document {
   average_cost: number;
   for_sale:boolean,
   is_raw:boolean,
-  stock?: IStockSummary;
-  reorder_amount?: number;
+  stock: IStockSummary;
   suppliers?: [string];
   regulatory: IRegulatoryContainer;
   cas_number?: string;
@@ -48,14 +48,14 @@ const inventorySchema = new mongoose.Schema({
       quarantined: Number,
       allocated: Number,
       average_price: Number,
+      reorder_amount: Number
     },
-  reorder_amount: Number,
   suppliers: [String],
   regulatory: {
     fda_status: Number,
-    cpl_hazard: String,
+    cpl_hazard: [],
     fema_number: Number,
-    ttb_status: String,
+    ttb_status: Number,
     eu_status: Number,
     organic: Boolean,
     kosher: Boolean,

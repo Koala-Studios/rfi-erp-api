@@ -45,6 +45,7 @@ interface IInventoryStockGrouped {
 
 
 export interface IInventoryStock extends mongoose.Document {
+  purchase_id?:string;
   product_id:string;
   product_code: string;
   name: string;
@@ -54,13 +55,10 @@ export interface IInventoryStock extends mongoose.Document {
   used_amount: number;
   allocated_amount: number;
   quarantined_containers: number;
-  
   lot_number:string;
-
   supplier_code:string;
   supplier_id:ObjectId;
   supplier_sku:ObjectId;
-
   received_date:Date;
   expiry_date:Date;
   notes:string;
@@ -69,6 +67,7 @@ export interface IInventoryStock extends mongoose.Document {
 }
 
 const inventoryStockSchema = new mongoose.Schema({
+  purchase_id:ObjectId,
   product_id:ObjectId,
   product_code: String,
   name: String,

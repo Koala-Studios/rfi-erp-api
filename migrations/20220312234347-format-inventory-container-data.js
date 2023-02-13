@@ -11,24 +11,27 @@ module.exports = {
           db.collection("inventory").insertOne({
             product_code: InventoryItem.CODE,
             name: InventoryItem.NAME,
-            is_raw_mat: checkIfRaw(InventoryItem.CODE),
             for_sale: false,
+            is_raw: checkIfRaw(InventoryItem.CODE),
             cost: parseFloat(InventoryItem.PRICE),
             stock: 
               {
                 on_hand: parseFloat(InventoryItem.QTY),
+                on_hold: 0,
+                on_order: 0,
+                quarantined: 0,
                 allocated: 0,
-                on_order:0,
+                average_price: 0,
+                reorder_amount: parseFloat(InventoryItem.REORDER_AMT),
               }
             ,
-            reorder_amount: parseFloat(InventoryItem.REORDER_AMT),
             suppliers: [parseInt(InventoryItem.SUPPLIERS)],
             regulatory: {
-              cpl_hazard: InventoryItem.CPL_HAZARD,
+              cpl_hazard: InventoryItem.CPL_HAZARD ? [InventoryItem.CPL_HAZARD] : [],
               eu_status: InventoryItem.EU_STATUS,
               fda_status: InventoryItem.FDA_STATUS,
-              kosher: InventoryItem.KOSHER,
-              organic: InventoryItem.ORGANIC,
+              kosher: true,
+              organic: false,
               ttb_status: InventoryItem.TTB_STATUS,
               fema_number: InventoryItem.FEMA_NUMBER,
             },

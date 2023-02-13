@@ -2,30 +2,25 @@ import mongoose from "mongoose";
 import paginate from "mongoose-paginate-v2";
 import { ICustomer } from "./customer.model";
 
-interface IProductContainer {
-  batch_code: string;
-  cont_amount: Number;
-  supplier_id: string;
-  exp_date: Date;
-  received_date: Date;
+
+interface IStockSummary {
   on_hold: number;
   on_hand: number;
-  on_transit: number;
+  on_order: number;
   quarantined: number;
   allocated: number;
-  price: number;
-  for_sale:boolean;
-  is_raw:boolean;
+  average_price: number;
+  reorder_amount:number | null;
 }
 
 interface IRegulatory {
-  fda_status?:number;
-  cpl_hazard?:string;
-  fema_number?:number;
-  ttb_status?:string;
+  cpl_hazard?:[];
+  kosher?:boolean | null;
+  organic?:boolean | null;
   eu_status?:number;
-  organic?:boolean;
-  kosher?:boolean;
+  ttb_status?:number;
+  fda_status?:number;
+  fema_number?:number;
 }
 
 export interface IProductCustomerItem {
@@ -34,50 +29,52 @@ export interface IProductCustomerItem {
 }
 
 export interface IProduct extends mongoose.Document {
-  for_sale: boolean;
-  name:string;
-  description:string;
-  rating:number;
   product_code: string;
+  name:string;
+  average_cost?: number;
+  description:string;
+  rating:number | null;
+  date_created: Date;
   is_raw?: boolean,
-  cost?: number;
-  stock?: IProductContainer;
+  for_sale: boolean;
+  versions?: number;
+  approved_version?: number | undefined;
+  status: number;
+  rec_dose_rate:number;
+  stock?: IStockSummary;
   customers: IProductCustomerItem[];
   regulatory:IRegulatory;
-  versions?: number;
-  status: number;
-  approved_version?: number;
-  rec_dose_rate?:number;
   product_type:{ name:string, _id:string }
 }
 
 const productSchema = new mongoose.Schema({
-  name:String,
   product_code: String,
+  name:String,
   cost: Number,
-  is_raw_mat:Boolean,
+  rating:Number,
+  date_created: Date,
+  for_sale:Boolean,
+  is_raw:Boolean,
   versions: Number,
   approved_version: Number,
   rec_dose_rate: Number,
-  stock: [
+  stock: 
     {
-      batch_date: Date,
-      batch_code: String,
       on_hand: Number,
       on_order: Number,
-      allocated: Number,
       on_hold: Number,
       quarantined: Number,
-      ready_for_transit: Number,
+      allocated: Number,
+      average_price: Number,
+      reorder_amount:Number,
     },
-  ],
   customers: [String],
   status: Number,
   regulatory: {
     fda_status: Number,
-    cpl_hazard: String,
+    cpl_hazard: [],
     fema_number: Number,
-    ttb_status: String,
+    ttb_status: Number,
     eu_status:Number,
     organic: Boolean,
     kosher: Boolean, 

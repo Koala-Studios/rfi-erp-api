@@ -56,9 +56,10 @@ export class ProductTypeController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async productTypeLookupRequest(
     @Request() req: eRequest,
-    @Query() search_value: string
+    @Query() search_value: string,
+    @Query() f_sale: boolean
   ) {
-    const res = await productTypeLookup(search_value);
+    const res = await productTypeLookup(search_value,f_sale);
     this.setStatus(res.status);
     console.log(res.data)
     return res.data;

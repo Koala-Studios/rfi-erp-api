@@ -30,7 +30,7 @@ export const inventoryLookup = async (s_value, f_sale) => {
     for_sale: f_sale,
     $or: [
       { product_code: new RegExp("^" + searchValue) },
-      { name: new RegExp(searchValue) },
+      { name: new RegExp(searchValue, "i") },
     ],
   }).limit(15);
 

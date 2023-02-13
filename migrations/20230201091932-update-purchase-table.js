@@ -3,16 +3,19 @@ let ObjectId = require('mongodb').ObjectId;
 module.exports = {
   async up(db, client) {
     const inserted_codes = [];
-
-      db.dropCollection("purchases", function (err, res) {
-        if (err) {
-          console.log("purchases table doesn't exist")
-        }
-      })
-    
+  
+    await db
+    .collection("inventory")
+    .find()
+    .forEach(function (Material) {
+          db.collection("Purchase_Order").updateMany(
+            { CODE: Material.product_code }, 
+            { $set: { "material_id": Material._id } }
+          );
+    });
 
     const orders = await db
-      .collection("Purchase Order")
+      .collection("Purchase_Order")
       .find()
       .toArray();
       for ( const PurchaseOrder of orders) {
@@ -32,7 +35,7 @@ module.exports = {
       };
 
       await db
-      .collection("Purchase Order")
+      .collection("Purchase_Order")
       .find()
       .forEach(async function (PurchaseOrder) {
       db.collection("purchases").updateOne(

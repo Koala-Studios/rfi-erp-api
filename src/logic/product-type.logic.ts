@@ -16,9 +16,9 @@ export const listProductType = async (
   };
 };
 
-export const productTypeLookup = async (s_value) => {
+export const productTypeLookup = async (s_value, f_sale:boolean) => {
   const searchValue = s_value.toString();
-  const list = await ProductType.find({ name: new RegExp(searchValue) }).limit(15);
+  const list = await ProductType.find({ name: new RegExp(searchValue, 'i'), for_sale:f_sale }).limit(15);
 
   return { status: status.OK, data: { message: "", res: list } };
 };

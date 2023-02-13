@@ -5,14 +5,16 @@ export interface IProductType extends mongoose.Document {
   name:string;
   code: string;
   is_raw:boolean;
-  for_sale:boolean
+  for_sale:boolean;
+  avoid_recur:boolean;
 }
 
 const productTypeSchema = new mongoose.Schema({
     name:String,
     code: String,
     is_raw:Boolean,
-    for_sale:Boolean
+    for_sale:Boolean,
+    avoid_recur:Boolean,
 });
 
 productTypeSchema.plugin(paginate);

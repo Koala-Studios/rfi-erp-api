@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import paginate from "mongoose-paginate-v2";
 
 interface IOrderItem {
+  _id:ObjectId,
   product_id: ObjectId;
   product_code: string;
   purchased_amount: number;
@@ -10,10 +11,28 @@ interface IOrderItem {
   unit_price: number;
 }
 
+export const orderStatus = {
+	AWAITING_SHIPPING: 1,
+	AWAITING_ARRIVAL: 2,
+	PARTIALLY_RECEIVED: 3,
+	RECEIVED: 4,
+	ABANDONED: 5,
+	DRAFT: 6,
+};
+
+
+export interface IOrderItemProcess extends IOrderItem {
+    lot_number:string,
+    process_amount:number,
+    container_size:number,
+    expiry_date:Date,
+  }
+
 export interface IPurchaseOrder extends mongoose.Document {
     date_purchased: Date;
     date_arrived?: Date;
     order_code: string;
+    shipping_code:string;
     supplier: {
         supplier_id: string;
         name: string;
@@ -27,6 +46,7 @@ const purchaseOrderSchema = new mongoose.Schema({
 
     date_purchased: Date,
     date_arrived: Date,
+    shipping_code:String,
     supplier: {
         supplier_id: ObjectId,
         name: String,
@@ -35,6 +55,7 @@ const purchaseOrderSchema = new mongoose.Schema({
     status: Number,
     order_items: 
     [{
+        _id:ObjectId,
         product_id:ObjectId,
         product_code: String,
         purchased_amount: Number,

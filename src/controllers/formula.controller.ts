@@ -11,7 +11,7 @@ import { Route } from "@tsoa/runtime";
 import { Request } from "@tsoa/runtime";
 import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
-import Formula, { IFormula } from "../models/formula.model";
+import Formula, { IFormula,IFormulaItem } from "../models/formula.model";
 import Inventory from "../models/inventory.model";
 import { reply, status } from "../config/config.status";
 import { getFormula } from "../logic/formula.logic";
@@ -39,10 +39,12 @@ export class FormulaController extends Controller {
   @Post("submit")
   @SuccessResponse(status.OK, reply.success)
   public async submitFormulaRequest(
-    @Request() req: IFormulaSubmitInfo
+    @Request() req: eRequest,
+    @Query() approved: boolean,
+    @Body() formula: IFormula,
+
   ) {
-    
-    const _res = await submitFormula(req);
+    const _res = await submitFormula(formula,approved);
 
     this.setStatus(_res.status);
 
