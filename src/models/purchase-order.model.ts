@@ -29,8 +29,8 @@ export interface IOrderItemProcess extends IOrderItem {
   }
 
 export interface IPurchaseOrder extends mongoose.Document {
-    date_purchased: Date;
-    date_arrived?: Date;
+    date_purchased: string;
+    date_arrived?: string;
     order_code: string;
     shipping_code:string;
     supplier: {
@@ -44,8 +44,8 @@ export interface IPurchaseOrder extends mongoose.Document {
 
 const purchaseOrderSchema = new mongoose.Schema({
 
-    date_purchased: Date,
-    date_arrived: Date,
+    date_purchased: String,
+    date_arrived: String,
     shipping_code:String,
     supplier: {
         supplier_id: ObjectId,
