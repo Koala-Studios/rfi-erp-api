@@ -22,7 +22,7 @@ module.exports = {
                 quarantined: 0,
                 allocated: 0,
                 average_price: 0,
-                reorder_amount: parseFloat(InventoryItem.REORDER_AMT),
+                reorder_amount:InventoryItem.REORDER_AMT ? parseFloat(InventoryItem.REORDER_AMT) : 0,
               }
             ,
             suppliers: [parseInt(InventoryItem.SUPPLIERS)],

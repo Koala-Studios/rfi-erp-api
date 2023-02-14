@@ -13,7 +13,7 @@ import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import PurchaseOrder, {IOrderItemProcess, IPurchaseOrder, orderStatus} from "../models/purchase-order.model";
 import { reply, status } from "../config/config.status";
-import { getPO, listPurchases, proccessPurchaseRow, confirmPurchase, setAsReceived } from "../logic/purchase.logic";
+import { getPO, listPurchases, proccessPurchaseRow, confirmPurchase, setAsReceivedOrCancelled } from "../logic/purchase.logic";
 import { InventoryController } from "./inventory.controller";
 
 
@@ -99,13 +99,24 @@ export class PurchaseController extends Controller {
     return res.data.res;
   }
 
-  @Put("mark-received")
+  @Post("mark-received")
   @SuccessResponse(status.OK, reply.success)
   public async markPurchaseReceived(
     @Request() req: eRequest,
     @Query() po_id:string,
   ) {
-    const res = await setAsReceived(po_id);
+    const res = await setAsReceivedOrCancelled(po_id,true);
+    this.setStatus(res.status);
+    return res.data.res;
+  }
+
+  @Post("mark-cancelled")
+  @SuccessResponse(status.OK, reply.success)
+  public async markPurchaseCancelled(
+    @Request() req: eRequest,
+    @Query() po_id:string,
+  ) {
+    const res = await setAsReceivedOrCancelled(po_id,false);
     this.setStatus(res.status);
     return res.data.res;
   }

@@ -190,19 +190,26 @@ export const confirmPurchase = async (purchase:IPurchaseOrder):Promise<ILogicRes
     return {status: status.OK, data:{message: "Order Successfully Confirmed",res: _purchase}};
 }
 
-export const setAsReceived = async (po_id):Promise<ILogicResponse> => {
-
+export const setAsReceivedOrCancelled = async (po_id,to_received):Promise<ILogicResponse> => {
+    const set_status = to_received ? orderStatus.RECEIVED : orderStatus.ABANDONED
     const purchase_order = await PurchaseOrder.findById(po_id);
-    const order_items = purchase_order.order_items;
-    for (let index = 0; index < order_items.length; index++) {
-        const order_item = order_items[index];
-        const inv_item = await Inventory.findById(order_item.product_id)
-        inv_item.stock.on_order -= order_item.purchased_amount -order_item.received_amount //TODO: Update To Movements
-        inv_item.save();
+    let message = "Order Successfully Updated";
+    if(purchase_order.status != orderStatus.RECEIVED) {
+    if(purchase_order && purchase_order.order_items) {
+        const order_items = purchase_order.order_items;
+        for (let index = 0; index < order_items.length; index++) { //removing the on_order qtys from inventory
+            const order_item = order_items[index];
+            const inv_item = await Inventory.findById(order_item.product_id)
+            inv_item.stock.on_order -= order_item.purchased_amount -order_item.received_amount //TODO: Update To Movements
+            inv_item.save();
+        }
     }
-    purchase_order.status = 4;
-    purchase_order.save();
-    console.log("THIS IS POG! GOTEM")
-    return {status: status.OK, data:{message:  "Order Successfully Marked As Received",res: true}};
-}
 
+        purchase_order.status = set_status;
+        purchase_order.save();
+    } else {
+        message = "Order has Already Been Finalized"
+    }
+    console.log("THIS IS POG! GOTEM")
+    return {status: status.OK, data:{message: message,res: true}};
+}
