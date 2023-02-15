@@ -6,21 +6,44 @@ export interface IForecast {
   amount: number;
 }
 
+export interface IForecastResults {
+  product_id:string;
+  product_code: string;
+  product_name:string;
+  required_amount: number;
+  available_amount: number;
+  on_order_amount: number;
+  on_hand_amount: number;
+
+}
+
 export const calculateMaterials = async(
   products: IForecast[]
-):Promise<IForecast[]> => {
+):Promise<IForecastResults[]> => {
   
   let rawIngredients: IForecast[] = [];  
-  let rawIngredientsFinal: IForecast[] = [];
+  let rawIngredientsFinal: IForecastResults[] = [];
   for (let i = 0; i < products.length; i++) {
     rawIngredients = [...rawIngredients,...await recursiveFinder(products[i])];
   }
   rawIngredients = Array.from(rawIngredients.reduce(
-    (m, {product_code, amount}) => m.set(product_code, (m.get(product_code) || 0) + amount), new Map
+    (m, {product_code, amount}) => m.set(product_code,(m.get(product_code) || 0) + amount), new Map
   ), ([product_code, amount]) => ({product_code, amount}));
 
+  for(const ingredient of rawIngredients) {
+    const inv_item = await Inventory.findOne({product_code: ingredient.product_code});
+    rawIngredientsFinal = [...rawIngredientsFinal, 
+      { product_id: inv_item._id, 
+        product_code: ingredient.product_code,
+        product_name: inv_item.name,
+        required_amount: ingredient.amount,
+        available_amount: inv_item.stock.on_hand - inv_item.stock.allocated,
+        on_order_amount: inv_item.stock.on_order,
+        on_hand_amount: inv_item.stock.on_hand
+        }]
+  }
 
-  return rawIngredients
+  return rawIngredientsFinal
 };
 
 const recursiveFinder = async (product: IForecast) => {
