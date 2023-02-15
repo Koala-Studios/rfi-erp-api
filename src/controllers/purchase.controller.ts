@@ -13,7 +13,7 @@ import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import PurchaseOrder, {IOrderItemProcess, IPurchaseOrder, orderStatus} from "../models/purchase-order.model";
 import { reply, status } from "../config/config.status";
-import { getPO, listPurchases, proccessPurchaseRow, confirmPurchase, setAsReceivedOrCancelled } from "../logic/purchase.logic";
+import { getPO, listPurchases, proccessPurchaseRow, confirmPurchase, setAsReceived, setAsCancelled } from "../logic/purchase.logic";
 import { InventoryController } from "./inventory.controller";
 
 
@@ -105,7 +105,7 @@ export class PurchaseController extends Controller {
     @Request() req: eRequest,
     @Query() po_id:string,
   ) {
-    const res = await setAsReceivedOrCancelled(po_id,true);
+    const res = await setAsReceived(po_id);
     this.setStatus(res.status);
     return res.data.res;
   }
@@ -116,7 +116,7 @@ export class PurchaseController extends Controller {
     @Request() req: eRequest,
     @Query() po_id:string,
   ) {
-    const res = await setAsReceivedOrCancelled(po_id,false);
+    const res = await setAsCancelled(po_id);
     this.setStatus(res.status);
     return res.data.res;
   }
