@@ -12,16 +12,17 @@ import {
 } from "@tsoa/runtime";
 import { Request as eRequest } from "express";
 import { Query } from "tsoa";
-import User, { INotification, IUser } from "../models/user.model";
+import User, { IUser } from "../models/user.model";
 import { reply, status } from "../config/config.status";
 import { listUser, userLookup } from "../logic/user.logic";
+import Notification, { INotification } from "../models/notification.model";
 
 interface IGetUserResponse {
+  _id: string;
   email: string;
   username: string;
   photo: string;
   identities: string[];
-  friends: string[];
   notifications: INotification[];
 }
 
@@ -33,22 +34,27 @@ export const getUserProjects = () => {};
 @Tags("User")
 @Security("jwt")
 export class UserController extends Controller {
-  @Get("getNotifications")
+  // @Get("getNotifications")
+  // @SuccessResponse(status.OK, reply.success)
+  // public async getNotifications(@Request() req: eRequest) {
+  //   const user = <IUser>req.user;
+
+  //   const notifications = Notification.findOne()
+
+  //   this.setStatus(status.OK);
+  //   return user.notifications;
+  // }
+  @Get("loadUser")
   @SuccessResponse(status.OK, reply.success)
-  public async getNotifications(@Request() req: eRequest) {
-    const user = <IUser>req.user;
-    this.setStatus(status.OK);
-    return user.notifications;
-  }
-  @Get("getUser")
-  @SuccessResponse(status.OK, reply.success)
-  public async getUser(@Request() req: eRequest) {
-    const user = <IGetUserResponse>req.user;
+  public async loadUser(@Request() req: eRequest) {
+    let user = <IGetUserResponse>req.user;
 
     if (!user) {
       this.setStatus(status.BAD_REQUEST);
       return;
     }
+
+    console.log(req.user);
 
     this.setStatus(status.OK);
     return user;
@@ -103,16 +109,11 @@ export class UserController extends Controller {
 
   @Post("update")
   @SuccessResponse(status.OK, reply.success)
-  public async updateUserRequest(
-    @Request() req: eRequest,
-    @Body() u: IUser
-  ) {
+  public async updateUserRequest(@Request() req: eRequest, @Body() u: IUser) {
     console.log("update", u);
     await User.findOneAndUpdate({ _id: u._id }, u);
 
     this.setStatus(status.OK);
     return true;
   }
-
-
 }
