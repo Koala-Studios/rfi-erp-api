@@ -1,5 +1,5 @@
 import User from "../models/user.model";
-import { deleteUserNotification } from "../logic/user.logic";
+import { deleteNotification } from "../logic/notification.logic";
 import send from "./config.socket";
 import logger from "../logger/logger";
 
@@ -31,6 +31,6 @@ export const userSockets = async (io, socket) => {
   });
 
   socket.on(send.delete_notification, (notificationId: string) => {
-    deleteUserNotification(socket.userId, notificationId);
+    deleteNotification(socket.userId, notificationId);
   });
 };

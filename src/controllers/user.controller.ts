@@ -16,13 +16,14 @@ import User, { IUser } from "../models/user.model";
 import { reply, status } from "../config/config.status";
 import { listUser, userLookup } from "../logic/user.logic";
 import Notification, { INotification } from "../models/notification.model";
+import { ObjectId } from "mongoose";
 
 interface IGetUserResponse {
-  _id: string;
+  _id: any;
   email: string;
   username: string;
-  photo: string;
-  identities: string[];
+  // photo: string;
+  // identities: string[];
   notifications: INotification[];
 }
 
@@ -47,14 +48,23 @@ export class UserController extends Controller {
   @Get("loadUser")
   @SuccessResponse(status.OK, reply.success)
   public async loadUser(@Request() req: eRequest) {
-    let user = <IGetUserResponse>req.user;
+    const _user = <IUser>req.user;
 
-    if (!user) {
-      this.setStatus(status.BAD_REQUEST);
-      return;
+    // console.log(_user);
+
+    let user: IGetUserResponse = {
+      _id: _user._id,
+      email: _user.email,
+      username: _user.username,
+      notifications: [],
+    };
+
+    const nc = await Notification.findOne({ receiverId: user._id });
+
+    if (nc) {
+      user.notifications = nc.notifications;
+      console.log(nc.notifications, user);
     }
-
-    console.log(req.user);
 
     this.setStatus(status.OK);
     return user;

@@ -3,10 +3,11 @@ import paginate from "mongoose-paginate-v2";
 
 export interface INotification {
   _id?: string;
-  type: number; //notification type;
+  n_type: number; //notification type;
   text?: string;
   ref?: string; //any reference id needed for notification
   sender?: string;
+  save?: boolean;
 }
 
 export interface INotificationCluster extends mongoose.Document {
@@ -22,10 +23,10 @@ const notificationSchema = new mongoose.Schema({
   receiverId: String,
   notifications: [
     {
-      type: Number,
       text: String,
       ref: String,
       sender: String,
+      n_type: Number,
     },
   ],
 });

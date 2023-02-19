@@ -16,7 +16,7 @@ import { reply, status } from "../config/config.status";
 import { listProject } from "../logic/project.logic";
 import { ObjectId } from "mongodb";
 import { Deprecated } from "tsoa";
-import { createNotification, textNotification } from "../logic/user.logic";
+import { notify } from "../logic/notification.logic";
 import { IUser } from "../models/user.model";
 
 interface ICreateProjectRequest {
@@ -56,12 +56,7 @@ export class ProjectController extends Controller {
 
     const currUser = <IUser>req.user;
 
-    textNotification(
-      "Opened a project wow",
-      false,
-      "System",
-      currUser.id.toString()
-    );
+    notify("Opened a project wow", true, "System", currUser.id.toString());
 
     this.setStatus(status.OK);
     return _project;
