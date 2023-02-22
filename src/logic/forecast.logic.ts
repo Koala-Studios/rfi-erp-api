@@ -1,3 +1,4 @@
+import { IForecastResults } from "../models/forecast.model";
 import Formula, { IFormula } from "../models/formula.model";
 import Inventory, { IInventory } from "../models/inventory.model";
 
@@ -6,16 +7,7 @@ export interface IForecast {
   amount: number;
 }
 
-export interface IForecastResults {
-  product_id:string;
-  product_code: string;
-  product_name:string;
-  required_amount: number;
-  available_amount: number;
-  on_order_amount: number;
-  on_hand_amount: number;
 
-}
 
 export const calculateMaterials = async(
   products: IForecast[]
@@ -39,7 +31,9 @@ export const calculateMaterials = async(
         required_amount: ingredient.amount,
         available_amount: inv_item.stock.on_hand - inv_item.stock.allocated,
         on_order_amount: inv_item.stock.on_order,
-        on_hand_amount: inv_item.stock.on_hand
+        on_hand_amount: inv_item.stock.on_hand,
+        in_transit_amount: inv_item.stock.in_transit,
+        reorder_amount: inv_item.stock.reorder_amount
         }]
   }
 

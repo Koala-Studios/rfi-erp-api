@@ -8,6 +8,18 @@ interface IForecastProduct {
     status: number;
   }
 
+  export interface IForecastResults {
+    product_id:string;
+    product_code: string;
+    product_name:string;
+    required_amount: number;
+    available_amount: number;
+    on_order_amount: number;
+    on_hand_amount: number;
+    in_transit_amount: number;
+    reorder_amount:number;
+  }
+
 
 export interface IForecast extends mongoose.Document {
     forecast_code: string;

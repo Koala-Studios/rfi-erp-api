@@ -5,6 +5,7 @@ interface IStockSummary {
   on_hold: number;
   on_hand: number;
   on_order: number;
+  in_transit: number;
   quarantined: number;
   allocated: number;
   average_price: number;
