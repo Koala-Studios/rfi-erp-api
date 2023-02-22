@@ -16,6 +16,8 @@ import { reply, status } from "../config/config.status";
 import { listProject } from "../logic/project.logic";
 import { ObjectId } from "mongodb";
 import { Deprecated } from "tsoa";
+import { notify } from "../logic/notification.logic";
+import { IUser } from "../models/user.model";
 
 interface ICreateProjectRequest {
   project_name: string;
@@ -51,8 +53,12 @@ export class ProjectController extends Controller {
     @Query() id: string
   ) {
     const _project = await Project.findById(id);
+
+    const currUser = <IUser>req.user;
+
+    notify("Opened a project wow", true, "System", currUser.id.toString());
+
     this.setStatus(status.OK);
-    console.log(_project);
     return _project;
   }
 
@@ -67,7 +73,6 @@ export class ProjectController extends Controller {
     const newProject = new Project(body);
 
     newProject.save();
-    console.log("create", newProject);
     this.setStatus(status.CREATED);
     return newProject._id;
   }
@@ -78,7 +83,6 @@ export class ProjectController extends Controller {
     @Request() req: eRequest,
     @Body() p: IProject
   ) {
-    console.log("update", p);
     await Project.findOneAndUpdate({ _id: p._id }, p);
 
     this.setStatus(status.OK);

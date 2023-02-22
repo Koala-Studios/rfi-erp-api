@@ -12,16 +12,18 @@ import {
 } from "@tsoa/runtime";
 import { Request as eRequest } from "express";
 import { Query } from "tsoa";
-import User, { INotification, IUser } from "../models/user.model";
+import User, { IUser } from "../models/user.model";
 import { reply, status } from "../config/config.status";
 import { listUser, userLookup } from "../logic/user.logic";
+import Notification, { INotification } from "../models/notification.model";
+import { ObjectId } from "mongoose";
 
 interface IGetUserResponse {
+  _id: any;
   email: string;
   username: string;
-  photo: string;
-  identities: string[];
-  friends: string[];
+  // photo: string;
+  // identities: string[];
   notifications: INotification[];
 }
 
@@ -33,21 +35,35 @@ export const getUserProjects = () => {};
 @Tags("User")
 @Security("jwt")
 export class UserController extends Controller {
-  @Get("getNotifications")
-  @SuccessResponse(status.OK, reply.success)
-  public async getNotifications(@Request() req: eRequest) {
-    const user = <IUser>req.user;
-    this.setStatus(status.OK);
-    return user.notifications;
-  }
-  @Get("getUser")
-  @SuccessResponse(status.OK, reply.success)
-  public async getUser(@Request() req: eRequest) {
-    const user = <IGetUserResponse>req.user;
+  // @Get("getNotifications")
+  // @SuccessResponse(status.OK, reply.success)
+  // public async getNotifications(@Request() req: eRequest) {
+  //   const user = <IUser>req.user;
 
-    if (!user) {
-      this.setStatus(status.BAD_REQUEST);
-      return;
+  //   const notifications = Notification.findOne()
+
+  //   this.setStatus(status.OK);
+  //   return user.notifications;
+  // }
+  @Get("loadUser")
+  @SuccessResponse(status.OK, reply.success)
+  public async loadUser(@Request() req: eRequest) {
+    const _user = <IUser>req.user;
+
+    // console.log(_user);
+
+    let user: IGetUserResponse = {
+      _id: _user._id,
+      email: _user.email,
+      username: _user.username,
+      notifications: [],
+    };
+
+    const nc = await Notification.findOne({ receiverId: user._id });
+
+    if (nc) {
+      user.notifications = nc.notifications;
+      console.log(nc.notifications, user);
     }
 
     this.setStatus(status.OK);
@@ -103,16 +119,11 @@ export class UserController extends Controller {
 
   @Post("update")
   @SuccessResponse(status.OK, reply.success)
-  public async updateUserRequest(
-    @Request() req: eRequest,
-    @Body() u: IUser
-  ) {
+  public async updateUserRequest(@Request() req: eRequest, @Body() u: IUser) {
     console.log("update", u);
     await User.findOneAndUpdate({ _id: u._id }, u);
 
     this.setStatus(status.OK);
     return true;
   }
-
-
 }
