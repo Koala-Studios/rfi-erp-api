@@ -50,7 +50,7 @@ export class UserController extends Controller {
   public async loadUser(@Request() req: eRequest) {
     const _user = <IUser>req.user;
 
-    // console.log(_user);
+    console.log(_user);
 
     let user: IGetUserResponse = {
       _id: _user._id,

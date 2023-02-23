@@ -1,4 +1,5 @@
 import app from "../app";
+import logger from "../logger/logger";
 import send from "./config.socket";
 import { initNotifications } from "./notification.socket";
 import { userSockets } from "./user.socket";
@@ -19,4 +20,5 @@ export const initializeSockets = () => {
   });
 
   httpServer.listen(5001);
+  logger.info("Socket Server Initialized");
 };

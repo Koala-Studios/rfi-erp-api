@@ -5,7 +5,6 @@ import logger from "../logger/logger";
 
 export const userSockets = async (io, socket) => {
   //TODO:use handshake.auth to authenticate connection
-  console.log(socket.handshake.query.userId);
 
   const user = await User.findById(socket.handshake.query.userId);
 
