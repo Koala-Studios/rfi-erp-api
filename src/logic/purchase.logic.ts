@@ -157,7 +157,7 @@ export const proccessPurchaseRow = async (
   // order_item, "OK IT WORKED?!?!")
 
   purchase_order.order_items[item_index].received_amount += row.process_amount;
-  const order_item = purchase_order[item_index];
+  const order_item = purchase_order.order_items[item_index];
   purchase_order.save();
   const approved_by_qc = true;
   if (quarantine) {
@@ -176,7 +176,7 @@ export const proccessPurchaseRow = async (
     }
   }
   _status = status.OK;
-  return { status: _status, data: { message: _message, res: order_item } };
+  return { status: _status, data: { message: _message, res: purchase_order } };
 };
 
 export const receiveItem = async (
@@ -232,8 +232,8 @@ export const confirmPurchase = async (
 export const setAsReceived = async (po_id): Promise<ILogicResponse> => {
   const purchase_order = await PurchaseOrder.findById(po_id);
   const order_items = purchase_order.order_items;
-  for (let index = 0; index < order_items.length; index++) {
-    const order_item = order_items[index];
+  for (const element of order_items) {
+    const order_item = element;
     const inv_item = await Inventory.findById(order_item.product_id);
     inv_item.stock.on_order -=
       order_item.purchased_amount - order_item.received_amount; //TODO: Update To Movements
@@ -244,26 +244,26 @@ export const setAsReceived = async (po_id): Promise<ILogicResponse> => {
 
   return {
     status: status.OK,
-    data: { message: "Order Successfully Marked As Received", res: true },
+    data: { message: "Order Successfully Marked As Received", res: purchase_order },
   };
 };
 
 
 export const setAsCancelled = async (po_id): Promise<ILogicResponse> => {
-    const purchase_order = await PurchaseOrder.findById(po_id);
-    const order_items = purchase_order.order_items;
-    for (let index = 0; index < order_items.length; index++) {
-      const order_item = order_items[index];
-      const inv_item = await Inventory.findById(order_item.product_id);
-      inv_item.stock.on_order -=
-        order_item.purchased_amount - order_item.received_amount; //TODO: Update To Movements
-      inv_item.save();
-    }
-    purchase_order.status = 5;
-    purchase_order.save();
-  
-    return {
-      status: status.OK,
-      data: { message: "Order Successfully Marked As Abandoned", res: true },
-    };
+  const purchase_order = await PurchaseOrder.findById(po_id);
+  const order_items = purchase_order.order_items;
+  for (const element of order_items) {
+    const order_item = element;
+    const inv_item = await Inventory.findById(order_item.product_id);
+    inv_item.stock.on_order -=
+      order_item.purchased_amount - order_item.received_amount; //TODO: Update To Movements
+    inv_item.save();
+  }
+  purchase_order.status = 5;
+  purchase_order.save();
+
+  return {
+    status: status.OK,
+    data: { message: "Order Successfully Marked As Abandoned", res: purchase_order },
   };
+};
