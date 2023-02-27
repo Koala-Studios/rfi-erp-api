@@ -2,15 +2,17 @@
 import mongoose from "mongoose";
 import paginate from "mongoose-paginate-v2";
 
-interface ICountItem {
-  product_id: string;
-  amount: number;
-  amount_proposed: number;
-  status: number;
+export interface ICountItem {
+    product_id: string;
+    amount: number;
+    amount_proposed: number;
+    status: number;
 }
 
 export interface IStockCount extends mongoose.Document {
+    count_code: string;
     date_proposed: Date;
+    date_approved: Date;
     count_items: [ICountItem];
     status: number;
 }
