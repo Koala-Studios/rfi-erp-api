@@ -30,4 +30,4 @@ const stockCountSchema = new mongoose.Schema({
 
 stockCountSchema.plugin(paginate);
 
-export default mongoose.model<IStockCount, mongoose.PaginateModel<IStockCount>>("Stock Count", stockCountSchema);
+export default mongoose.model<IStockCount, mongoose.PaginateModel<IStockCount>>("Stock Count", stockCountSchema,"stock_counts");

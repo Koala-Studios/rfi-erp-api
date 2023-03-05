@@ -20,6 +20,7 @@ interface IInventoryStockGrouped {
   average_cost: number,
   received_amount: number,
   used_amount: number,
+  adjusted_amount:number,
   allocated_amount: number,
   quarantined_containers: number,
   items:[IInventoryStock]
