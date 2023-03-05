@@ -13,8 +13,12 @@ import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import Batching, { IBatching } from "../models/Batching.model";
 import { reply, status } from "../config/config.status";
-import Inventory, {IInventory} from "../models/inventory.model";
-import { createBatching, createBOM, listBatching } from "../logic/batching.logic";
+import Inventory, { IInventory } from "../models/inventory.model";
+import {
+  createBatching,
+  createBOM,
+  listBatching,
+} from "../logic/batching.logic";
 import { ICreateBatchingInfo } from "../logic/interfaces.logic";
 
 @Route("batching")
@@ -25,20 +29,10 @@ export class BatchingController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async listBatchingRequest(
     @Request() req: eRequest,
-    @Query() page: string,
-    @Query() count: string,
     @Query() query: string
   ) {
-    const _page = parseInt(<string>page);
-    const _count = parseInt(<string>count);
-
-    console.log(JSON.parse(query));
-
-    const res = await listBatching({
-      page: _page,
-      count: _count,
-      filter: query,
-    });
+    console.log("batching query", query);
+    const res = await listBatching(query);
     this.setStatus(res.status);
     return res.data;
   }
@@ -55,12 +49,12 @@ export class BatchingController extends Controller {
     return _res.data;
   }
 
-  @Post("bom")// Not done at all, will change how it works lol
-  @SuccessResponse(status.CREATED, reply.success) 
+  @Post("bom") // Not done at all, will change how it works lol
+  @SuccessResponse(status.CREATED, reply.success)
   public async createBOMRequest(
     @Request() req: eRequest,
-    @Query() product_id:string,
-    @Query() amount:number,
+    @Query() product_id: string,
+    @Query() amount: number
   ) {
     const _res = await createBOM(product_id, amount);
 
