@@ -8,16 +8,15 @@ import Inventory from "../models/inventory.model";
 import Batching, { IBatching } from "../models/Batching.model";
 import Formula, { IFormula } from "../models/formula.model";
 import { FilterQuery } from "mongoose";
+import { IProcessedQuery, processQuery } from "./utils";
 
 //TODO:LISTING PARAMETER GENERALIZING
-export const listBatching = async (
-  listParams: IListParams
-): Promise<ILogicResponse> => {
-  const query = JSON.parse(listParams.filter) as FilterQuery<IBatching>;
+export const listBatching = async (query: string): Promise<ILogicResponse> => {
+  const { _filter, _page, _count }: IProcessedQuery = processQuery(query);
 
-  const list = await Batching.paginate(query, {
-    page: listParams.page,
-    limit: listParams.count,
+  const list = await Batching.paginate(_filter, {
+    page: _page,
+    limit: _count,
     leanWithId: true,
   });
 
