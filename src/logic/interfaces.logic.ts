@@ -26,8 +26,3 @@ export interface IFormulaSubmitInfo {
   approved: boolean;
 }
 
-export interface ICreateBatchingInfo {
-  quantity: number;
-  batch_code: string;
-  product_id: string;
-}

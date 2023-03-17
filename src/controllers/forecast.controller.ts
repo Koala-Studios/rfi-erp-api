@@ -28,7 +28,7 @@ export class ForecastController extends Controller {
     @Body() req: calculateForecastRequest
   ) {
     // console.log(req);
-    const _forecast = await calculateMaterials(req.products);
+    const _forecast = await calculateMaterials(<any>req.products);
     
 // console.log(_forecast)
 

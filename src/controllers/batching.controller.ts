@@ -15,11 +15,11 @@ import Batching, { IBatching } from "../models/Batching.model";
 import { reply, status } from "../config/config.status";
 import Inventory, { IInventory } from "../models/inventory.model";
 import {
-  createBatching,
   createBOM,
+  getBatching,
   listBatching,
 } from "../logic/batching.logic";
-import { ICreateBatchingInfo } from "../logic/interfaces.logic";
+import mongoose from "mongoose";
 
 @Route("batching")
 @Tags("Batching")
@@ -37,27 +37,60 @@ export class BatchingController extends Controller {
     return res.data;
   }
 
+
+  @Get("get")
+  @SuccessResponse(status.OK, reply.success)
+  public async getFormulaRequest(
+    @Request() req: eRequest,
+    @Query() id: string,
+  ) {
+    console.log(id, 'THIS IS ID SENT')
+    const _res = await getBatching(id);
+
+    this.setStatus(status.OK);
+    console.log(_res)
+    return _res.data;
+  }
+
+
+
   @Post("create")
   @SuccessResponse(status.CREATED, reply.success)
   public async createBatchingRequest(
     @Request() req: eRequest,
-    @Body() body: ICreateBatchingInfo
+    @Body() body: IBatching
   ) {
-    const _res = await createBatching(body);
-
-    this.setStatus(_res.status);
-    return _res.data;
+    body._id = new mongoose.Types.ObjectId();
+    body.ingredients = [];
+    body.date_created = new Date();
+    const _batching = new Batching(body);
+    _batching.save();
+    this.setStatus(status.CREATED);
+    return _batching._id;
   }
 
-  @Post("bom") // Not done at all, will change how it works lol
+  @Post("update")
+  @SuccessResponse(status.OK, reply.success)
+  public async updateProjectRequest(
+    @Request() req: eRequest,
+    @Body() p: IBatching
+  ) {
+    await Batching.findOneAndUpdate({ _id: p._id }, p);
+
+    this.setStatus(status.OK);
+    return true;
+  }
+
+
+
+  @Post("generate-bom")
   @SuccessResponse(status.CREATED, reply.success)
   public async createBOMRequest(
     @Request() req: eRequest,
-    @Query() product_id: string,
-    @Query() amount: number
+    @Query() batching_id,
   ) {
-    const _res = await createBOM(product_id, amount);
-
+    const _batching = await Batching.findById(batching_id)
+    const _res = await createBOM(_batching);
     this.setStatus(_res.status);
     return _res.data;
   }

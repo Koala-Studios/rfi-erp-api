@@ -1,5 +1,4 @@
 import {
-  ICreateBatchingInfo,
   IListParams,
   ILogicResponse,
 } from "./interfaces.logic";
@@ -7,8 +6,11 @@ import { reply, status } from "../config/config.status";
 import Inventory from "../models/inventory.model";
 import Batching, { IBatching } from "../models/Batching.model";
 import Formula, { IFormula } from "../models/formula.model";
-import { FilterQuery } from "mongoose";
+import mongoose, { FilterQuery } from "mongoose";
 import { IProcessedQuery, processQuery } from "./utils";
+import { calculateMaterials } from "./forecast.logic";
+import { ObjectId } from "mongodb";
+
 
 //TODO:LISTING PARAMETER GENERALIZING
 export const listBatching = async (query: string): Promise<ILogicResponse> => {
@@ -18,118 +20,76 @@ export const listBatching = async (query: string): Promise<ILogicResponse> => {
     page: _page,
     limit: _count,
     leanWithId: true,
-  });
+    sort: { date_created: 'desc' }
 
+  });
+  console.log(list, 'LIST')
   //TODO: REMOVE THIS LMAO
   for (let index = 0; index < list.docs.length; index++) {
     const material_id = list.docs[index].product_id;
-
     const product = await Inventory.findOne({ _id: material_id });
-    list.docs[index].product_name = product.name;
+    list.docs[index].product_name = product ? product.name : 'ERROR';
   }
 
   return { status: status.OK, data: { message: null, res: list } };
 };
 
-export const createBatching = async (
-  createInfo: ICreateBatchingInfo
-): Promise<ILogicResponse> => {
-  const _batching = new Batching(<IBatching>{
-    product_id: createInfo.product_id,
-    quantity: createInfo.quantity,
-    date_created: new Date(),
-    batch_code: createInfo.batch_code,
-    status: 1,
-  });
 
-  _batching.save();
+
+export const getBatching = async (_id): Promise<ILogicResponse> => {
+  let _status: number;
+
+
+  const _batching = await Batching.findById(_id)
+  if (!_batching) {
+    _status = status.OK;
+    console.log(_id, 'BRUH')
+    return {
+      status: _status,
+      data: { message: "No Batching Order Found", res: null },
+    };
+  }
+  _status = status.OK;
 
   return {
-    status: status.CREATED,
-    data: { message: "Batch Created", res: _batching },
+    status: _status,
+    data: { message: "Batching Order", res: _batching },
   };
 };
 
 export const createBOM = async (
-  product_code: string,
-  amount: number
+  batching: IBatching
 ): Promise<ILogicResponse> => {
-  const materials = await recursiveFinder({ product_code, amount });
-
-  console.log(materials, "THIS IS FINAL");
+  const materials = await calculateMaterials([{product_code: batching.product_code,amount: batching.quantity}]);
+  for(const material of materials) {
+    const newId = new mongoose.Types.ObjectId();
+    batching.ingredients = [...batching.ingredients, 
+    {
+      _id:  new mongoose.Types.ObjectId().toHexString(),
+      product_id: material.product_id,
+      product_code: material.product_code,
+      product_name: material.product_name,
+      required_amount: material.required_amount,
+      used_containers: [],
+      used_amount: 0
+    }]
+  }
+  batching.save()
+  console.log(materials, "batching materials");
   return {
     status: status.CREATED,
-    data: { message: "Batch Created", res: materials },
+    data: { message: "Batch Created", res: batching },
   };
 };
 
-const recursiveFinder = async (product: {
-  product_code: string;
-  amount: number;
-}) => {
-  const materialTypes = ["FL", "FK", "FE", "SM"]; //TODO: make this modular
-  const avoidRecursionMatTypes = ["FK"];
-  let rawIngredients: { product_code: string; amount: number }[] = [];
 
-  const formula = await Formula.findOne({
-    product_code: product.product_code,
-    $max: "version",
-  });
-  // console.log(formula)
-  const f = formula.formula_items;
-
-  for (let i = 0; i < f.length; i++) {
-    //TODO: INCOMPLETE
-    if (
-      materialTypes.some((substring) =>
-        f[i].material_code.startsWith(substring)
-      )
-    ) {
-      //if not a raw material.
-      if (
-        avoidRecursionMatTypes.some((substring) =>
-          f[i].material_code.startsWith(substring)
-        )
-      ) {
-        const inv_material = await Inventory.findOne({
-          product_code: f[i].material_code,
-        });
-        if (
-          inv_material.stock[0].on_hand - inv_material.stock[0].allocated >=
-          (product.amount * f[i].amount) / 100
-        ) {
-          //!MIGRATE TO REMOVE ARRAY AND GET RID OF THESE [0]'s
-          // console.log(inv_material.stock[0].on_hand,  inv_material.stock[0].allocated, (product.amount * f[i].amount) / 100, 'HAS ENOUGH' )
-          rawIngredients.push({
-            product_code: f[i].material_code,
-            amount: (product.amount * f[i].amount) / 100,
-          });
-        } else {
-          // console.log(inv_material.stock[0].on_hand,  inv_material.stock[0].allocated, (product.amount * f[i].amount) / 100, 'HAS NOT ENOUGH' + f[i].material_code )
-          rawIngredients = [
-            ...rawIngredients,
-            ...(await recursiveFinder({
-              product_code: f[i].material_code,
-              amount: (product.amount * f[i].amount) / 100,
-            })),
-          ];
-        }
-      } else {
-        rawIngredients = [
-          ...rawIngredients,
-          ...(await recursiveFinder({
-            product_code: f[i].material_code,
-            amount: (product.amount * f[i].amount) / 100,
-          })),
-        ];
-      }
-    } else {
-      rawIngredients.push({
-        product_code: f[i].material_code,
-        amount: (product.amount * f[i].amount) / 100,
-      });
-    }
-  }
-
-  return rawIngredients;
+export const startProduction = async (
+  batching: IBatching
+): Promise<ILogicResponse> => {
+  
+  batching.save()
+  return {
+    status: status.CREATED,
+    data: { message: "Batch Created", res: batching },
+  };
 };

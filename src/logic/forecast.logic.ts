@@ -10,7 +10,7 @@ export interface IForecast {
 
 
 export const calculateMaterials = async(
-  products: IForecast[]
+  products: [{product_code:string, amount:number }]
 ):Promise<IForecastResults[]> => {
   
   let rawIngredients: IForecast[] = [];  
