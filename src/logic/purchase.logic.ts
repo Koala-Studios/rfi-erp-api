@@ -4,10 +4,12 @@ import PurchaseOrder, {
   IPurchaseOrder,
   orderStatus,
 } from "../models/purchase-order.model";
-import Inventory from "../models/inventory.model";
+import Inventory, { IInventory } from "../models/inventory.model";
 import mongoose from "mongoose";
 import { IListParams, IListResponse, ILogicResponse } from "./interfaces.logic";
 import { inventoryLookup } from "./inventory.logic";
+import { moveInventory } from "./inventory_movements.logic";
+import { movementTypes } from "../models/inventory-movements.model";
 let ObjectId = require("mongodb").ObjectId;
 
 export const listPurchases = async (
@@ -160,18 +162,25 @@ export const proccessPurchaseRow = async (
   const order_item = purchase_order.order_items[item_index];
   purchase_order.save();
   const approved_by_qc = true;
+  const movement = {
+    product_id: inv_item._id,
+    product_code: inv_item.product_code,
+    name: inv_item.name,
+    module_source: PurchaseOrder.modelName,
+    movement_target_type: quarantine ? movementTypes.QUARANTINED : movementTypes.ON_HOLD,
+    amount: row.process_amount
+  }
+  const movement_source = {
+    movement_source_type: movementTypes.IN_TRANSIT,
+    amount: row.process_amount
+  }
+  await moveInventory(movement, movement_source);
   if (quarantine) {
-    inv_item.stock.quarantined += row.process_amount;
-    inv_item.stock.on_order -= row.process_amount;
-    inv_item.save();
-    _message = "Sent To Quarantine Successfully";
+    _message = "Sent To Quarantine Successfully"
   } else {
     //TODO: Change this step to ONLY send to QC. QC will then call the receiveItem function on its own
-    inv_item.stock.on_order -= row.process_amount; //TODO: This will soon be replaced by the movement logs (will also use findOneAndUpdate)
-    inv_item.stock.on_hold += row.process_amount;
-    inv_item.save();
     if (approved_by_qc) {
-      receiveItem(row);
+      receiveItem(row, inv_item);
       _message = "Sent To QC Successfully";
     }
   }
@@ -180,25 +189,58 @@ export const proccessPurchaseRow = async (
 };
 
 export const receiveItem = async (
-  row: IOrderItemProcess
+  row: IOrderItemProcess,
+  inv_item: IInventory
 ): Promise<ILogicResponse> => {
   let _status: number;
   let _message: string = "";
-  const inv_item = await Inventory.findOneAndUpdate(
-    { _id: row.product_id },
-    {
-      $inc: {
-        "stock.on_hand": row.process_amount,
-        "stock.on_hold": -row.process_amount,
-      },
-    }
-  );
+
+  const movement = {
+    product_id: inv_item._id ,
+    product_code: inv_item.product_code,
+    name: inv_item.name,
+    module_source: PurchaseOrder.modelName,
+    movement_target_type: movementTypes.ON_HAND,
+    amount: row.process_amount
+  }
+  const movement_source = {
+    movement_source_type: movementTypes.ON_HOLD,
+    amount: row.process_amount
+  }
+  const _res = await moveInventory(movement, movement_source);
+
   _status = status.OK;
   return {
     status: _status,
     data: { message: "Successfully Added To Inventory", res: null },
   };
 };
+export const handlePurchaseShipment = async (
+  purchase: IPurchaseOrder
+): Promise<ILogicResponse> => {
+
+  
+  for (const item of purchase.order_items) {
+    const inv_item = await Inventory.findById(item.product_id);
+    const movement = {
+      product_id: inv_item._id ,
+      product_code: inv_item.product_code,
+      name: inv_item.name,
+      module_source: PurchaseOrder.modelName,
+      movement_target_type: movementTypes.IN_TRANSIT,
+      amount: item.purchased_amount
+    }
+    const movement_source = {
+      movement_source_type: movementTypes.ON_ORDER,
+      amount: item.purchased_amount
+    };
+    await moveInventory(movement,movement_source);
+  }
+  return {
+    status: status.OK,
+    data: { message: "Success", res: null },
+  };
+}
 
 export const confirmPurchase = async (
   purchase: IPurchaseOrder
@@ -216,12 +258,18 @@ export const confirmPurchase = async (
     { new: true }
   );
   for (const item of _purchase.order_items) {
-    await Inventory.findOneAndUpdate(
-      { _id: item.product_id },
-      { $inc: { "stock.on_order": item.purchased_amount } }
-    );
+    const inv_item = await Inventory.findById(item.product_id);
+    const movement = {
+      product_id: inv_item._id ,
+      product_code: inv_item.product_code,
+      name: inv_item.name,
+      module_source: PurchaseOrder.modelName,
+      movement_target_type: movementTypes.ON_ORDER,
+      amount: item.purchased_amount
+    }
+    await moveInventory(movement);
   }
-
+  
   return {
     status: status.OK,
     data: { message: "Order Successfully Confirmed", res: _purchase },
@@ -232,14 +280,24 @@ export const confirmPurchase = async (
 export const setAsReceived = async (po_id): Promise<ILogicResponse> => {
   const purchase_order = await PurchaseOrder.findById(po_id);
   const order_items = purchase_order.order_items;
-  for (const element of order_items) {
-    const order_item = element;
-    const inv_item = await Inventory.findById(order_item.product_id);
-    inv_item.stock.on_order -=
-      order_item.purchased_amount - order_item.received_amount; //TODO: Update To Movements
-    inv_item.save();
+  for (const order_item of order_items) {
+    if(order_item.purchased_amount - order_item.received_amount > 0) {
+      const inv_item = await Inventory.findById(order_item.product_id);
+      const movement = {
+        product_id: inv_item._id ,
+        product_code: inv_item.product_code,
+        name: inv_item.name,
+        module_source: PurchaseOrder.modelName,
+        movement_target_type: purchase_order.status == orderStatus.AWAITING_SHIPPING ? movementTypes.ON_ORDER : movementTypes.IN_TRANSIT,
+        amount: - (order_item.purchased_amount - order_item.received_amount)
+      }
+      await moveInventory(movement);
+    }
+
+
+    
   }
-  purchase_order.status = 4;
+  purchase_order.status = orderStatus.RECEIVED;
   purchase_order.save();
 
   return {
@@ -252,16 +310,22 @@ export const setAsReceived = async (po_id): Promise<ILogicResponse> => {
 export const setAsCancelled = async (po_id): Promise<ILogicResponse> => {
   const purchase_order = await PurchaseOrder.findById(po_id);
   const order_items = purchase_order.order_items;
-  for (const element of order_items) {
-    const order_item = element;
-    const inv_item = await Inventory.findById(order_item.product_id);
-    inv_item.stock.on_order -=
-      order_item.purchased_amount - order_item.received_amount; //TODO: Update To Movements
-    inv_item.save();
+  for (const order_item of order_items) {
+    if(order_item.purchased_amount - order_item.received_amount > 0) {
+      const inv_item = await Inventory.findById(order_item.product_id);
+      const movement = {
+        product_id: inv_item._id ,
+        product_code: inv_item.product_code,
+        name: inv_item.name,
+        module_source: PurchaseOrder.modelName,
+        movement_target_type: purchase_order.status == orderStatus.AWAITING_SHIPPING ? movementTypes.ON_ORDER : movementTypes.IN_TRANSIT,
+        amount: - (order_item.purchased_amount - order_item.received_amount)
+      }
+      await moveInventory(movement);
+    }
   }
-  purchase_order.status = 5;
+  purchase_order.status = orderStatus.ABANDONED;
   purchase_order.save();
-
   return {
     status: status.OK,
     data: { message: "Order Successfully Marked As Abandoned", res: purchase_order },

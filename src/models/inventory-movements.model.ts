@@ -8,8 +8,8 @@ export const movementTypes = {
 	ON_HAND: 'on_hand',
 	ON_ORDER: 'on_order',
 	IN_TRANSIT: 'in_transit',
-	QUARANTINE: 'quarantine',
-	ALLOCATE: 'allocated',
+	QUARANTINED: 'quarantined',
+	ALLOCATED: 'allocated',
 };
 
 export interface IInventoryMovement extends mongoose.Document {
@@ -17,7 +17,7 @@ export interface IInventoryMovement extends mongoose.Document {
   product_code: string;
   name: string;
   module_source:string;
-  movement_type:string;
+  movement_target_type:string;
   amount:number;
 }
 
@@ -27,6 +27,7 @@ const inventoryMovementSchema = new mongoose.Schema({
     name: String,
     module_source: String,
     movement_type: String,
+    movement_target_type: String,
     amount:Number
 });
 

@@ -49,7 +49,8 @@ const inventorySchema = new mongoose.Schema({
       quarantined: Number,
       allocated: Number,
       average_price: Number,
-      reorder_amount: Number
+      reorder_amount: Number,
+      in_transit: Number
     },
   suppliers: [String],
   regulatory: {

@@ -13,7 +13,7 @@ import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import PurchaseOrder, { IOrderItemProcess, IPurchaseOrder, orderStatus } from "../models/purchase-order.model";
 import { reply, status } from "../config/config.status";
-import { getPO, listPurchases, proccessPurchaseRow, confirmPurchase, setAsReceived, setAsCancelled } from "../logic/purchase.logic";
+import { getPO, listPurchases, proccessPurchaseRow, confirmPurchase, setAsReceived, setAsCancelled, handlePurchaseShipment } from "../logic/purchase.logic";
 import { InventoryController } from "./inventory.controller";
 
 
@@ -79,9 +79,11 @@ export class PurchaseController extends Controller {
     @Body() p: IPurchaseOrder
   ) {
     console.log("update", p);
-    if (p.status != orderStatus.ABANDONED && p.status != orderStatus.RECEIVED && p.status != orderStatus.DRAFT) {
-      const shippingSet = p.shipping_code != null && p.shipping_code != ""
-      p.status = shippingSet ? orderStatus.AWAITING_ARRIVAL : orderStatus.AWAITING_SHIPPING
+    if (p.status == orderStatus.AWAITING_SHIPPING) {
+      if(p.shipping_code != null && p.shipping_code != "") {
+        p.status = orderStatus.AWAITING_ARRIVAL //later will have to do individual "in_transit" items
+        await handlePurchaseShipment(p)
+      }
     }
     await PurchaseOrder.findOneAndUpdate({ _id: p._id }, p);
 
