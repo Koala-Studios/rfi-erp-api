@@ -3,6 +3,7 @@ import paginate from "mongoose-paginate-v2";
 
 export interface IProductType extends mongoose.Document {
   name:string;
+  total:number;
   code: string;
   is_raw:boolean;
   for_sale:boolean;
@@ -11,6 +12,7 @@ export interface IProductType extends mongoose.Document {
 
 const productTypeSchema = new mongoose.Schema({
     name:String,
+    total:Number,
     code: String,
     is_raw:Boolean,
     for_sale:Boolean,

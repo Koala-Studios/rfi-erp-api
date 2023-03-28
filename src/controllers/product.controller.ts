@@ -64,17 +64,18 @@ export class ProductController extends Controller {
     @Body() body: IProduct
   ) {
     const mongoose = require("mongoose");
-    const product_type = await ProductType.findOne({_id: body.product_type._id });
+    const product_type = await ProductType.findById(body.product_type._id);
+    product_type.total +=1;
+    product_type.save();
     body._id = new mongoose.Types.ObjectId();    
-    const product_code = await generateProductCode(product_type)
-    body.product_code = product_code;//TODO: MAKING SURE NO DUPLICATES PROPERLY!
+    body.product_code = await generateProductCode(product_type.total,product_type.code)
+    // console.log(body.product_code, 'in create') 
     body.for_sale = product_type.for_sale;
     body.is_raw = product_type.is_raw;
-    const newProduct = new Product(body);
-    newProduct.save();
+    const newProduct = await Product.create(body);
     this.setStatus(status.CREATED);
-    return newProduct._id;
-  }
+  return newProduct;
+  } 
 
   @Post("update")
   @SuccessResponse(status.OK, reply.success)
