@@ -40,6 +40,20 @@ export interface IBatchingIngredient {
   used_amount: number;  
 }
 
+const ingredientSchema = new mongoose.Schema({
+  _id:String,
+  product_id:String,
+  product_code: String,
+  product_name:String,
+  required_amount: Number,
+  used_containers: [{
+    container_id:String,
+    lot_number: String,
+    used_amount: String
+  }],
+  used_amount: Number,  
+});
+
 const batchingSchema = new mongoose.Schema({
   product_id:String,
   product_code:String,
@@ -47,19 +61,7 @@ const batchingSchema = new mongoose.Schema({
   quantity: Number,
   date_created: Date,
   date_needed: Date,
-  ingredients: [{
-    _id:String,
-    product_id:String,
-    product_code: String,
-    product_name:String,
-    required_amount: Number,
-    used_containers: [{
-      container_id:String,
-      lot_number: String,
-      used_amount: String
-    }],
-    used_amount: Number,  
-  }],
+  ingredients: {type:[ingredientSchema]},
   batch_code: String,
   status: Number,
   notes: String

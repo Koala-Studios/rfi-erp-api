@@ -19,6 +19,7 @@ export interface IInventoryMovement extends mongoose.Document {
   module_source:string;
   movement_target_type:string;
   amount:number;
+  lot_number?:string;
 }
 
 const inventoryMovementSchema = new mongoose.Schema({
@@ -28,7 +29,8 @@ const inventoryMovementSchema = new mongoose.Schema({
     module_source: String,
     movement_type: String,
     movement_target_type: String,
-    amount:Number
+    amount:Number,
+    lot_number:String
 });
 
 inventoryMovementSchema.plugin(paginate);

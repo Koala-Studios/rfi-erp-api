@@ -32,7 +32,7 @@ const salesOrderSchema = new mongoose.Schema({
     date_arrived: Date,
     customer:{ _id:String, name:String},
     shipping_code:String,
-    order_code: String,
+    order_code: {type: String, required: true, unique: true},
     status: Number,
     order_items: 
     [{

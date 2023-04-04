@@ -18,6 +18,7 @@ export interface IStockCount extends mongoose.Document {
 }
 
 const stockCountSchema = new mongoose.Schema({
+    count_code: {type: String, required: true, unique: true},
     date_proposed: Date,
     count_items: {
         product_id: String,

@@ -51,7 +51,7 @@ const purchaseOrderSchema = new mongoose.Schema({
         supplier_id: ObjectId,
         name: String,
     },
-    order_code: String,
+    order_code: {type: String, required: true, unique: true},
     status: Number,
     order_items: 
     [{

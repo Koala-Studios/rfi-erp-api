@@ -3,15 +3,21 @@ import paginate from "mongoose-paginate-v2";
 import { ICustomer } from "./customer.model";
 
 interface IProjectItem {
-  flavor_name: string;
-  code: string;
-  status: number;
   product_id: string | null;
   product_code: string | null;
   product_name: string | null;
   product_status: number;
+  flavor_name: string;
+  external_code: string;
+  target_price: number,
+  status: number;
   notes: string;
   target_cost: number | null;
+  assigned_user: {
+    _id: string,
+    email: string,
+    username: string,
+  } | null
 }
 
 export interface ICustomerItem {
@@ -27,8 +33,8 @@ export interface ICustomerItem {
 }
 
 export interface IProject extends mongoose.Document {
-  start_date: string;
-  finish_date: string;
+  start_date: Date;
+  finish_date: Date;
   project_code: string;
   name: string;
   status: number;
@@ -44,10 +50,10 @@ export interface IProject extends mongoose.Document {
 }
 
 const projectSchema = new mongoose.Schema({
-  start_date: String,
-  due_date: String,
-  finish_date: String,
-  project_code: String,
+  start_date: Date,
+  due_date: Date,
+  finish_date: Date,
+  project_code: {type: String, required: true, unique: true},
   name: String,
   status: Number,
   notes: String,
@@ -64,19 +70,20 @@ const projectSchema = new mongoose.Schema({
   project_items: [
     {
       flavor_name: String,
-      code: String,
+      external_code: {type: String, required: true, unique: true},
+      target_price: Number,
       status: Number,
       product_id: String,
       product_code: String,
       product_name: String,
-      product_status: Number,
+      product_status: String,
       notes: String,
-      target_price: Number,
       assigned_user: {
         _id: String,
         email: String,
         username: String,
       },
+      //TODO: Regulatory :')
     },
   ],
 });

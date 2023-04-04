@@ -40,7 +40,7 @@ module.exports = {
     const product_type = await db.collection("product_types").findOne({'code' : {$eq : (inventoryItem.product_code).slice(0,2) } })
       if( product_type) {
         await db
-        .collection("inventory").updateOne({_id: inventoryItem._id}, {$set: {'rating':null, 'avoid_recur': product_type.avoid_recur, 'is_raw': ('RM' === (inventoryItem.product_code).slice(0,2)), 'product_type': {'name': product_type ? product_type.name : 'Not Found', '_id': product_type ? product_type._id : 'Not Found'}}});
+        .collection("inventory").updateOne({_id: inventoryItem._id}, {$set: {'rating':null, 'avoid_recur': product_type.avoid_recur, 'is_raw': ('RM' === (inventoryItem.product_code).slice(0,2)), 'product_type': {'name': product_type ? product_type.name : 'Not Found', 'code': product_type ? product_type.code : 'Not Found', '_id': product_type ? product_type._id : 'Not Found'}}});
     
       } else { //removing products/materials that are not within our "product_types" as they are deprecated (such as WD for water, etc) 
         await db.collection("inventory").deleteOne({_id: inventoryItem._id})

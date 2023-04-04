@@ -44,12 +44,12 @@ export interface IProduct extends mongoose.Document {
   stock?: IStockSummary;
   customers: IProductCustomerItem[];
   regulatory:IRegulatory;
-  product_type:{ name:string, _id:string }
+  product_type:{ name:string, code:string, _id:string }
 }
 
 const productSchema = new mongoose.Schema({
-  product_code: String,
-  name:String,
+  product_code: {type: String, required: true, unique: true},
+  name:{type: String, required: true, unique: true},
   cost: Number,
   rating:Number,
   date_created: Date,
@@ -79,7 +79,7 @@ const productSchema = new mongoose.Schema({
     organic: Boolean,
     kosher: Boolean, 
   },
-  product_type:{ name:String, _id:String }
+  product_type:{ name:String, code: String, _id:String }
 });
 
 productSchema.plugin(paginate);
