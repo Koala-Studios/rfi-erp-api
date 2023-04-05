@@ -2,6 +2,7 @@ import Product, { IProduct } from "../models/product.model";
 import { IListParams, IListResponse, ILogicResponse } from "./interfaces.logic";
 import { reply, status } from "../config/config.status";
 import { createBOM } from "./batching.logic";
+import productModel from "../models/product.model";
 
 export const listProduct = async (
   listParams: IListParams, approved = null
@@ -35,3 +36,7 @@ export const productLookup = async (s_value, f_sale, approved:boolean = false) =
   console.log(list);
   return { status: status.OK, data: { message: "", res: list } };
 };
+
+export const productLookupByCode = async (lookup_list:string[]) => {
+    return await Product.find({ product_code : {$in: lookup_list} });
+}
