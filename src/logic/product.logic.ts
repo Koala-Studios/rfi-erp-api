@@ -38,5 +38,5 @@ export const productLookup = async (s_value, f_sale, approved:boolean = false) =
 };
 
 export const productLookupByCode = async (lookup_list:string[]) => {
-    return await Product.find({ product_code : {$in: lookup_list} });
+    return await Product.find({ product_code : {$in: lookup_list}, status: 4 });
 }
