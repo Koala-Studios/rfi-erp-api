@@ -46,8 +46,8 @@ module.exports = {
         await db.collection("inventory").deleteOne({_id: inventoryItem._id})
       }
 
-    // await db //is being done 
-    // .collection("inventory").updateOne({_id: inventoryItem._id}, {$unset: {'is_raw_mat':""}});
+    await db //is being done 
+    .collection("inventory").updateOne({_id: inventoryItem._id}, {$unset: {'is_raw_mat':""}});
     }
 
 

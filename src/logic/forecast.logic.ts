@@ -1,6 +1,7 @@
 import { amtStatus, IForecastResults } from "../models/forecast.model";
 import Formula, { IFormula } from "../models/formula.model";
 import Inventory, { IInventory } from "../models/inventory.model";
+import ProductType, { IProductType } from "../models/product-type.model";
 
 export interface IForecast {
   product_code: string;
@@ -59,8 +60,7 @@ export const calculateMaterials = async(
 };
 
 const recursiveFinder = async (product: IForecast) => {
-  const materialTypes = ["FL", "FK", "FE", "SM"]; //TODO: make this modular
-  const avoidRecursionMatTypes = ["FK"];
+  const materialTypes = await ProductType.find();
   let rawIngredients: IForecast[] = [];
   
   const formula = await Formula.findOne({ product_code: product.product_code }).sort('-version');
@@ -68,10 +68,28 @@ const recursiveFinder = async (product: IForecast) => {
   if(formula) {
     const f = formula.formula_items;
     for (let i = 0; i < f.length; i++) { //TODO: INCOMPLETE
-      if (materialTypes.some((substring) => f[i].material_code.startsWith(substring))) { //if not a raw material.
-        if((avoidRecursionMatTypes.some((substring) => f[i].material_code.startsWith(substring)))) {
-          const inv_material = await Inventory.findOne({id: f[i].material_id});
-          //morse things here for anti recursion mats?
+      const mat_type = materialTypes.find((mat_type) => f[i].material_code.startsWith(mat_type.code))
+      if (mat_type && !mat_type.is_raw) { //if not a raw material.
+        if(mat_type.avoid_recur) {
+          const inv_material = await Inventory.findOne({id: f[i].material_id, product_code: f[i].material_code});
+          //console.log(f[i].material_id, f[i].material_code, 'bruh')
+          if(inv_material && inv_material.stock.on_hand - inv_material.stock.allocated >= (product.amount * f[i].amount) / 100.000000) //if enough in inventory, send straight to production
+          {
+            //console.log(inv_material.stock.on_hand - inv_material.stock.allocated, (product.amount * f[i].amount) / 100.000000, 'FK calc: ', inv_material.product_code, ' ', mat_type)
+            rawIngredients.push({
+              product_code: f[i].material_code,
+              amount: (product.amount * f[i].amount) / 100.000000,
+            });
+          } else { //otherwise break it up into the ingredients
+            rawIngredients = [
+              ...rawIngredients,
+              ...await recursiveFinder({
+                  product_code: f[i].material_code,
+                  amount: (product.amount * f[i].amount) / 100.000000,
+                }
+              ),
+            ];
+          }
         }
         rawIngredients = [
           ...rawIngredients,
@@ -82,11 +100,7 @@ const recursiveFinder = async (product: IForecast) => {
           ),
         ];
       } else {
-
-        if(f[i].material_code === 'RM00875') {
-          console.log("RHUBA", f[i].material_code, product)
-        }
-
+        // if(!mat_type) console.log(f[i], 'product')
         rawIngredients.push({
           product_code: f[i].material_code,
           amount: (product.amount * f[i].amount) / 100.000000,

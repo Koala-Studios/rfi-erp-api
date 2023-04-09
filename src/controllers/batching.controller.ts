@@ -11,7 +11,7 @@ import { Route } from "@tsoa/runtime";
 import { Request } from "@tsoa/runtime";
 import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
-import Batching, { IBatching } from "../models/Batching.model";
+import Batching, { batchingStatus, IBatching } from "../models/Batching.model";
 import { reply, status } from "../config/config.status";
 import Inventory, { IInventory } from "../models/inventory.model";
 import {
@@ -40,13 +40,11 @@ export class BatchingController extends Controller {
 
   @Get("get")
   @SuccessResponse(status.OK, reply.success)
-  public async getFormulaRequest(
+  public async getBatchingRequest(
     @Request() req: eRequest,
     @Query() id: string,
   ) {
-    console.log(id, 'THIS IS ID SENT')
     const _res = await getBatching(id);
-
     this.setStatus(status.OK);
     console.log(_res)
     return _res.data;
@@ -71,17 +69,28 @@ export class BatchingController extends Controller {
 
   @Post("update")
   @SuccessResponse(status.OK, reply.success)
-  public async updateProjectRequest(
+  public async updateBatchingRequest(
     @Request() req: eRequest,
-    @Body() p: IBatching
+    @Body() b: IBatching
   ) {
-    await Batching.findOneAndUpdate({ _id: p._id }, p);
+    await Batching.findOneAndUpdate({ _id: b._id }, b);
 
     this.setStatus(status.OK);
     return true;
   }
 
-
+  @Post("confirm")
+  @SuccessResponse(status.OK, reply.success)
+  public async confirmBatchingRequest(
+    @Request() req: eRequest,
+    @Body() b: IBatching
+  ) {
+    b.status = batchingStatus.SCHEDULED;
+    const _batching = await Batching.findOneAndUpdate({ _id: b._id }, b,
+      { new: true });
+    this.setStatus(status.OK);
+    return {message:"Successfully Confirmed", res: _batching};
+  }
 
   @Post("generate-bom")
   @SuccessResponse(status.CREATED, reply.success)

@@ -36,7 +36,5 @@ export const inventoryLookup = async (s_value, f_sale) => {
       { name: new RegExp(searchValue, "i") },
     ],
   }).limit(15);
-
-  console.log(list);
   return { status: status.OK, data: { message: "", res: list } };
 };

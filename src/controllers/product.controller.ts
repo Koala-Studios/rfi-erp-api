@@ -84,7 +84,6 @@ export class ProductController extends Controller {
     @Query() code_list: string[]
   ) {
     const products = await productLookupByCode(code_list);
-    console.log(products);
     this.setStatus(status.OK);
     return products;
   }

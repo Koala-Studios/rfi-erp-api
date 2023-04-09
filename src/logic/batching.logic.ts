@@ -10,6 +10,8 @@ import mongoose, { FilterQuery } from "mongoose";
 import { IProcessedQuery, processQuery } from "./utils";
 import { calculateMaterials } from "./forecast.logic";
 import { ObjectId } from "mongodb";
+import { moveInventory } from "./inventory_movements.logic";
+import { movementTypes } from "../models/inventory-movements.model";
 
 
 //TODO:LISTING PARAMETER GENERALIZING
@@ -73,11 +75,17 @@ export const createBOM = async (
       used_containers: [],
       used_amount: 0
     }]
+    moveInventory({product_id: material.product_id, //ALLOCATING THE PRODUCTION #
+      product_code: material.product_code,
+      name: material.product_name,
+      module_source:Batching.modelName,
+      movement_target_type:movementTypes.ALLOCATED,
+      amount:material.required_amount
+    });
   }
   batching.save()
-  console.log(materials, "batching materials");
   return {
-    status: status.CREATED,
+    status: status.OK,
     data: { message: "Batch Created", res: batching },
   };
 };
