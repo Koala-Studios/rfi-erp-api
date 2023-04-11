@@ -27,14 +27,31 @@ export const listInventory = async (
   };
 };
 
-export const inventoryLookup = async (s_value, f_sale) => {
+export const inventoryLookup = async (s_value, f_sale, i_raw, approved) => {
   const searchValue = s_value.toString();
-  const list = await Inventory.find({
-    for_sale: f_sale,
+  const statusList = approved ? [4] : [1,2,3,4];
+  const for_sale_obj = { for_sale: f_sale}
+  const is_raw_obj = {is_raw: i_raw}
+  let query = {
+    status: { $in : statusList},
     $or: [
       { product_code: new RegExp("^" + searchValue) },
       { name: new RegExp(searchValue, "i") },
+      { aliases: new RegExp(searchValue, "i") },
     ],
-  }).limit(15);
+  }
+  if(f_sale != null) {
+    query = {...query, ...for_sale_obj};
+  }
+  if(i_raw != null) {
+    query = {...query, ...is_raw_obj};
+  }
+  if(approved != null) {
+    status: { $in : statusList};
+  }
+  console.log(query,' test query merge')
+
+
+  const list = await Inventory.find(query).limit(15);
   return { status: status.OK, data: { message: "", res: list } };
 };

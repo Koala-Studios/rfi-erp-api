@@ -13,7 +13,7 @@ interface IStockSummary {
   reorder_amount:number | null;
 }
 
-interface IRegulatory {
+interface IRegulatoryContainer {
   cpl_hazard?:[];
   kosher?:boolean | null;
   organic?:boolean | null;
@@ -43,13 +43,15 @@ export interface IProduct extends mongoose.Document {
   rec_dose_rate:number;
   stock?: IStockSummary;
   customers: IProductCustomerItem[];
-  regulatory:IRegulatory;
+  regulatory:IRegulatoryContainer;
+  aliases:string;
   product_type:{ name:string, code:string, _id:string }
 }
 
 const productSchema = new mongoose.Schema({
   product_code: {type: String, required: true, unique: true},
   name:{type: String, required: true, unique: true},
+  aliases:String,
   cost: Number,
   rating:Number,
   date_created: Date,

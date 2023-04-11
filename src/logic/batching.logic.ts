@@ -25,7 +25,6 @@ export const listBatching = async (query: string): Promise<ILogicResponse> => {
     sort: { date_created: 'desc' }
 
   });
-  console.log(list, 'LIST')
   //TODO: REMOVE THIS LMAO
   for (let index = 0; index < list.docs.length; index++) {
     const material_id = list.docs[index].product_id;
@@ -45,7 +44,6 @@ export const getBatching = async (_id): Promise<ILogicResponse> => {
   const _batching = await Batching.findById(_id)
   if (!_batching) {
     _status = status.OK;
-    console.log(_id, 'BRUH')
     return {
       status: _status,
       data: { message: "No Batching Order Found", res: null },

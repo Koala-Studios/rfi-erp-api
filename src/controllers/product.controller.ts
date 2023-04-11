@@ -13,7 +13,7 @@ import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import Product, {IProduct} from "../models/product.model";
 import { reply, status } from "../config/config.status";
-import { listProduct, productLookupByCode } from "../logic/product.logic";
+import { listProduct, productLookup, productLookupByCode } from "../logic/product.logic";
 import ProductType, {IProductType} from "../models/product-type.model";
 import { generateProductCode } from "../logic/utils";
 
@@ -75,6 +75,21 @@ export class ProductController extends Controller {
     const newProduct = await Product.create(body);
     this.setStatus(status.CREATED);
   return newProduct;
+  }
+
+  @Get("lookup")
+  @SuccessResponse(status.OK, reply.success)
+  public async productLookupRequest(
+    @Request() req: eRequest,
+    @Query() search_value: string,
+    @Query() for_sale: boolean | null,
+    @Query() approved: boolean | null
+  ) {
+    console.log(req, search_value, for_sale, approved, 'test bruh')
+    const res = await productLookup(search_value, for_sale, approved);
+    this.setStatus(res.status);
+
+    return res.data;
   }
 
   @Get("lookup-list")
