@@ -33,10 +33,10 @@ export const productLookup = async (s_value, f_sale, approved) => {
       { aliases: new RegExp(searchValue, "i") },
     ],
   }
-  if(f_sale != null) {
+  if(f_sale != undefined) {
     query = {...query, ...for_sale};
   }
-  if(approved != null) {
+  if(approved != undefined) {
     status: { $in : statusList};
   }
   console.log(for_sale)

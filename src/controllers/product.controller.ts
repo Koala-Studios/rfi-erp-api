@@ -82,10 +82,9 @@ export class ProductController extends Controller {
   public async productLookupRequest(
     @Request() req: eRequest,
     @Query() search_value: string,
-    @Query() for_sale: boolean | null,
-    @Query() approved: boolean | null
+    @Query() for_sale?: boolean,
+    @Query() approved?: boolean,
   ) {
-    console.log(req, search_value, for_sale, approved, 'test bruh')
     const res = await productLookup(search_value, for_sale, approved);
     this.setStatus(res.status);
 

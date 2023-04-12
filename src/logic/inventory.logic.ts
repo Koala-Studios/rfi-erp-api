@@ -40,13 +40,13 @@ export const inventoryLookup = async (s_value, f_sale, i_raw, approved) => {
       { aliases: new RegExp(searchValue, "i") },
     ],
   }
-  if(f_sale != null) {
+  if(f_sale != undefined) {
     query = {...query, ...for_sale_obj};
   }
-  if(i_raw != null) {
+  if(i_raw != undefined) {
     query = {...query, ...is_raw_obj};
   }
-  if(approved != null) {
+  if(approved != undefined) {
     status: { $in : statusList};
   }
   console.log(query,' test query merge')

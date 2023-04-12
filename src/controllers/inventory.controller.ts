@@ -51,12 +51,12 @@ export class InventoryController extends Controller {
   public async inventoryLookupRequest(
     @Request() req: eRequest,
     @Query() search_value: string,
-    @Query() for_sale: boolean,
-    // @Query() is_raw: boolean | null,
-    // @Query() approved: boolean | null
+    @Query() for_sale?: boolean,
+    @Query() is_raw?: boolean,
+    @Query() approved?: boolean
   ) {
 
-    const res = await inventoryLookup(search_value, for_sale, null , true)
+    const res = await inventoryLookup(search_value, for_sale, is_raw , approved)
       //  is_raw, approved);
     this.setStatus(res.status);
 
