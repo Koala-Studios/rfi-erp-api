@@ -28,20 +28,9 @@ export class InventoryController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async listInventoryRequest(
     @Request() req: eRequest,
-    @Query() page: string,
-    @Query() count: string,
     @Query() query: string
   ) {
-    const _page = parseInt(<string>page);
-    const _count = parseInt(<string>count);
-
-    console.log(query, JSON.parse(query));
-
-    const res = await listInventory({
-      page: _page,
-      count: _count,
-      filter: query,
-    });
+    const res = await listInventory(query);
     this.setStatus(res.status);
 
     return res.data;

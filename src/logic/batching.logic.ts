@@ -4,7 +4,7 @@ import {
 } from "./interfaces.logic";
 import { reply, status } from "../config/config.status";
 import Inventory from "../models/inventory.model";
-import Batching, { IBatching } from "../models/Batching.model";
+import Batching, { IBatching } from "../models/batching.model";
 import Formula, { IFormula } from "../models/formula.model";
 import mongoose, { FilterQuery } from "mongoose";
 import { IProcessedQuery, processQuery } from "./utils";
@@ -22,7 +22,7 @@ export const listBatching = async (query: string): Promise<ILogicResponse> => {
     page: _page,
     limit: _count,
     leanWithId: true,
-    sort: { date_created: 'desc' }
+    // sort: { date_created: 'desc' }
 
   });
   //TODO: REMOVE THIS LMAO

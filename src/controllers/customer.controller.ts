@@ -24,17 +24,9 @@ export class CustomerController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async listCustomerRequest(
     @Request() req: eRequest,
-    @Query() page: string,
-    @Query() count: string
+    @Query() query: string
   ) {
-    const _page = parseInt(<string>page);
-    const _count = parseInt(<string>count);
-
-    const res = await listCustomer({
-      page: _page,
-      count: _count,
-      filter: "",
-    });
+    const res = await listCustomer(query);
     this.setStatus(res.status);
     return res.data;
   }

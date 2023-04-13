@@ -7,24 +7,25 @@ import Inventory from "../models/inventory.model";
 import StockCount, { IStockCount } from "../models/stock-count.model";
 import Formula, { IFormula } from "../models/formula.model";
 import { FilterQuery } from "mongoose";
+import { IProcessedQuery, processQuery } from "./utils";
 
 //TODO:LISTING PARAMETER GENERALIZING
 export const listStockCount = async (
-    listParams: IListParams
+    query:string
   ): Promise<ILogicResponse> => {
-    const query = JSON.parse(listParams.filter) as FilterQuery<IStockCount>;
-  
-    const list = await StockCount.paginate(query, {
-      page: listParams.page,
-      limit: listParams.count,
+    const { _filter, _page, _count }: IProcessedQuery = processQuery(query);
+
+    const list = await StockCount.paginate(_filter, {
+      page: _page,
+      limit: _count,
       leanWithId: true,
-    });
+      // sort: { date_created: 'desc' }
   
-    return {
-      status: status.OK,
-      data: { message: null, res: list },
-    };
+    });
+
+    return { status: status.OK, data: { message: null, res: list } };
   };
+  
 
 export const createStockCount = async (
     createInfo: IStockCount

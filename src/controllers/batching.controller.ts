@@ -11,7 +11,7 @@ import { Route } from "@tsoa/runtime";
 import { Request } from "@tsoa/runtime";
 import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
-import Batching, { batchingStatus, IBatching } from "../models/Batching.model";
+import Batching, { batchingStatus, IBatching } from "../models/batching.model";
 import { reply, status } from "../config/config.status";
 import Inventory, { IInventory } from "../models/inventory.model";
 import {
@@ -31,7 +31,7 @@ export class BatchingController extends Controller {
     @Request() req: eRequest,
     @Query() query: string
   ) {
-    console.log("batching query", query);
+    // console.log("batching query", query);
     const res = await listBatching(query);
     this.setStatus(res.status);
     return res.data;

@@ -3,21 +3,23 @@ import SalesOrder, { ISalesOrder } from "../models/sales-order.model";
 import Inventory from "../models/inventory.model";
 import mongoose from "mongoose";
 import { IListParams, IListResponse, ILogicResponse } from "./interfaces.logic";
+import { IProcessedQuery, processQuery } from "./utils";
 let ObjectId = require('mongodb').ObjectId;
 
 
 export const listSalesOrders = async (
-    listParams: IListParams
+    query:string
   ): Promise<ILogicResponse> => {
-    const list = await SalesOrder.paginate(
-      {},
-      { page: listParams.page, limit: listParams.count, leanWithId: true }
-    );
+    const { _filter, _page, _count }: IProcessedQuery = processQuery(query);
+
+    const list = await SalesOrder.paginate(_filter, {
+      page: _page,
+      limit: _count,
+      leanWithId: true,
+      // sort: { date_created: 'desc' }
   
-    return {
-      status: status.OK,
-      data: { message: "", res: list },
-    };
+    });
+    return { status: status.OK, data: { message: null, res: list } };
   };
 
 

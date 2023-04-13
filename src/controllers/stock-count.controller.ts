@@ -23,20 +23,12 @@ export class StockCountController extends Controller {
     @SuccessResponse(status.OK, reply.success)
     public async listStockCountRequest(
         @Request() req: eRequest,
-        @Query() page: string,
-        @Query() count: string,
-        @Query() query: string
+        @Query() query:string
     ) {
-        const _page = parseInt(<string>page);
-        const _count = parseInt(<string>count);
 
         console.log(JSON.parse(query));
 
-        const res = await listStockCount({
-            page: _page,
-            count: _count,
-            filter: query,
-        });
+        const res = await listStockCount(query);
         this.setStatus(res.status);
         return res.data;
     }

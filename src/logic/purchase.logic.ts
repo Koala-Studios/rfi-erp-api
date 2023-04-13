@@ -10,20 +10,21 @@ import { IListParams, IListResponse, ILogicResponse } from "./interfaces.logic";
 import { inventoryLookup } from "./inventory.logic";
 import { moveInventory } from "./inventory_movements.logic";
 import { movementTypes } from "../models/inventory-movements.model";
+import { IProcessedQuery, processQuery } from "./utils";
 let ObjectId = require("mongodb").ObjectId;
 
 export const listPurchases = async (
-  listParams: IListParams
+  query:string
 ): Promise<ILogicResponse> => {
-  const list = await PurchaseOrder.paginate(
-    {},
-    {
-      page: listParams.page,
-      limit: listParams.count,
-      leanWithId: true,
-      sort: { date_purchased: -1 },
-    }
-  );
+  const { _filter, _page, _count }: IProcessedQuery = processQuery(query);
+
+  const list = await PurchaseOrder.paginate(_filter, {
+    page: _page,
+    limit: _count,
+    leanWithId: true,
+    // sort: { date_created: 'desc' }
+
+  });
 
   return {
     status: status.OK,
