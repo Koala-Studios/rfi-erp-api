@@ -16,9 +16,17 @@ export const listProductType = async (
   };
 };
 
-export const productTypeLookup = async (s_value, f_sale:boolean) => {
+export const productTypeLookup = async (s_value, f_sale, i_raw) => {
   const searchValue = s_value.toString();
-  const list = await ProductType.find({ name: new RegExp(searchValue, 'i'), for_sale:f_sale }).limit(15);
+  let query = { name: new RegExp(searchValue, 'i')}
+  console.log(f_sale, i_raw,' bruh bruh')
+  if(f_sale != undefined) {
+    query = {...query, ... { for_sale:f_sale}}
+  }
+  if(i_raw != undefined) {
+    query = {...query, ... { is_raw:i_raw}}
+  }
+  const list = await ProductType.find(query).limit(15);
 
   return { status: status.OK, data: { message: "", res: list } };
 };

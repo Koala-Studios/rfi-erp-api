@@ -14,7 +14,8 @@ import logger from "../logger/logger";
 import Inventory, { IInventory } from "../models/inventory.model";
 import { reply, status } from "../config/config.status";
 import { inventoryLookup, listInventory } from "../logic/inventory.logic";
-
+import ProductType, {IProductType} from "../models/product-type.model";
+import { generateProductCode } from "../logic/utils";
 interface ICreateInventoryRequest {
   name: string;
 }
@@ -62,21 +63,24 @@ export class InventoryController extends Controller {
 
     return res.data;
   }
-
+  
   @Post("create")
   @SuccessResponse(status.CREATED, reply.success)
   public async createInventoryRequest(
     @Request() req: eRequest,
-    @Body() body: ICreateInventoryRequest
+    @Body() body: IInventory
   ) {
-    const _inventory = new Inventory(<IInventory>{
-      name: body.name,
-    });
-
-    _inventory.save();
-
+    const mongoose = require("mongoose");
+    const product_type = await ProductType.findById(body.product_type._id);
+    product_type.total +=1;
+    product_type.save();
+    body._id = new mongoose.Types.ObjectId();
+    body.product_code = await generateProductCode(product_type.total,product_type.code);
+    body.for_sale = product_type.for_sale;
+    body.is_raw = product_type.is_raw;
+    const newInventory = await Inventory.create(body);
     this.setStatus(status.CREATED);
-    return _inventory;
+  return newInventory;
   }
 
   @Post("delete")

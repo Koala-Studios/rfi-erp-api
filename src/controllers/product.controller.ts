@@ -69,9 +69,9 @@ export class ProductController extends Controller {
     product_type.save();
     body._id = new mongoose.Types.ObjectId();    
     body.product_code = await generateProductCode(product_type.total,product_type.code)
-    // console.log(body.product_code, 'in create') 
     body.for_sale = product_type.for_sale;
     body.is_raw = product_type.is_raw;
+    body.avoid_recur = product_type.avoid_recur;
     const newProduct = await Product.create(body);
     this.setStatus(status.CREATED);
   return newProduct;

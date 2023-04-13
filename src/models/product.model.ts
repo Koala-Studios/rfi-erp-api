@@ -29,6 +29,7 @@ export interface IProductCustomerItem {
 }
 
 export interface IProduct extends mongoose.Document {
+
   product_code: string;
   name:string;
   average_cost?: number;
@@ -37,6 +38,7 @@ export interface IProduct extends mongoose.Document {
   date_created: Date;
   is_raw?: boolean,
   for_sale: boolean;
+  avoid_recur: boolean;
   versions?: number;
   approved_version?: number | undefined;
   status: number;
@@ -57,6 +59,7 @@ const productSchema = new mongoose.Schema({
   date_created: Date,
   for_sale:Boolean,
   is_raw:Boolean,
+  avoid_recur: Boolean,
   versions: Number,
   approved_version: Number,
   rec_dose_rate: Number,
