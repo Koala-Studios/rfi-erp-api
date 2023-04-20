@@ -11,14 +11,17 @@ export interface ICustomer extends mongoose.Document {
   phone: string;
   email: string;
   lead_time: string;
+  notes:string;
+  products: ICustomerProducts[];
 }
 
 export interface ICustomerProducts extends mongoose.Document {
     product_id: string,
+    product_code: string,
     product_name: string,
-    customer_p_code: string,
-    customer_p_name: string,
-    customer_p_price:string;
+    cust_product_code: string,
+    cust_product_name: string,
+    cust_product_price:string;
 }
 
 const customerSchema = new mongoose.Schema({
@@ -31,6 +34,17 @@ const customerSchema = new mongoose.Schema({
     phone: String,
     email: String,
     lead_time: String,
+    notes:String,
+    products: [
+      {    
+        product_id: String,
+        product_code: String,
+        product_name: String,
+        cust_product_code: String,
+        cust_product_name: String,
+        cust_product_price:String
+      }
+    ]
 });
 
 customerSchema.plugin(paginate);

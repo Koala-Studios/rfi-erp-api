@@ -17,7 +17,6 @@ import { movementTypes } from "../models/inventory-movements.model";
 //TODO:LISTING PARAMETER GENERALIZING
 export const listBatching = async (query: string): Promise<ILogicResponse> => {
   const { _filter, _page, _count }: IProcessedQuery = processQuery(query);
-
   const list = await Batching.paginate(_filter, {
     page: _page,
     limit: _count,

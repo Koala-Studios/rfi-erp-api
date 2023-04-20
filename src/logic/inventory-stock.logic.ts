@@ -77,10 +77,10 @@ export const listInventoryStockGrouped = async ( //TODO: IMPLEMENT FILTERS INTO 
           {$set: { average_cost: {$round : [{ $divide: ['$average_cost', {$sum : "$received_amount" }]},2] } ,}}
         ]
      )
-    
+
     const list = await InventoryStock.aggregatePaginate(
       tester,
-      {     page: _page,
+      {page: _page,
         limit: _count,
         leanWithId: true, }
     );
