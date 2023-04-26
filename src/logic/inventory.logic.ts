@@ -33,9 +33,9 @@ export const inventoryLookup = async (s_value, f_sale, i_raw, approved) => {
   let query = {
     status: { $in : statusList},
     $or: [
+      { aliases: new RegExp(searchValue, "i") },
       { product_code: new RegExp("^" + searchValue) },
       { name: new RegExp(searchValue, "i") },
-      { aliases: new RegExp(searchValue, "i") },
     ],
   }
   if(f_sale != undefined) {
@@ -50,6 +50,6 @@ export const inventoryLookup = async (s_value, f_sale, i_raw, approved) => {
   console.log(query,' test query merge')
 
 
-  const list = await Inventory.find(query).limit(15);
+  const list = await Inventory.find(query).limit(25);
   return { status: status.OK, data: { message: "", res: list } };
 };

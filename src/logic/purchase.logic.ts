@@ -22,7 +22,7 @@ export const listPurchases = async (
     page: _page,
     limit: _count,
     leanWithId: true,
-    // sort: { date_created: 'desc' }
+    sort: { date_purchased: 'desc' }
 
   });
 

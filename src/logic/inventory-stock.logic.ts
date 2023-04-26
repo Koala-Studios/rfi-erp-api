@@ -2,6 +2,7 @@ import InventoryStock, { IInventoryStock } from "../models/inventory-stock.model
 import { IListParams, IListResponse, ILogicResponse } from "./interfaces.logic";
 import { reply, status } from "../config/config.status";
 import { IProcessedQuery, processQuery } from "./utils";
+import { ObjectId } from "mongodb";
 
 // export const listInventory = async():Promise<IInventory[]> => {
 //     //filters: all
@@ -98,13 +99,13 @@ export const listInventoryStockGrouped = async ( //TODO: IMPLEMENT FILTERS INTO 
 
 
 
-export const inventoryStockLookup = async (s_value, f_sale) => {
+export const inventoryStockLookup = async (s_value) => {
   const searchValue = s_value.toString();
   const list = await InventoryStock.find({
-    for_sale: f_sale,
     $or: [
       { product_code: new RegExp("^" + searchValue) },
       { name: new RegExp(searchValue, "i") },
+      { lot_number: new RegExp(searchValue, "i") },
     ],
   }).limit(15);
 

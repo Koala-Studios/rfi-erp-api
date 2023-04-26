@@ -37,7 +37,7 @@ export class PurchaseController extends Controller {
 
   @Get("get")
   @SuccessResponse(status.OK, reply.success)
-  public async getFormulaRequest(
+  public async getPurchaseRequest(
     @Request() req: eRequest,
     @Query() id: string,
   ) {
@@ -60,9 +60,8 @@ export class PurchaseController extends Controller {
     body._id = new mongoose.Types.ObjectId();
     const newPurchase = new PurchaseOrder(body);
     newPurchase.save();
-    console.log("create", newPurchase);
     this.setStatus(status.CREATED);
-    return newPurchase._id;
+    return newPurchase;
   }
 
   @Post("update")

@@ -100,7 +100,7 @@ export class ProductController extends Controller {
 
   @Post("update")
   @SuccessResponse(status.OK, reply.success)
-  public async updateProjectRequest(
+  public async updateProductRequest(
     @Request() req: eRequest,
     @Body() p: IProduct
   ) {

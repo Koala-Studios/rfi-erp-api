@@ -1,6 +1,6 @@
 
 import mongoose from "mongoose";
-const Schema = mongoose.Schema
+const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 export interface IFormulaItem {
   material_code: string;
@@ -15,6 +15,7 @@ export interface IFormula extends mongoose.Document{
     product_code: string;
     version: number;
     yield:number;
+    rec_dose_rate:number;
     base_hundred:boolean;
     date_created: Date;
     formula_items: IFormulaItem[];
@@ -26,6 +27,7 @@ const formulaSchema = new mongoose.Schema({
     version: Number,
     date_created: Date,
     yield:Number,
+    rec_dose_rate:Number,
     base_hundred:Boolean,
     formula_items: [
       {

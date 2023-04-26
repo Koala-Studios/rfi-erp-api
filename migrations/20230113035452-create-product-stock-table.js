@@ -23,7 +23,7 @@ module.exports = {
             unit_cost: Math.random()*Math.random()*(10/Math.random()), //!!!! REMOVE THIS LATER, JUST FOR TESTING PURPOSES
             lot_number: InvStockItem.lot_number,
             container_size: InvStockItem.qty_per_cont ? InvStockItem.qty_per_cont : 0,
-            received_amount: InvStockItem.Rec_qty ? InvStockItem.Rec_qty : ( (InvStockItem.qty_per_cont * InvStockItem.cont_num)!= NaN ? (InvStockItem.qty_per_cont * InvStockItem.cont_num) : 0),
+            received_amount: InvStockItem.Rec_qty ? InvStockItem.Rec_qty : ( (InvStockItem.qty_per_cont * InvStockItem.cont_num) != NaN ? (InvStockItem.qty_per_cont * InvStockItem.cont_num) : 0), //!!!! make sure no NaN remain, currently some do.
             used_amount: InvStockItem.used_qty ? InvStockItem.used_qty : 0,
             allocated_amount: 0,
             quarantined_containers: 0,

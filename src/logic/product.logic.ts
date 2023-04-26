@@ -33,9 +33,9 @@ export const productLookup = async (s_value, f_sale, approved) => {
   let query = {
 
     $or: [
+      { aliases: new RegExp(searchValue, "i") },
       { product_code: new RegExp("^" + searchValue) },
       { name: new RegExp(searchValue, "i") },
-      { aliases: new RegExp(searchValue, "i") },
     ],
   }
   if(f_sale != undefined) {
@@ -45,7 +45,7 @@ export const productLookup = async (s_value, f_sale, approved) => {
     status: { $in : statusList};
   }
   console.log(for_sale)
-  const list = await Product.find(query).limit(15);
+  const list = await Product.find(query).limit(25);
 
   console.log(list);
   return { status: status.OK, data: { message: "", res: list } };

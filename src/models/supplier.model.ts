@@ -11,7 +11,7 @@ export interface ISupplier extends mongoose.Document {
   phone: string;
   email: string;
   lead_time: string;
-  notets: string;
+  notes: string;
   trust_factor: number;
   products: ISupplierProducts[]
 }
@@ -22,6 +22,7 @@ export interface ISupplierProducts extends mongoose.Document {
   supp_product_code?:string,
   product_code: string,
   product_name: string,
+  price: string;
 }
 
 
@@ -35,7 +36,7 @@ const supplierSchema = new mongoose.Schema({
     phone: String,
     email: String,
     lead_time: String,
-    notets: String,
+    notes: String,
     trust_factor: Number,
     products: [
       {    

@@ -36,23 +36,22 @@ export class InventoryController extends Controller {
     return res.data;
   }
 
-  @Get("lookup")
+
+
+  @Get("get")
   @SuccessResponse(status.OK, reply.success)
-  public async inventoryLookupRequest(
+  public async getInventory(
     @Request() req: eRequest,
-    @Query() search_value: string,
-    @Query() for_sale?: boolean,
-    @Query() is_raw?: boolean,
-    @Query() approved?: boolean
+    @Query() id: string,
   ) {
 
-    const res = await inventoryLookup(search_value, for_sale, is_raw , approved)
-      //  is_raw, approved);
-    this.setStatus(res.status);
+    const _inventory = await Inventory.findById(id);
 
-    return res.data;
+    this.setStatus(status.OK);
+    return _inventory;
   }
-  
+
+
   @Post("create")
   @SuccessResponse(status.CREATED, reply.success)
   public async createInventoryRequest(
@@ -72,6 +71,36 @@ export class InventoryController extends Controller {
   return newInventory;
   }
 
+  @Post("update")
+  @SuccessResponse(status.OK, reply.success)
+  public async updateInventoryRequest(
+    @Request() req: eRequest,
+    @Body() i: IInventory
+  ) {
+    console.log("update", i);
+    await Inventory.findOneAndUpdate({ _id: i._id }, i, {new: true});
+
+    this.setStatus(status.OK);
+    return true;
+  }
+
+  @Get("lookup")
+  @SuccessResponse(status.OK, reply.success)
+  public async inventoryLookupRequest(
+    @Request() req: eRequest,
+    @Query() search_value: string,
+    @Query() for_sale?: boolean,
+    @Query() is_raw?: boolean,
+    @Query() approved?: boolean
+  ) {
+
+    const res = await inventoryLookup(search_value, for_sale, is_raw , approved)
+      //  is_raw, approved);
+    this.setStatus(res.status);
+
+    return res.data;
+  }
+  
   @Post("delete")
   @SuccessResponse(status.OK, reply.success)
   public async deleteInventory(@Query() inventoryId: string) {
