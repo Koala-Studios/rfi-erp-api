@@ -6,6 +6,7 @@ const send = {
   //notification
   notification: "n",
   delete_notification: "dn",
+  delete_all_notifications: "dn_all",
 
   //user
   user_connected: "uc",
