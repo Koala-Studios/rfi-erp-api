@@ -1,8 +1,5 @@
 module.exports = {
   async up(db, client) {
-    //!UNCOMMENT THIS ON FIRST RUN
-    // await db.renameCollection("Inventory", "OldInventory");
-
     await db
       .collection("OldInventory")
       .find()
@@ -25,20 +22,29 @@ module.exports = {
                 reorder_amount:InventoryItem.REORDER_AMT ? parseFloat(InventoryItem.REORDER_AMT) : 0,
               }
             ,
-            suppliers: [parseInt(InventoryItem.SUPPLIERS)],
-            regulatory: {
-              cpl_hazard: InventoryItem.CPL_HAZARD ? [InventoryItem.CPL_HAZARD] : [],
-              eu_status: InventoryItem.EU_STATUS,
-              fda_status: InventoryItem.FDA_STATUS,
+            regulatory:
+            {
+              cpl_hazard: [],
+              eu_status: null,
+              ttb_status: null,
+              fda_status: null,
+              fema_number: null,
+            },
+            dietary:
+            {
               kosher: true,
+              vegan: false,
               organic: false,
-              ttb_status: InventoryItem.TTB_STATUS,
-              fema_number: InventoryItem.FEMA_NUMBER,
+              halal: false,
+              no_gmo:false
             },
             cas_number: InventoryItem.CAS,
           });
         }
       });
+
+    
+    
 
     function checkIfRaw(code) {
       return code.includes("RM") ? true : false;
