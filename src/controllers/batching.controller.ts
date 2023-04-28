@@ -11,14 +11,10 @@ import { Route } from "@tsoa/runtime";
 import { Request } from "@tsoa/runtime";
 import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
-import Batching, { IBatching } from "../models/Batching.model";
+import Batching, { IBatching } from "../models/batching.model";
 import { reply, status } from "../config/config.status";
 import Inventory, { IInventory } from "../models/inventory.model";
-import {
-  createBOM,
-  getBatching,
-  listBatching,
-} from "../logic/batching.logic";
+import { createBOM, getBatching, listBatching } from "../logic/batching.logic";
 import mongoose from "mongoose";
 
 @Route("batching")
@@ -37,22 +33,19 @@ export class BatchingController extends Controller {
     return res.data;
   }
 
-
   @Get("get")
   @SuccessResponse(status.OK, reply.success)
   public async getFormulaRequest(
     @Request() req: eRequest,
-    @Query() id: string,
+    @Query() id: string
   ) {
-    console.log(id, 'THIS IS ID SENT')
+    console.log(id, "THIS IS ID SENT");
     const _res = await getBatching(id);
 
     this.setStatus(status.OK);
-    console.log(_res)
+    console.log(_res);
     return _res.data;
   }
-
-
 
   @Post("create")
   @SuccessResponse(status.CREATED, reply.success)
@@ -81,15 +74,13 @@ export class BatchingController extends Controller {
     return true;
   }
 
-
-
   @Post("generate-bom")
   @SuccessResponse(status.CREATED, reply.success)
   public async createBOMRequest(
     @Request() req: eRequest,
-    @Query() batching_id,
+    @Query() batching_id
   ) {
-    const _batching = await Batching.findById(batching_id)
+    const _batching = await Batching.findById(batching_id);
     const _res = await createBOM(_batching);
     this.setStatus(_res.status);
     return _res.data;
