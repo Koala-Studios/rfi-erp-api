@@ -27,18 +27,22 @@ module.exports = {
             quarantined: parseFloat(0),
             average_price: parseFloat(Product.COST)
           },
-          customers:[],
           regulatory:
           {
             cpl_hazard: [],
+            eu_status: null,
+            ttb_status: null,
+            fda_status: null,
+            fema_number: null,
+          },
+          dietary:
+          {
+            vegan: false,
             kosher: true,
             organic: false,
-            eu_status: parseInt(Product.EU_STATUS),
-            ttb_status: parseInt(Product.TTB_STATUS),
-            fda_status: parseInt(Product.FDA_RATINGS),
-            fema_number: parseInt(Product.fema_number),
+            halal: false,
+            no_gmo:false
           }
-          //product_type added on later migration
         });
       } else {
         db.collection("inventory").findOneAndUpdate({product_code: { $eq: Product.PRODUCT_CODE} },
@@ -48,7 +52,7 @@ module.exports = {
           approved_version: parseInt(Product.APPROVED_VERSION),
           status: parseInt(Product.STATUS),
           rec_dose_rate: parseFloat(Product.REC_DOSE_RATE),
-        } }, { $unset : {suppliers:''}});
+        } });
       }
     });
   },

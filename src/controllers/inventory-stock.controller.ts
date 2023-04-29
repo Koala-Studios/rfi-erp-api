@@ -13,7 +13,7 @@ import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import InventoryStock, { IInventoryStock } from "../models/inventory-stock.model";
 import { reply, status } from "../config/config.status";
-import { inventoryStockLookup, listInventoryStock, listInventoryStockGrouped } from "../logic/inventory-stock.logic";
+import { inventoryStockLookup, listInventoryStockGrouped } from "../logic/inventory-stock.logic";
 
 interface ICreateInventoryStockRequest {
   name: string;
@@ -27,18 +27,16 @@ export class InventoryStockStockController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async listInventoryStockRequest(
     @Request() req: eRequest,
-    @Query() page: string,
-    @Query() count: string,
+    @Query() query: string,
     @Query() grouped: boolean
   ) {
-    const _page = parseInt(<string>page);
-    const _count = parseInt(<string>count);
     let res;
-    console.log(grouped)
     if(grouped) {
-      res = await listInventoryStockGrouped({ page: _page, count: _count, filter: "" });
+      res = await listInventoryStockGrouped(query);
     } else {
-      res = await listInventoryStock({ page: _page, count: _count, filter: "" });
+      // res = await listInventoryStock(query);
+      //TODO: Fix if necessary or remove.
+      return null;
     }
     this.setStatus(res.status);
     return res.data;
@@ -48,10 +46,9 @@ export class InventoryStockStockController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async inventoryStockLookupRequest(
     @Request() req: eRequest,
-    @Query() search_value: string,
-    @Query() for_sale: boolean
+    @Query() search_value: string
   ) {
-    const res = await inventoryStockLookup(search_value,for_sale);
+    const res = await inventoryStockLookup(search_value);
     this.setStatus(res.status);
 
     return res.data;

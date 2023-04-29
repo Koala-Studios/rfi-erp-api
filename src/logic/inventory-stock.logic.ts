@@ -1,6 +1,8 @@
 import InventoryStock, { IInventoryStock } from "../models/inventory-stock.model";
 import { IListParams, IListResponse, ILogicResponse } from "./interfaces.logic";
 import { reply, status } from "../config/config.status";
+import { IProcessedQuery, processQuery } from "./utils";
+import { ObjectId } from "mongodb";
 
 // export const listInventory = async():Promise<IInventory[]> => {
 //     //filters: all
@@ -9,26 +11,33 @@ import { reply, status } from "../config/config.status";
 //     return _inventoryStock;
 // }
 
-export const listInventoryStock = async (
-  listParams: IListParams
-): Promise<ILogicResponse> => {
-  const list = await InventoryStock.aggregatePaginate(
-    undefined,
-    { page: listParams.page, limit: listParams.count, leanWithId: true }
-  );
+//TODO: Fix this if necessary, not being used
+// export const listInventoryStock = async (
+//   query: string
+// ): Promise<ILogicResponse> => {
+//   const { _filter, _page, _count }: IProcessedQuery = processQuery(query);
 
-  return {
-    status: status.OK,
-    data: { message: "", res: list },
-  };
+//   const list = await InventoryStock.paginate(_filter, {
+//     page: _page,
+//     limit: _count,
+//     leanWithId: true,
+//     // sort: { date_created: 'desc' }
+
+//   });
+
+//   return {
+//     status: status.OK,
+//     data: { message: "", res: list },
+//   };
 
 
-};
+// };
 
 
-export const listInventoryStockGrouped = async (
-    listParams: IListParams
+export const listInventoryStockGrouped = async ( //TODO: IMPLEMENT FILTERS INTO AGGREGATE PAGINATE 
+    query:string
   ): Promise<ILogicResponse> => {
+    const { _filter, _page, _count }: IProcessedQuery = processQuery(query);
   
     const tester = InventoryStock.aggregate(
         [
@@ -69,10 +78,12 @@ export const listInventoryStockGrouped = async (
           {$set: { average_cost: {$round : [{ $divide: ['$average_cost', {$sum : "$received_amount" }]},2] } ,}}
         ]
      )
-    
+
     const list = await InventoryStock.aggregatePaginate(
       tester,
-      { page: listParams.page, limit: listParams.count, leanWithId: true }
+      {page: _page,
+        limit: _count,
+        leanWithId: true, }
     );
   
     return {
@@ -88,13 +99,13 @@ export const listInventoryStockGrouped = async (
 
 
 
-export const inventoryStockLookup = async (s_value, f_sale) => {
+export const inventoryStockLookup = async (s_value) => {
   const searchValue = s_value.toString();
   const list = await InventoryStock.find({
-    for_sale: f_sale,
     $or: [
       { product_code: new RegExp("^" + searchValue) },
       { name: new RegExp(searchValue, "i") },
+      { lot_number: new RegExp(searchValue, "i") },
     ],
   }).limit(15);
 

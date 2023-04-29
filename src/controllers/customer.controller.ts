@@ -24,17 +24,9 @@ export class CustomerController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async listCustomerRequest(
     @Request() req: eRequest,
-    @Query() page: string,
-    @Query() count: string
+    @Query() query: string
   ) {
-    const _page = parseInt(<string>page);
-    const _count = parseInt(<string>count);
-
-    const res = await listCustomer({
-      page: _page,
-      count: _count,
-      filter: "",
-    });
+    const res = await listCustomer(query);
     this.setStatus(res.status);
     return res.data;
   }
@@ -64,34 +56,31 @@ export class CustomerController extends Controller {
     return res.data;
   }
 
-  
-@Post("create")
-@SuccessResponse(status.CREATED, reply.success)
-public async createCustomerRequest(
-  @Request() req: eRequest,
-  @Body() body: ICustomer
-) {
-  const mongoose = require("mongoose");
-  body._id = new mongoose.Types.ObjectId();
-  const newCustomer = new Customer(body);
-  newCustomer.save();
-  console.log("create", newCustomer);
-  this.setStatus(status.CREATED);
-  return newCustomer._id;
-}
+  @Post("create")
+  @SuccessResponse(status.CREATED, reply.success)
+  public async createCustomerRequest(
+    @Request() req: eRequest,
+    @Body() body: ICustomer
+  ) {
+    const mongoose = require("mongoose");
+    body._id = new mongoose.Types.ObjectId();
+    const newCustomer = new Customer(body);
+    newCustomer.save();
+    console.log("create", newCustomer);
+    this.setStatus(status.CREATED);
+    return newCustomer._id;
+  }
 
-@Post("update")
-@SuccessResponse(status.OK, reply.success)
-public async updateCustomerRequest(
-  @Request() req: eRequest,
-  @Body() c: ICustomer
-) {
-  console.log("update", c);
-  await Customer.findOneAndUpdate({ _id: c._id }, c);
+  @Post("update")
+  @SuccessResponse(status.OK, reply.success)
+  public async updateCustomerRequest(
+    @Request() req: eRequest,
+    @Body() c: ICustomer
+  ) {
+    console.log("update", c);
+    await Customer.findOneAndUpdate({ _id: c._id }, c);
 
-  this.setStatus(status.OK);
-  return true;
-}
-
-
+    this.setStatus(status.OK);
+    return true;
+  }
 }

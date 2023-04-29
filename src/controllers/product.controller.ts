@@ -13,7 +13,7 @@ import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import Product, {IProduct} from "../models/product.model";
 import { reply, status } from "../config/config.status";
-import { listProduct } from "../logic/product.logic";
+import { listProduct, productLookup, productLookupByCode } from "../logic/product.logic";
 import ProductType, {IProductType} from "../models/product-type.model";
 import { generateProductCode } from "../logic/utils";
 
@@ -29,16 +29,12 @@ export class ProductController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async listProductRequest(
     @Request() req: eRequest,
-    @Query() page: string,
-    @Query() count: string,
+    @Query() query:string,
     @Query() approved?: boolean,
   ) {
-    const _page = parseInt(<string>page);
-    const _count = parseInt(<string>count);
-    const res = await listProduct({
-      page: _page,
-      count: _count,
-      filter: "" }, approved);
+
+    const res = await listProduct(
+      query, approved);
     this.setStatus(res.status);
     return res.data;
   }
@@ -69,17 +65,42 @@ export class ProductController extends Controller {
     product_type.save();
     body._id = new mongoose.Types.ObjectId();    
     body.product_code = await generateProductCode(product_type.total,product_type.code)
-    // console.log(body.product_code, 'in create') 
     body.for_sale = product_type.for_sale;
     body.is_raw = product_type.is_raw;
+    body.avoid_recur = product_type.avoid_recur;
     const newProduct = await Product.create(body);
     this.setStatus(status.CREATED);
   return newProduct;
-  } 
+  }
+
+  @Get("lookup")
+  @SuccessResponse(status.OK, reply.success)
+  public async productLookupRequest(
+    @Request() req: eRequest,
+    @Query() search_value: string,
+    @Query() for_sale?: boolean,
+    @Query() approved?: boolean,
+  ) {
+    const res = await productLookup(search_value, for_sale, approved);
+    this.setStatus(res.status);
+
+    return res.data;
+  }
+
+  @Get("lookup-list")
+  @SuccessResponse(status.OK, reply.success)
+  public async lookupListByCode(
+    @Request() req: eRequest,
+    @Query() code_list: string[]
+  ) {
+    const products = await productLookupByCode(code_list);
+    this.setStatus(status.OK);
+    return products;
+  }
 
   @Post("update")
   @SuccessResponse(status.OK, reply.success)
-  public async updateProjectRequest(
+  public async updateProductRequest(
     @Request() req: eRequest,
     @Body() p: IProduct
   ) {

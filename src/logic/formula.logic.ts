@@ -116,17 +116,19 @@ export const submitFormula = async (
   let product = await Product.findById(formula.product_id);
 
   //!If product is already approved
-  if (product.status == 4) {
+  if (product.status === 4) {
     _status = status.FORBIDDEN;
     _message = "Product is already approved!";
     return { status: _status, data: { message: _message, res: product } };
   }
 
   product.versions += 1;
+  product.rec_dose_rate = formula.rec_dose_rate;
 
   //*If flavorist is setting product as ready for approval
-  if (approved) {
+  if (approved || product.status === 3) {
     product.status = 3;
+    product.approved_version = product.versions;
     _message = "Formula Submitted & Ready For Manager Approval!";
   } else {
     _message = "Formula Submitted!";
@@ -138,6 +140,7 @@ export const submitFormula = async (
     version: product.versions,
     yield: formula.yield,
     base_hundred:formula.base_hundred,
+    rec_dose_rate: formula.rec_dose_rate,
     date_created: new Date(),
     formula_items: formula.formula_items,
   });

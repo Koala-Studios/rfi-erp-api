@@ -8,6 +8,15 @@ interface IForecastProduct {
     status: number;
   }
 
+  export const amtStatus = {
+    NOT_ENOUGH: 1,
+    IN_ORDER: 2,
+    UNDER_RECOMMENDED: 3,
+    IS_ENOUGH:6
+    //more in future? maybe "in transit"
+  };
+  
+
   export interface IForecastResults {
     product_id:string;
     product_code: string;
@@ -18,6 +27,7 @@ interface IForecastProduct {
     on_hand_amount: number;
     in_transit_amount: number;
     reorder_amount:number;
+    amt_status:number;
   }
 
 

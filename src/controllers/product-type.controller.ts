@@ -24,17 +24,9 @@ export class ProductTypeController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async listProductTypeRequest(
     @Request() req: eRequest,
-    @Query() page: string,
-    @Query() count: string
+    @Query() query:string
   ) {
-    const _page = parseInt(<string>page);
-    const _count = parseInt(<string>count);
-
-    const res = await listProductType({
-      page: _page,
-      count: _count,
-      filter: "",
-    });
+    const res = await listProductType(query);
     this.setStatus(res.status);
     return res.data;
   }
@@ -57,9 +49,10 @@ export class ProductTypeController extends Controller {
   public async productTypeLookupRequest(
     @Request() req: eRequest,
     @Query() search_value: string,
-    @Query() f_sale: boolean
+    @Query() f_sale?: boolean,
+    @Query() i_raw?: boolean
   ) {
-    const res = await productTypeLookup(search_value,f_sale);
+    const res = await productTypeLookup(search_value,f_sale,i_raw);
     this.setStatus(res.status);
     console.log(res.data)
     return res.data;

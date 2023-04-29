@@ -27,10 +27,8 @@ export class ForecastController extends Controller {
   public async calculateForecast(
     @Body() req: calculateForecastRequest
   ) {
-    // console.log(req);
     const _forecast = await calculateMaterials(<any>req.products);
-    
-// console.log(_forecast)
+
 
     this.setStatus(status.OK);
     return _forecast;
