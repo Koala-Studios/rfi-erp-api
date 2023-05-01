@@ -2,10 +2,20 @@ import User, { IUser } from "../models/user.model";
 import { reply, status } from "../config/config.status";
 import { IListParams, ILogicResponse } from "./interfaces.logic";
 import { IProcessedQuery, processQuery } from "./utils";
+import UserRole, { IUserRole } from "../models/user-role.model";
+import Notification, { INotification } from "../models/notification.model";
 
-export const listUser = async (
-  query:string
-): Promise<ILogicResponse> => {
+export interface IGetUserResponse {
+  _id: any;
+  email: string;
+  username: string;
+  // photo: string;
+  // identities: string[];
+  roles: { name: string; permissions: string[] }[];
+  notifications: INotification[];
+}
+
+export const listUser = async (query: string): Promise<ILogicResponse> => {
   const { _filter, _page, _count }: IProcessedQuery = processQuery(query);
 
   const list = await User.paginate(_filter, {
@@ -13,7 +23,6 @@ export const listUser = async (
     limit: _count,
     leanWithId: true,
     // sort: { date_created: 'desc' }
-
   });
   return {
     status: status.OK,
@@ -28,4 +37,25 @@ export const userLookup = async (s_value) => {
   );
 
   return { status: status.OK, data: { message: "", res: list } };
+};
+
+export const loadUserInfo = async (_user: IUser): Promise<IGetUserResponse> => {
+  const roles = await UserRole.find().where("_id").in(_user.roles).exec();
+
+  let user: IGetUserResponse = {
+    _id: _user._id,
+    email: _user.email,
+    username: _user.username,
+    roles: roles,
+    notifications: [],
+  };
+
+  const nc = await Notification.findOne({ receiverId: user._id });
+
+  if (nc) {
+    user.notifications = nc.notifications;
+    console.log(nc.notifications, user);
+  }
+
+  return user;
 };

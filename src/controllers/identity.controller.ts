@@ -16,6 +16,8 @@ import { Request } from "@tsoa/runtime";
 import { Security } from "@tsoa/runtime";
 import { Get } from "@tsoa/runtime";
 import Notification, { INotification } from "../models/notification.model";
+import UserRole, { IUserRole } from "../models/user-role.model";
+import { IGetUserResponse, loadUserInfo } from "../logic/user.logic";
 
 function createToken(user: IUser) {
   return jwt.sign(
@@ -37,15 +39,8 @@ interface signinRequest {
   password: string;
 }
 
-interface IUserResponse {
-  email: string;
-  username: string;
-  identities: string[];
-  notifications?: INotification[];
-}
-
 interface signinResponse {
-  user: IUserResponse;
+  user: IGetUserResponse;
   token: string;
 }
 
@@ -108,7 +103,7 @@ export class IdentityController extends Controller {
 
     // console.log(req.username, req.password);
 
-    let user = await User.findOne({
+    const user = await User.findOne({
       $or: [
         { email: req.username.toLowerCase() },
         { username: req.username.toLowerCase() },
@@ -120,23 +115,16 @@ export class IdentityController extends Controller {
       return;
     }
 
-    const userNotifications = await Notification.findOne({
-      receiverId: user._id,
-    });
-
-    let notifications: INotification[];
-    if (userNotifications) {
-      notifications = userNotifications.notifications;
-    }
-
     const identity = await Identity.findOne({ user: user.id });
     const passwordMatch = await identity.comparePassword(req.password);
 
     if (passwordMatch) {
       this.setStatus(status.OK);
 
+      const getUserResponse = await loadUserInfo(user);
+
       return {
-        user: { ...user, notifications },
+        user: getUserResponse,
         token: createToken(user),
       };
     }

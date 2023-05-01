@@ -14,7 +14,7 @@ import { Request as eRequest } from "express";
 import { Query } from "tsoa";
 import User, { IUser } from "../models/user.model";
 import { reply, status } from "../config/config.status";
-import { listUser, userLookup } from "../logic/user.logic";
+import { listUser, loadUserInfo, userLookup } from "../logic/user.logic";
 import Notification, { INotification } from "../models/notification.model";
 import { ObjectId } from "mongoose";
 import UserRole, { IUserRole } from "../models/user-role.model";
@@ -52,27 +52,12 @@ export class UserController extends Controller {
   public async loadUser(@Request() req: eRequest) {
     const _user = <IUser>req.user;
 
-    console.log(_user);
+    console.log("loaduser");
 
-    const roles = await UserRole.find().where("_id").exec();
-
-    let user: IGetUserResponse = {
-      _id: _user._id,
-      email: _user.email,
-      username: _user.username,
-      roles: roles,
-      notifications: [],
-    };
-
-    const nc = await Notification.findOne({ receiverId: user._id });
-
-    if (nc) {
-      user.notifications = nc.notifications;
-      console.log(nc.notifications, user);
-    }
+    const getUserResponse = await loadUserInfo(_user);
 
     this.setStatus(status.OK);
-    return user;
+    return getUserResponse;
   }
 
   @Get("list")
