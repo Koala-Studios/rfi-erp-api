@@ -33,9 +33,10 @@ export const userSockets = async (io, socket) => {
   });
 
   socket.on(send.delete_notification, (notificationId: string) => {
-    deleteNotification(socket.userId, notificationId);
+    deleteNotification(socket.handshake.query.userId, notificationId);
   });
-  socket.on(send.delete_notification, () => {
-    deleteAllNotifications(socket.userId);
+  socket.on(send.delete_all_notifications, () => {
+    console.log(socket.handshake.query.userId);
+    deleteAllNotifications(socket.handshake.query.userId);
   });
 };

@@ -60,6 +60,7 @@ export const deleteNotification = async (
 ) => {
   let nc = await Notification.findOne({ receiverId: receiverId });
   if (nc) {
+    console.log("found");
     nc.notifications = nc.notifications.filter(
       (item) => item._id != notificationId
     );
