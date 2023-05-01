@@ -3,7 +3,7 @@ import paginate from "mongoose-paginate-v2";
 
 export interface IUserRole extends mongoose.Document {
   name: string;
-  permissions: string;
+  permissions: string[];
 }
 
 const userRoleSchema = new mongoose.Schema({

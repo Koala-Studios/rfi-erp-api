@@ -17,6 +17,7 @@ import { reply, status } from "../config/config.status";
 import { listUser, userLookup } from "../logic/user.logic";
 import Notification, { INotification } from "../models/notification.model";
 import { ObjectId } from "mongoose";
+import UserRole, { IUserRole } from "../models/user-role.model";
 
 interface IGetUserResponse {
   _id: any;
@@ -24,6 +25,7 @@ interface IGetUserResponse {
   username: string;
   // photo: string;
   // identities: string[];
+  roles: { name: string; permissions: string[] }[];
   notifications: INotification[];
 }
 
@@ -52,10 +54,13 @@ export class UserController extends Controller {
 
     console.log(_user);
 
+    const roles = await UserRole.find().where("_id").exec();
+
     let user: IGetUserResponse = {
       _id: _user._id,
       email: _user.email,
       username: _user.username,
+      roles: roles,
       notifications: [],
     };
 
@@ -74,9 +79,8 @@ export class UserController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async listUserRequest(
     @Request() req: eRequest,
-    @Query() query:string
+    @Query() query: string
   ) {
-
     const res = await listUser(query);
     this.setStatus(res.status);
     return res.data;
