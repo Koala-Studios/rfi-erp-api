@@ -4,6 +4,7 @@ export interface IUser extends mongoose.Document {
   email: string;
   username: string;
   photo: string;
+  roles: string[]; //ids of roles
   identities: string[];
 }
 
@@ -23,6 +24,7 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     minLength: 3,
   },
+  roles: [String],
   identities: [String],
 });
 

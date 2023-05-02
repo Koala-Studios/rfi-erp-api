@@ -60,9 +60,18 @@ export const deleteNotification = async (
 ) => {
   let nc = await Notification.findOne({ receiverId: receiverId });
   if (nc) {
+    console.log("found");
     nc.notifications = nc.notifications.filter(
       (item) => item._id != notificationId
     );
+    nc.save();
+  }
+};
+
+export const deleteAllNotifications = async (receiverId: string) => {
+  let nc = await Notification.findOne({ receiverId: receiverId });
+  if (nc) {
+    nc.notifications = [];
     nc.save();
   }
 };

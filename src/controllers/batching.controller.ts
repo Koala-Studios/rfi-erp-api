@@ -14,11 +14,7 @@ import logger from "../logger/logger";
 import Batching, { batchingStatus, IBatching } from "../models/batching.model";
 import { reply, status } from "../config/config.status";
 import Inventory, { IInventory } from "../models/inventory.model";
-import {
-  createBOM,
-  getBatching,
-  listBatching,
-} from "../logic/batching.logic";
+import { createBOM, getBatching, listBatching } from "../logic/batching.logic";
 import mongoose from "mongoose";
 
 @Route("batching")
@@ -37,20 +33,17 @@ export class BatchingController extends Controller {
     return res.data;
   }
 
-
   @Get("get")
   @SuccessResponse(status.OK, reply.success)
   public async getBatchingRequest(
     @Request() req: eRequest,
-    @Query() id: string,
+    @Query() id: string
   ) {
     const _res = await getBatching(id);
     this.setStatus(status.OK);
-    console.log(_res)
+    console.log(_res);
     return _res.data;
   }
-
-
 
   @Post("create")
   @SuccessResponse(status.CREATED, reply.success)
@@ -86,19 +79,20 @@ export class BatchingController extends Controller {
     @Body() b: IBatching
   ) {
     b.status = batchingStatus.SCHEDULED;
-    const _batching = await Batching.findOneAndUpdate({ _id: b._id }, b,
-      { new: true });
+    const _batching = await Batching.findOneAndUpdate({ _id: b._id }, b, {
+      new: true,
+    });
     this.setStatus(status.OK);
-    return {message:"Successfully Confirmed", res: _batching};
+    return { message: "Successfully Confirmed", res: _batching };
   }
 
   @Post("generate-bom")
   @SuccessResponse(status.CREATED, reply.success)
   public async createBOMRequest(
     @Request() req: eRequest,
-    @Query() batching_id,
+    @Query() batching_id
   ) {
-    const _batching = await Batching.findById(batching_id)
+    const _batching = await Batching.findById(batching_id);
     const _res = await createBOM(_batching);
     this.setStatus(_res.status);
     return _res.data;
