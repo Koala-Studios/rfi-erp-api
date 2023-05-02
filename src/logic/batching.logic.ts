@@ -17,14 +17,8 @@ export const listBatching = async (query: string): Promise<ILogicResponse> => {
     page: _page,
     limit: _count,
     leanWithId: true,
-    // sort: { date_created: 'desc' }
+    sort: { date_created: "desc" },
   });
-  //TODO: REMOVE THIS LMAO
-  for (let index = 0; index < list.docs.length; index++) {
-    const material_id = list.docs[index].product_id;
-    const product = await Inventory.findOne({ _id: material_id });
-    list.docs[index].product_name = product ? product.name : "ERROR";
-  }
 
   return { status: status.OK, data: { message: null, res: list } };
 };

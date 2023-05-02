@@ -19,7 +19,8 @@ module.exports = {
       .forEach(function (Inventory) {
             db.collection("batchings").updateMany(
               { product_code: Inventory.product_code }, 
-              { $set: { "product_id": Inventory._id } }
+              { $set: { "product_id": Inventory._id, 
+              'name': Inventory.name, } }
             );
       });
       

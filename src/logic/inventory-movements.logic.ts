@@ -24,7 +24,6 @@ export interface IMovement {
 
 export interface IMovementSource {
   movement_source_type: string;
-  amount: number;
 }
 
 export const listInventoryMovement = async (
@@ -70,7 +69,7 @@ export const moveInventory = async (
   if (movement_source) {
     await Inventory.findOneAndUpdate(
       { _id: movement.product_id },
-      { $inc: { [movement_source_variable]: -movement_source.amount } }
+      { $inc: { [movement_source_variable]: -movement.amount } }
     ).then(() => {
       const source_movement = {
         product_id: movement.product_id,
@@ -78,7 +77,7 @@ export const moveInventory = async (
         name: movement.name,
         module_source: movement.module_source,
         movement_target_type: movement_source.movement_source_type,
-        amount: movement_source.amount,
+        amount: -movement.amount,
         movement_date: movement.movement_date,
       };
 

@@ -13,8 +13,12 @@ import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
 import Inventory, { IInventory } from "../models/inventory.model";
 import { reply, status } from "../config/config.status";
-import { inventoryLookup, listInventory } from "../logic/inventory.logic";
-import ProductType, {IProductType} from "../models/product-type.model";
+import {
+  getInventory,
+  inventoryLookup,
+  listInventory,
+} from "../logic/inventory.logic";
+import ProductType, { IProductType } from "../models/product-type.model";
 import { generateProductCode } from "../logic/utils";
 interface ICreateInventoryRequest {
   name: string;
@@ -28,29 +32,23 @@ export class InventoryController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async listInventoryRequest(
     @Request() req: eRequest,
-    @Query() query: string
+    @Query() query: string,
+    @Query() for_sale?: boolean
   ) {
-    const res = await listInventory(query);
+    const res = await listInventory(query, for_sale);
     this.setStatus(res.status);
 
     return res.data;
   }
 
-
-
   @Get("get")
   @SuccessResponse(status.OK, reply.success)
-  public async getInventory(
-    @Request() req: eRequest,
-    @Query() id: string,
-  ) {
+  public async getInventory(@Request() req: eRequest, @Query() id: string) {
+    const _res = await getInventory(id);
 
-    const _inventory = await Inventory.findById(id);
-
-    this.setStatus(status.OK);
-    return _inventory;
+    this.setStatus(_res.status);
+    return _res.data;
   }
-
 
   @Post("create")
   @SuccessResponse(status.CREATED, reply.success)
@@ -60,15 +58,18 @@ export class InventoryController extends Controller {
   ) {
     const mongoose = require("mongoose");
     const product_type = await ProductType.findById(body.product_type._id);
-    product_type.total +=1;
+    product_type.total += 1;
     product_type.save();
     body._id = new mongoose.Types.ObjectId();
-    body.product_code = await generateProductCode(product_type.total,product_type.code);
+    body.product_code = await generateProductCode(
+      product_type.total,
+      product_type.code
+    );
     body.for_sale = product_type.for_sale;
     body.is_raw = product_type.is_raw;
     const newInventory = await Inventory.create(body);
     this.setStatus(status.CREATED);
-  return newInventory;
+    return newInventory;
   }
 
   @Post("update")
@@ -78,7 +79,7 @@ export class InventoryController extends Controller {
     @Body() i: IInventory
   ) {
     console.log("update", i);
-    await Inventory.findOneAndUpdate({ _id: i._id }, i, {new: true});
+    await Inventory.findOneAndUpdate({ _id: i._id }, i, { new: true });
 
     this.setStatus(status.OK);
     return true;
@@ -93,14 +94,13 @@ export class InventoryController extends Controller {
     @Query() is_raw?: boolean,
     @Query() approved?: boolean
   ) {
-
-    const res = await inventoryLookup(search_value, for_sale, is_raw , approved)
-      //  is_raw, approved);
+    const res = await inventoryLookup(search_value, for_sale, is_raw, approved);
+    //  is_raw, approved);
     this.setStatus(res.status);
 
     return res.data;
   }
-  
+
   @Post("delete")
   @SuccessResponse(status.OK, reply.success)
   public async deleteInventory(@Query() inventoryId: string) {

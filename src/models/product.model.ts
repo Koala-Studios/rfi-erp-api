@@ -55,6 +55,7 @@ const productSchema = new mongoose.Schema({
   date_created: Date,
   for_sale: Boolean,
   is_raw: Boolean,
+  description: String,
   avoid_recur: Boolean,
   versions: Number,
   approved_version: Number,

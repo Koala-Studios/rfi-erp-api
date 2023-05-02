@@ -5,10 +5,9 @@ import PurchaseOrder, {
   orderStatus,
 } from "../models/purchase-order.model";
 import Inventory, { IInventory } from "../models/inventory.model";
-import mongoose from "mongoose";
 import { IListParams, IListResponse, ILogicResponse } from "./interfaces.logic";
 import { inventoryLookup } from "./inventory.logic";
-import { moveInventory } from "./inventory-movements.logic";
+import { IMovement, moveInventory } from "./inventory-movements.logic";
 import { movementTypes } from "../models/inventory-movements.model";
 import { IProcessedQuery, processQuery } from "./utils";
 let ObjectId = require("mongodb").ObjectId;
@@ -147,20 +146,11 @@ export const proccessPurchaseRow = async (
   );
   const inv_item = await Inventory.findById(row.product_id);
 
-  console.log(
-    "po: ",
-    purchase_order,
-    "invitem: ",
-    inv_item,
-    "order_item: " + purchase_order.order_items[item_index]
-  );
-  // order_item, "OK IT WORKED?!?!")
-
   purchase_order.order_items[item_index].received_amount += row.process_amount;
   const order_item = purchase_order.order_items[item_index];
   purchase_order.save();
   const approved_by_qc = true;
-  const movement = {
+  const movement: IMovement = {
     product_id: inv_item._id,
     product_code: inv_item.product_code,
     name: inv_item.name,
@@ -172,8 +162,7 @@ export const proccessPurchaseRow = async (
     movement_date: new Date(),
   };
   const movement_source = {
-    movement_source_type: movementTypes.IN_TRANSIT,
-    amount: row.process_amount,
+    movement_source_type: movementTypes.ON_ORDER,
   };
   await moveInventory(movement, movement_source);
   if (quarantine) {
@@ -207,7 +196,6 @@ export const receiveItem = async (
   };
   const movement_source = {
     movement_source_type: movementTypes.ON_HOLD,
-    amount: row.process_amount,
   };
   const _res = await moveInventory(movement, movement_source);
 
@@ -233,7 +221,6 @@ export const handlePurchaseShipment = async (
     };
     const movement_source = {
       movement_source_type: movementTypes.ON_ORDER,
-      amount: item.purchased_amount,
     };
     await moveInventory(movement, movement_source);
   }

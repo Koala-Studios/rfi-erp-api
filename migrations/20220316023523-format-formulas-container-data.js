@@ -23,7 +23,7 @@ module.exports = {
             product_code: formula.PRODUCT_CODE,
             version: parseInt(formula.VERSION),
             date_created: new Date(),
-            base_hundred:true,
+            base:100,
             yield:1.00
           });
           inserted_codes.push([formula.PRODUCT_CODE, formula.VERSION]);

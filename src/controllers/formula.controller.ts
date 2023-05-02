@@ -11,13 +11,13 @@ import { Route } from "@tsoa/runtime";
 import { Request } from "@tsoa/runtime";
 import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
-import Formula, { IFormula,IFormulaItem } from "../models/formula.model";
+import Formula, { IFormula, IFormulaItem } from "../models/formula.model";
 import Inventory from "../models/inventory.model";
 import { reply, status } from "../config/config.status";
 import { getFormula } from "../logic/formula.logic";
 import { submitFormula } from "../logic/formula.logic";
 import { IFormulaSubmitInfo } from "../logic/interfaces.logic";
-var ObjectId = require('mongodb').ObjectId; 
+var ObjectId = require("mongodb").ObjectId;
 @Route("formula")
 @Tags("Formula")
 @Security("jwt")
@@ -27,10 +27,10 @@ export class FormulaController extends Controller {
   public async getFormulaRequest(
     @Request() req: eRequest,
     @Query() product_id: string,
-    @Query() version: string,
+    @Query() version: string
   ) {
     const _res = await getFormula(product_id, version);
-    
+
     this.setStatus(_res.status);
 
     return _res.data;
@@ -42,9 +42,9 @@ export class FormulaController extends Controller {
     @Request() req: eRequest,
     @Query() approved: boolean,
     @Body() formula: IFormula,
-
+    @Query() description: string
   ) {
-    const _res = await submitFormula(formula,approved);
+    const _res = await submitFormula(formula, approved, description);
 
     this.setStatus(_res.status);
 

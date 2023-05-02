@@ -10,6 +10,7 @@ module.exports = {
             name: InventoryItem.NAME,
             for_sale: false,
             is_raw: checkIfRaw(InventoryItem.CODE),
+            is_solid: false,
             cost: parseFloat(InventoryItem.PRICE),
             stock: 
               {
@@ -36,7 +37,7 @@ module.exports = {
               vegan: false,
               organic: false,
               halal: false,
-              no_gmo:false
+              non_gmo:false
             },
             cas_number: InventoryItem.CAS,
           });

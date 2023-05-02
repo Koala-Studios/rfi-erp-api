@@ -7,9 +7,13 @@ import { IProcessedQuery, processQuery } from "./utils";
 
 export const listProduct = async (
   query: string,
-  approved: boolean = null
+  approved: boolean = null,
+  f_sale: boolean | undefined = undefined
 ): Promise<ILogicResponse> => {
-  const { _filter, _page, _count }: IProcessedQuery = processQuery(query);
+  let { _filter, _page, _count }: IProcessedQuery = processQuery(query);
+  if (f_sale != undefined) {
+    _filter = { ..._filter, for_sale: f_sale };
+  }
 
   const list = await Product.paginate(
     { ..._filter, is_raw: false, status: approved ? 4 : { $ne: 4 } }, //filters
@@ -17,7 +21,7 @@ export const listProduct = async (
       page: _page,
       limit: _count,
       leanWithId: true,
-      // sort: { date_created: "desc" },
+      sort: { product_code: "desc" },
     }
   );
   return {
@@ -28,9 +32,10 @@ export const listProduct = async (
 
 export const productLookup = async (s_value, f_sale, approved) => {
   const searchValue = s_value.toString();
-  const statusList = approved ? [4] : [1, 2, 3, 4];
+  const statusList = approved ? [4, 3] : [1, 2, 3, 4];
   const for_sale = { for_sale: f_sale };
   let query = {
+    is_raw: false,
     $or: [
       { aliases: new RegExp(searchValue, "i") },
       { product_code: new RegExp("^" + searchValue) },

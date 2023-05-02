@@ -107,7 +107,8 @@ export const getFormula = async (
 
 export const submitFormula = async (
   formula: IFormula,
-  approved:boolean,
+  approved: boolean,
+  description: string
 ): Promise<ILogicResponse> => {
   let _status: number;
   let _message: string;
@@ -124,7 +125,7 @@ export const submitFormula = async (
 
   product.versions += 1;
   product.rec_dose_rate = formula.rec_dose_rate;
-
+  product.description = description;
   //*If flavorist is setting product as ready for approval
   if (approved || product.status === 3) {
     product.status = 3;
@@ -139,14 +140,14 @@ export const submitFormula = async (
     product_code: product.product_code,
     version: product.versions,
     yield: formula.yield,
-    base_hundred:formula.base_hundred,
+    base: formula.base,
     rec_dose_rate: formula.rec_dose_rate,
     date_created: new Date(),
     formula_items: formula.formula_items,
+    description: description,
   });
 
-
-  console.log(newDevelopment, product, 'TEST SUBMIT')
+  console.log(newDevelopment, product, "TEST SUBMIT");
   newDevelopment.save();
   product.save();
 
@@ -159,5 +160,13 @@ export const submitFormula = async (
 export const approveFormula = async (
   formula: IFormulaSubmitInfo
 ): Promise<ILogicResponse> => {
-  return { status: null, data: { message: null, res: null } };
+  let _status = status.OK;
+  let _message = "Formula Approved!";
+
+  let _product = await Product.findOneAndUpdate(
+    { _id: formula.product_id },
+    { $set: { status: 4 } },
+    { new: true }
+  );
+  return { status: _status, data: { message: _message, res: _product } };
 };
