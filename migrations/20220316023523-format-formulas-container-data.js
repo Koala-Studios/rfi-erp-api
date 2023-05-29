@@ -24,7 +24,8 @@ module.exports = {
             version: parseInt(formula.VERSION),
             date_created: new Date(),
             base:100,
-            yield:1.00
+            yield:1.00,
+            rec_dose_rate: 0
           });
           inserted_codes.push([formula.PRODUCT_CODE, formula.VERSION]);
         }
@@ -42,7 +43,8 @@ module.exports = {
               material_code: formula.MATERIAL_CODE,
               amount: parseFloat(formula.QTY),
               notes: formula.NOTES,
-              material_id: formula.material_id
+              material_id: formula.material_id,
+              rec_dose_rate: 0
             }
           }
         });

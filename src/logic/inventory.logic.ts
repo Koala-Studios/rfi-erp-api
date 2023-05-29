@@ -4,13 +4,6 @@ import { reply, status } from "../config/config.status";
 import { FilterQuery } from "mongoose";
 import { IProcessedQuery, processQuery } from "./utils";
 
-// export const listInventory = async():Promise<IInventory[]> => {
-//     //filters: all
-//     const _inventory = await Inventory.find({}).limit(100);
-//     // console.log(_inventory);
-//     return _inventory;
-// }
-
 export const listInventory = async (
   query: string,
   f_sale: boolean | undefined
@@ -60,6 +53,6 @@ export const inventoryLookup = async (s_value, f_sale, i_raw, approved) => {
 };
 
 export const getInventory = async (id) => {
-  const _item = Inventory.findById(id).catch((err) => console.log(err));
+  const _item = await Inventory.findById(id).catch((err) => console.log(err));
   return { status: status.OK, data: { message: "Item Found", res: _item } };
 };

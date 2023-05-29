@@ -19,6 +19,7 @@ export interface IFormula extends mongoose.Document {
   date_created: Date;
   formula_items: IFormulaItem[];
   description: string;
+  approved: boolean;
 }
 
 const formulaSchema = new mongoose.Schema({
@@ -39,6 +40,7 @@ const formulaSchema = new mongoose.Schema({
     },
   ],
   description: String,
+  approved: Boolean,
 });
 
 export default mongoose.model<IFormula>("Formula", formulaSchema);

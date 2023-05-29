@@ -1,7 +1,7 @@
 import { IListParams, ILogicResponse } from "./interfaces.logic";
 import { reply, status } from "../config/config.status";
 import Inventory from "../models/inventory.model";
-import Batching, { IBatching } from "../models/batching.model";
+import Batching, { IBatching, batchingStatus } from "../models/batching.model";
 import Formula, { IFormula } from "../models/formula.model";
 import mongoose, { FilterQuery } from "mongoose";
 import { IProcessedQuery, processQuery } from "./utils";
@@ -79,12 +79,51 @@ export const createBOM = async (
   };
 };
 
-export const startProduction = async (
+export const finishBatching = async (
   batching: IBatching
 ): Promise<ILogicResponse> => {
+  for (const material of batching.ingredients) {
+    const newId = new mongoose.Types.ObjectId();
+    batching.ingredients = [
+      ...batching.ingredients,
+      {
+        _id: new mongoose.Types.ObjectId().toHexString(),
+        product_id: material.product_id,
+        product_code: material.product_code,
+        product_name: material.product_name,
+        required_amount: material.required_amount,
+        used_containers: [],
+        used_amount: 0,
+      },
+    ];
+    moveInventory({
+      product_id: material.product_id,
+      product_code: material.product_code,
+      name: material.product_name,
+      module_source: Batching.modelName,
+      movement_target_type: movementTypes.ALLOCATED,
+      amount: -material.required_amount, //DEALLOCATING THE AMOUNT THAT WAS SET ASIDE.
+      movement_date: new Date(),
+    });
+    for (const container of material.used_containers) {
+      moveInventory({
+        product_id: material.product_id, //UPDATING CONTAINER QTY
+        product_code: material.product_code,
+        name: material.product_name,
+        module_source: Batching.modelName,
+        movement_target_type: movementTypes.ON_HAND,
+        lot_number: container.lot_number,
+        container_id: container.container_id,
+        amount: -container.amount_used, //REMOVING USED AMT FROM CONTAINERS
+        movement_date: new Date(),
+      });
+    }
+  }
+  batching.status = batchingStatus.FINISHED;
   batching.save();
+
   return {
-    status: status.CREATED,
-    data: { message: "Batch Created", res: batching },
+    status: status.OK,
+    data: { message: "Batch Finished.", res: batching },
   };
 };

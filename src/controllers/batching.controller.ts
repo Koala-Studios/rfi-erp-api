@@ -14,7 +14,12 @@ import logger from "../logger/logger";
 import Batching, { batchingStatus, IBatching } from "../models/batching.model";
 import { reply, status } from "../config/config.status";
 import Inventory, { IInventory } from "../models/inventory.model";
-import { createBOM, getBatching, listBatching } from "../logic/batching.logic";
+import {
+  createBOM,
+  finishBatching,
+  getBatching,
+  listBatching,
+} from "../logic/batching.logic";
 import mongoose from "mongoose";
 
 @Route("batching")
@@ -94,6 +99,18 @@ export class BatchingController extends Controller {
   ) {
     const _batching = await Batching.findById(batching_id);
     const _res = await createBOM(_batching);
+    this.setStatus(_res.status);
+    return _res.data;
+  }
+
+  @Post("finish-batching")
+  @SuccessResponse(status.CREATED, reply.success)
+  public async finishBatchingRequest(
+    @Request() req: eRequest,
+    @Query() batching_id
+  ) {
+    const _batching = await Batching.findById(batching_id);
+    const _res = await finishBatching(_batching);
     this.setStatus(_res.status);
     return _res.data;
   }

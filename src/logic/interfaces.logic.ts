@@ -18,11 +18,3 @@ export interface IListResponse {
   list: any[];
   totalCount: number;
 }
-
-export interface IFormulaSubmitInfo {
-  yield?: number;
-  formula_items: IFormulaItem[];
-  product_id: string;
-  approved: boolean;
-}
-

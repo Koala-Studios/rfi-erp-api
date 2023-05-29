@@ -14,9 +14,14 @@ import logger from "../logger/logger";
 import Formula, { IFormula, IFormulaItem } from "../models/formula.model";
 import Inventory from "../models/inventory.model";
 import { reply, status } from "../config/config.status";
-import { getFormula } from "../logic/formula.logic";
+import {
+  approveFormula,
+  disapproveFormula,
+  getFormula,
+} from "../logic/formula.logic";
 import { submitFormula } from "../logic/formula.logic";
-import { IFormulaSubmitInfo } from "../logic/interfaces.logic";
+import mongoose from "mongoose";
+import { IProduct } from "../models/product.model";
 var ObjectId = require("mongodb").ObjectId;
 @Route("formula")
 @Tags("Formula")
@@ -36,18 +41,37 @@ export class FormulaController extends Controller {
     return _res.data;
   }
 
-  @Post("submit")
+  @Post("submit-formula")
   @SuccessResponse(status.OK, reply.success)
   public async submitFormulaRequest(
     @Request() req: eRequest,
-    @Query() approved: boolean,
     @Body() formula: IFormula,
+    @Query() approved: boolean,
     @Query() description: string
   ) {
+    if (formula._id === "new") {
+      formula._id = new mongoose.Types.ObjectId();
+    }
     const _res = await submitFormula(formula, approved, description);
 
     this.setStatus(_res.status);
 
+    return _res.data;
+  }
+
+  @Post("approve-formula")
+  @SuccessResponse(status.OK, reply.success)
+  public async approveFormulaRequest(@Body() product: IProduct) {
+    const _res = await approveFormula(product._id);
+    this.setStatus(_res.status);
+    return _res.data;
+  }
+
+  @Post("disapprove-formula")
+  @SuccessResponse(status.OK, reply.success)
+  public async disapproveFormulaRequest(@Body() product: IProduct) {
+    const _res = await disapproveFormula(product._id);
+    this.setStatus(_res.status);
     return _res.data;
   }
 }

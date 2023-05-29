@@ -5,7 +5,7 @@ import { ICustomer } from "./customer.model";
 interface IStockSummary {
   on_hold: number;
   on_hand: number;
-  on_order: number;
+  ordered: number;
   quarantined: number;
   allocated: number;
   average_price: number;
@@ -21,15 +21,14 @@ export const FDA_STATUSES = {
 
 interface IRegulatoryContainer {
   cpl_hazard?: [];
-  fda_status?: number;
-  fema_number?: number;
+  fda_status?: string;
   eu_status?: number;
   ttb_status?: number;
 }
 export interface IProduct extends mongoose.Document {
   product_code: string;
   name: string;
-  average_cost?: number;
+  cost: number;
   description: string;
   rating: number | null;
   date_created: string;
@@ -44,6 +43,7 @@ export interface IProduct extends mongoose.Document {
   regulatory: IRegulatoryContainer;
   aliases: string;
   product_type: { name: string; code: string; _id: string };
+  fema_number?: string;
 }
 
 const productSchema = new mongoose.Schema({
@@ -62,7 +62,7 @@ const productSchema = new mongoose.Schema({
   rec_dose_rate: Number,
   stock: {
     on_hand: Number,
-    on_order: Number,
+    ordered: Number,
     on_hold: Number,
     quarantined: Number,
     allocated: Number,
@@ -71,9 +71,8 @@ const productSchema = new mongoose.Schema({
   },
   status: Number,
   regulatory: {
-    fda_status: Number,
+    fda_status: String,
     cpl_hazard: [],
-    fema_number: Number,
     ttb_status: Number,
     eu_status: Number,
   },
@@ -84,6 +83,7 @@ const productSchema = new mongoose.Schema({
     halal: Boolean,
     non_gmo: Boolean,
   },
+  fema_number: Number,
   product_type: { name: String, code: String, _id: String },
 });
 

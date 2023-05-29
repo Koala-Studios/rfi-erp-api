@@ -16,15 +16,16 @@ module.exports = {
         const inv_product = await db.collection("inventory").findOne({"product_code": InvStockItem.product_code})
         const supplier = await db.collection("suppliers").findOne({"code": InvStockItem.supplier_code})
 
+        if(inv_product) {
           db.collection("inventory_stock").insertOne({
             product_id: inv_product ? inv_product._id : 'ERROR',
             product_code: InvStockItem.product_code,
             name: inv_product ? inv_product.name : InvStockItem.product_name,
             unit_cost: Math.random()*Math.random()*(10/Math.random()), //!!!! REMOVE THIS LATER, JUST FOR TESTING PURPOSES
             lot_number: InvStockItem.lot_number,
-            container_size: InvStockItem.qty_per_cont ? InvStockItem.qty_per_cont : 0,
-            received_amount: InvStockItem.Rec_qty ? InvStockItem.Rec_qty : ( (InvStockItem.qty_per_cont * InvStockItem.cont_num) != NaN ? (InvStockItem.qty_per_cont * InvStockItem.cont_num) : 0), //!!!! make sure no NaN remain, currently some do.
-            used_amount: InvStockItem.used_qty ? InvStockItem.used_qty : 0,
+            container_size: InvStockItem.qty_per_cont || 0,
+            received_amount: InvStockItem.Rec_qty || ( (InvStockItem.qty_per_cont * InvStockItem.cont_num) || 0),
+            used_amount: InvStockItem.used_qty || 0,
             allocated_amount: 0,
             quarantined_containers: 0,
             received_date:InvStockItem.received_date,
@@ -36,7 +37,13 @@ module.exports = {
             extensions: ext_list,
             qc_tests:[]
           });
+
+          
+        await db.collection("inventory").updateOne({_id: inv_product._id}, {$inc : {'stock.on_hand': (InvStockItem.Rec_qty || ( (InvStockItem.qty_per_cont * InvStockItem.cont_num) || 0) - InvStockItem.used_qty || 0) }})
+      
+        }
       };
+
   },
   async down(db, client) {
     db.collection("inventory_stock").drop();

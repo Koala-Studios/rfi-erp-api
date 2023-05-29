@@ -10,7 +10,7 @@ module.exports = {
           product_code: Product.PRODUCT_CODE,
           name: Product.NAME,
           description: "",
-          average_cost: parseFloat(Product.COST),
+          cost: parseFloat(Product.COST) || 0,
           rating: null,
           date_created: new Date(Product.DATE_CREATED),
           for_sale: true,
@@ -21,7 +21,7 @@ module.exports = {
           rec_dose_rate: 0,
           stock:{
             on_hand: parseFloat(0),
-            on_order: parseFloat(0),
+            ordered: parseFloat(0),
             allocated: parseFloat(0),
             on_hold: parseFloat(0),
             quarantined: parseFloat(0),
@@ -51,7 +51,8 @@ module.exports = {
           versions: parseInt(Product.VERSIONS),
           approved_version: parseInt(Product.APPROVED_VERSION),
           status: parseInt(Product.STATUS),
-          rec_dose_rate: parseFloat(Product.REC_DOSE_RATE),
+          created_date: Product.DATE_CREATED,
+          rec_dose_rate: 0,
         } });
       }
     });

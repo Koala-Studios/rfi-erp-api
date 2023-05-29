@@ -19,7 +19,7 @@ import {
   productLookupByCode,
 } from "../logic/product.logic";
 import ProductType, { IProductType } from "../models/product-type.model";
-import { generateProductCode } from "../logic/utils";
+import { generateProductCode, refreshProductCosts } from "../logic/utils";
 
 @Route("products")
 @Tags("Products")
@@ -34,6 +34,7 @@ export class ProductController extends Controller {
     @Query() for_sale?: boolean
   ) {
     const res = await listProduct(query, approved, for_sale);
+
     this.setStatus(res.status);
     return res.data;
   }

@@ -8,15 +8,16 @@ module.exports = {
           db.collection("inventory").insertOne({
             product_code: InventoryItem.CODE,
             name: InventoryItem.NAME,
+            description: "",
             for_sale: false,
             is_raw: checkIfRaw(InventoryItem.CODE),
             is_solid: false,
             cost: parseFloat(InventoryItem.PRICE),
             stock: 
               {
-                on_hand: parseFloat(InventoryItem.QTY),
+                on_hand: 0,
                 on_hold: 0,
-                on_order: 0,
+                ordered: 0,
                 quarantined: 0,
                 allocated: 0,
                 average_price: 0,

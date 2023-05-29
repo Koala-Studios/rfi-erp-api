@@ -162,7 +162,7 @@ export const proccessPurchaseRow = async (
     movement_date: new Date(),
   };
   const movement_source = {
-    movement_source_type: movementTypes.ON_ORDER,
+    movement_source_type: movementTypes.ORDERED,
   };
   await moveInventory(movement, movement_source);
   if (quarantine) {
@@ -220,7 +220,7 @@ export const handlePurchaseShipment = async (
       movement_date: new Date(),
     };
     const movement_source = {
-      movement_source_type: movementTypes.ON_ORDER,
+      movement_source_type: movementTypes.ORDERED,
     };
     await moveInventory(movement, movement_source);
   }
@@ -252,7 +252,7 @@ export const confirmPurchase = async (
       product_code: inv_item.product_code,
       name: inv_item.name,
       module_source: PurchaseOrder.modelName,
-      movement_target_type: movementTypes.ON_ORDER,
+      movement_target_type: movementTypes.ORDERED,
       amount: item.purchased_amount,
       movement_date: new Date(),
     };
@@ -278,7 +278,7 @@ export const setAsReceived = async (po_id): Promise<ILogicResponse> => {
         module_source: PurchaseOrder.modelName,
         movement_target_type:
           purchase_order.status == orderStatus.AWAITING_SHIPPING
-            ? movementTypes.ON_ORDER
+            ? movementTypes.ORDERED
             : movementTypes.IN_TRANSIT,
         amount: -(order_item.purchased_amount - order_item.received_amount),
         movement_date: new Date(),
@@ -311,7 +311,7 @@ export const setAsCancelled = async (po_id): Promise<ILogicResponse> => {
         module_source: PurchaseOrder.modelName,
         movement_target_type:
           purchase_order.status == orderStatus.AWAITING_SHIPPING
-            ? movementTypes.ON_ORDER
+            ? movementTypes.ORDERED
             : movementTypes.IN_TRANSIT,
         amount: -(order_item.purchased_amount - order_item.received_amount),
         movement_date: new Date(),

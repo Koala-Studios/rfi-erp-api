@@ -6,7 +6,7 @@ const ObjectId = Schema.Types.ObjectId;
 export const movementTypes = {
   ON_HOLD: "on_hold",
   ON_HAND: "on_hand",
-  ON_ORDER: "on_order",
+  ORDERED: "ordered",
   IN_TRANSIT: "in_transit",
   QUARANTINED: "quarantined",
   ALLOCATED: "allocated",

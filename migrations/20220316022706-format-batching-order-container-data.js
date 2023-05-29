@@ -9,7 +9,7 @@ module.exports = {
             date_created: new Date(InventoryItem.DATE_CREATED),
             product_code: InventoryItem.PRODUCT_CODE,
             quantity: parseFloat(InventoryItem.QTY),
-            status: parseInt(InventoryItem.STATUS),
+            status: 4,
           });
       });
 

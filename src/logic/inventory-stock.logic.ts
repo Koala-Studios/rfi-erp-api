@@ -41,7 +41,7 @@ export const listInventoryStockGrouped = async (
   const { _filter, _page, _count }: IProcessedQuery = processQuery(query);
 
   const tester = InventoryStock.aggregate([
-    { $sort: { product_id: 1, received_date: 1 } },
+    { $sort: { product_id: 1 } },
     {
       $group: {
         _id: { product_id: "$product_id", product_code: "$product_code" },
@@ -80,13 +80,20 @@ export const listInventoryStockGrouped = async (
     {
       $set: {
         average_cost: {
-          $round: [
-            { $divide: ["$average_cost", { $sum: "$received_amount" }] },
-            2,
-          ],
+          $cond: {
+            if: { $gt: ["$average_cost", 0] },
+            then: {
+              $round: [
+                { $divide: ["$average_cost", { $sum: "$received_amount" }] },
+                2,
+              ],
+            },
+            else: 0,
+          },
         },
       },
     },
+    { $sort: { product_code: -1 } },
   ]);
 
   const list = await InventoryStock.aggregatePaginate(tester, {

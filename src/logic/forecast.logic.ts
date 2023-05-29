@@ -55,14 +55,14 @@ export const calculateMaterials = async (
           product_name: inv_item.name,
           required_amount: ingredient.amount,
           available_amount: inv_item.stock.on_hand - inv_item.stock.allocated,
-          on_order_amount: inv_item.stock.on_order,
+          ordered_amount: inv_item.stock.ordered,
           on_hand_amount: inv_item.stock.on_hand,
           in_transit_amount: inv_item.stock.in_transit,
           reorder_amount: inv_item.stock.reorder_amount,
           amt_status: assignStatus(
             ingredient.amount,
             inv_item.stock.on_hand - inv_item.stock.allocated,
-            inv_item.stock.on_order
+            inv_item.stock.ordered
           ),
         },
       ];
