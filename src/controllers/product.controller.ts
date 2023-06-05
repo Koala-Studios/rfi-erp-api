@@ -17,6 +17,7 @@ import {
   listProduct,
   productLookup,
   productLookupByCode,
+  updateProductPrice,
 } from "../logic/product.logic";
 import ProductType, { IProductType } from "../models/product-type.model";
 import { generateProductCode, refreshProductCosts } from "../logic/utils";
@@ -43,6 +44,9 @@ export class ProductController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async getProduct(@Request() req: eRequest, @Query() id: string) {
     const _product = await Product.findById(id);
+
+    _product.cost = await updateProductPrice(id);
+    _product.save();
     this.setStatus(status.OK);
     return _product;
   }

@@ -1,8 +1,8 @@
 import Product, { IProduct } from "../models/product.model";
+import Formula, { IFormula } from "../models/formula.model";
 import { IListParams, IListResponse, ILogicResponse } from "./interfaces.logic";
 import { reply, status } from "../config/config.status";
 import { createBOM } from "./batching.logic";
-import productModel from "../models/product.model";
 import { IProcessedQuery, processQuery } from "./utils";
 
 export const listProduct = async (
@@ -59,4 +59,43 @@ export const productLookup = async (s_value, f_sale, approved) => {
 
 export const productLookupByCode = async (lookup_list: string[]) => {
   return await Product.find({ product_code: { $in: lookup_list }, status: 4 });
+};
+
+export const updateProductPrice = async (
+  _product_id: string
+): Promise<number> => {
+  const amount = await recursivePriceUpdater(_product_id, 1, 0);
+  console.log(amount, "FINAL");
+  return amount;
+};
+
+const recursivePriceUpdater = async (
+  product_id: string,
+  amount: number,
+  totalCost: number
+) => {
+  const product = await Product.findById(product_id);
+  if (product.is_raw) {
+    return product.cost * amount;
+  } else {
+    const formula = await Formula.findOne({
+      product_id: product._id,
+      version: product.versions,
+    });
+    if (formula) {
+      for (const form_item of formula.formula_items) {
+        totalCost +=
+          ((await recursivePriceUpdater(
+            form_item.material_id,
+            form_item.amount,
+            totalCost / 100
+          )) *
+            amount) /
+          100;
+      }
+    } else {
+      totalCost += (product.cost * amount) / 100;
+    }
+    return totalCost;
+  }
 };

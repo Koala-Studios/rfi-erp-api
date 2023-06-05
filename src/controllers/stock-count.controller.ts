@@ -18,6 +18,7 @@ import {
   approveStockCount,
   createStockCount,
   disapproveStockCount,
+  fillCountAllContainers,
   listStockCount,
   submitStockCount,
 } from "../logic/stock-count.logic";
@@ -52,6 +53,14 @@ export class StockCountController extends Controller {
     return { res: _stockCount, message: "Stock Count" };
   }
 
+  @Get("fill-all")
+  @SuccessResponse(status.OK, reply.success)
+  public async fillAllStockCountRequest(@Request() req: eRequest) {
+    const _res = await fillCountAllContainers();
+    this.setStatus(_res.status);
+    return _res.data;
+  }
+
   @Post("create")
   @SuccessResponse(status.CREATED, reply.success)
   public async createStockCountRequest(
@@ -80,7 +89,7 @@ export class StockCountController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async submitStockCountRequest(
     @Request() req: eRequest,
-    @Body() formData:IStockCount
+    @Body() formData: IStockCount
   ) {
     const _res = await submitStockCount(formData._id);
 
@@ -92,7 +101,7 @@ export class StockCountController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async approveStockCountRequest(
     @Request() req: eRequest,
-    @Body() formData:IStockCount
+    @Body() formData: IStockCount
   ) {
     const _res = await approveStockCount(formData._id);
 
@@ -104,7 +113,7 @@ export class StockCountController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async disapproveStockCountRequest(
     @Request() req: eRequest,
-    @Body() formData:IStockCount
+    @Body() formData: IStockCount
   ) {
     const _res = await disapproveStockCount(formData._id);
 
@@ -116,7 +125,7 @@ export class StockCountController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async abandonStockCountRequest(
     @Request() req: eRequest,
-    @Body() formData:IStockCount
+    @Body() formData: IStockCount
   ) {
     const _res = await abandonStockCount(formData._id);
 

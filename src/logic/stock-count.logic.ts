@@ -1,6 +1,7 @@
 import { IListParams, ILogicResponse } from "./interfaces.logic";
 import { reply, status } from "../config/config.status";
 import Inventory from "../models/inventory.model";
+import InventoryStock from "../models/inventory-stock.model";
 import StockCount, {
   IStockCount,
   stockCountStatus,
@@ -109,5 +110,14 @@ export const abandonStockCount = async (
   return {
     status: status.OK,
     data: { message: "Stock Count Abandoned", res: _stockCount },
+  };
+};
+
+export const fillCountAllContainers = async (): Promise<ILogicResponse> => {
+  const _containers = await InventoryStock.find();
+
+  return {
+    status: status.OK,
+    data: { message: "Stock Count Abandoned", res: _containers },
   };
 };
