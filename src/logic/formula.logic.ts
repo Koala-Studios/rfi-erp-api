@@ -8,12 +8,16 @@ import { ILogicResponse } from "./interfaces.logic";
 let ObjectId = require("mongodb").ObjectId;
 export const getFormula = async (
   product_id,
-  version
+  version: string | null = null
 ): Promise<ILogicResponse> => {
   let _status: number;
-
+  let ver: number;
   const p_id = new ObjectId(product_id);
-  const ver = parseInt(version);
+  if (version) {
+    ver = parseInt(version);
+  } else {
+    ver = (await Product.findById(product_id)).versions;
+  }
 
   const _formula = await Formula.aggregate(
     [
@@ -147,7 +151,7 @@ export const submitFormula = async (
 
   _status = status.OK;
 
-  const _formula = await getFormula(product._id, product.versions); //This is cause getFormula uses an aggregate query, so we can't just send raw formula
+  const _formula = await getFormula(product._id, product.versions.toString()); //This is cause getFormula uses an aggregate query, so we can't just send raw formula
   return {
     status: _status,
     data: { message: _message, res: [product, _formula.data.res] },

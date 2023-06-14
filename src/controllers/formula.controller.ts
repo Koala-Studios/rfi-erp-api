@@ -32,7 +32,7 @@ export class FormulaController extends Controller {
   public async getFormulaRequest(
     @Request() req: eRequest,
     @Query() product_id: string,
-    @Query() version: string
+    @Query() version?: string | null
   ) {
     const _res = await getFormula(product_id, version);
 

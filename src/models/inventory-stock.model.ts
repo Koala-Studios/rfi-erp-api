@@ -16,6 +16,11 @@ export interface IQCTest {
   passed: boolean;
 }
 
+export interface IStockLocation {
+  _id: string;
+  name: string;
+}
+
 interface IInventoryStockGrouped {
   _id: { product_id: string; product_code: string };
   product_code: string;
@@ -26,6 +31,7 @@ interface IInventoryStockGrouped {
   adjusted_amount: number;
   allocated_amount: number;
   quarantined_containers: number;
+  location: IStockLocation;
   items: [IInventoryStock];
 }
 // items: [{
