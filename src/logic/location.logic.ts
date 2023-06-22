@@ -33,6 +33,5 @@ export const locationLookup = async (s_value) => {
   const list = await Location.find({
     name: new RegExp(searchValue, "i"),
   }).limit(15);
-
   return { status: status.OK, data: { message: "", res: list } };
 };

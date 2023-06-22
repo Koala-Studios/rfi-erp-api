@@ -113,7 +113,7 @@ export const finishBatching = async (
         module_source: Batching.modelName,
         movement_target_type: movementTypes.ON_HAND,
         lot_number: container.lot_number,
-        container_id: container.container_id,
+        container_id: container._id,
         amount: -container.amount_used, //REMOVING USED AMT FROM CONTAINERS
         movement_date: new Date(),
       });

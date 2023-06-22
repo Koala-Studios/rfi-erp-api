@@ -24,7 +24,7 @@ export interface IBatching extends mongoose.Document {
 }
 
 export interface IBatchingContainer {
-  container_id: string;
+  _id: string;
   lot_number: string;
   amount_used: string;
 }
