@@ -50,10 +50,10 @@ export const productLookup = async (s_value, f_sale, approved) => {
       $in: statusList;
     }
   }
-  console.log(for_sale);
+  // console.log(for_sale);
   const list = await Product.find(query).limit(25);
 
-  console.log(list);
+  // console.log(list);
   return { status: status.OK, data: { message: "", res: list } };
 };
 

@@ -89,10 +89,10 @@ const recursiveFinder = async (product: IForecast) => {
     product.amount = (product.amount / 100) * formula.base * formula.yield; //TODO: Might pose problems if we don't want to adjust within recursive ingredients.
 
     const materialTypes = await ProductType.find();
-    for (let i = 0; i < f.length; i++) {
+    for (const element of f) {
       //TODO: INCOMPLETE
       const mat_type = materialTypes.find((mat_type) =>
-        f[i].material_code.startsWith(mat_type.code)
+        element.material_code.startsWith(mat_type.code)
       );
 
       if (mat_type && !mat_type.is_raw) {
@@ -101,34 +101,34 @@ const recursiveFinder = async (product: IForecast) => {
           rawIngredients = [
             ...rawIngredients,
             ...(await recursiveFinder({
-              product_code: f[i].material_code,
-              amount: (product.amount * f[i].amount) / 100.0,
+              product_code: element.material_code,
+              amount: (product.amount * element.amount) / 100.0,
             })),
           ];
         } else {
           const inv_material = await Inventory.findOne({
-            id: f[i].material_id,
-            product_code: f[i].material_code,
+            id: element.material_id,
+            product_code: element.material_code,
           });
           //console.log(f[i].material_id, f[i].material_code, 'bruh')
           if (
             inv_material &&
             inv_material.stock.on_hand - inv_material.stock.allocated >=
-              (product.amount * f[i].amount) / 100.0
+            (product.amount * element.amount) / 100.0 || mat_type.avoid_recur //!maybe split into two!
           ) {
             //if enough in inventory, send straight to production
             //console.log(inv_material.stock.on_hand - inv_material.stock.allocated, (product.amount * f[i].amount) / 100.000000, 'FK calc: ', inv_material.product_code, ' ', mat_type)
             rawIngredients.push({
-              product_code: f[i].material_code,
-              amount: (product.amount * f[i].amount) / 100.0,
+              product_code: element.material_code,
+              amount: (product.amount * element.amount) / 100.0,
             });
           } else {
             //otherwise break it up into the ingredients
             rawIngredients = [
               ...rawIngredients,
               ...(await recursiveFinder({
-                product_code: f[i].material_code,
-                amount: (product.amount * f[i].amount) / 100.0,
+                product_code: element.material_code,
+                amount: (product.amount * element.amount) / 100.0,
               })),
             ];
           }
@@ -136,8 +136,8 @@ const recursiveFinder = async (product: IForecast) => {
       } else {
         // if(!mat_type) console.log(f[i], 'product')
         rawIngredients.push({
-          product_code: f[i].material_code,
-          amount: (product.amount * f[i].amount) / 100.0,
+          product_code: element.material_code,
+          amount: (product.amount * element.amount) / 100.0,
         });
       }
     }

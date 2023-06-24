@@ -44,6 +44,7 @@ export interface IInventory extends mongoose.Document {
   rating?: number;
   is_raw: boolean;
   is_solid: boolean;
+  avoid_recur?: boolean;
   cost: number;
   stock: IStockSummary;
   regulatory: IRegulatoryContainer;

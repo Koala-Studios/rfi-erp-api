@@ -57,7 +57,7 @@ export const moveInventory = async (
     //TODO: Later will have to revise this, should work for now.
     await InventoryStock.findOneAndUpdate(
       { _id: movement.container_id },
-      { $inc: { used_amount: -movement.amount } },
+      { $inc: { remaining_amount: +movement.amount } },
       { new: true }
     ); //!!Value is flipped since we're updating the USED amt
   }

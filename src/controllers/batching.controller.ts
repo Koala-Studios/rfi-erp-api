@@ -46,7 +46,6 @@ export class BatchingController extends Controller {
   ) {
     const _res = await getBatching(id);
     this.setStatus(status.OK);
-    console.log(_res);
     return _res.data;
   }
 
@@ -124,5 +123,5 @@ export class BatchingController extends Controller {
 
   @Put("edit")
   @SuccessResponse(status.OK, reply.success)
-  public async editBatching() {}
+  public async editBatching() { }
 }
