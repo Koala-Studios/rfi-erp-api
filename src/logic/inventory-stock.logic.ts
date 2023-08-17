@@ -53,7 +53,7 @@ export const listInventoryStockGrouped = async (
           $sum: { $multiply: ["$unit_cost", "$received_amount"] },
         },
         received_amount: { $sum: "$received_amount" },
-        used_amount: { $sum: "$used_amount" },
+        remaining_amount: { $sum: "$remaining_amount" },
         allocated_amount: { $sum: "$allocated_amount" },
         quarantined_containers: { $sum: "$quarantined_containers" },
         items: {
@@ -62,7 +62,7 @@ export const listInventoryStockGrouped = async (
             name: "$name",
             unit_cost: "$unit_cost",
             received_amount: "$received_amount",
-            used_amount: "$used_amount",
+            remaining_amount: "$remaining_amount",
             allocated_amount: "$allocated_amount",
             quarantined_containers: "$quarantined_containers",
             lot_number: "$lot_number",

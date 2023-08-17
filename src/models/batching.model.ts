@@ -26,7 +26,8 @@ export interface IBatching extends mongoose.Document {
 export interface IBatchingContainer {
   _id: string;
   lot_number: string;
-  amount_used: string;
+  amount_to_use: number;
+  used_amount: number;
 }
 
 export interface IBatchingIngredient {
@@ -37,6 +38,7 @@ export interface IBatchingIngredient {
   required_amount: number;
   used_containers: IBatchingContainer[];
   used_amount: number;
+  has_enough?: boolean;
 }
 
 const ingredientSchema = new mongoose.Schema({
@@ -49,10 +51,12 @@ const ingredientSchema = new mongoose.Schema({
     {
       container_id: String,
       lot_number: String,
-      used_amount: String,
+      amount_to_use: Number,
+      used_amount: Number,
     },
   ],
   used_amount: Number,
+  has_enough: Boolean
 });
 
 const batchingSchema = new mongoose.Schema({
