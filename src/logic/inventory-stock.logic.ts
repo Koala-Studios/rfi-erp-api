@@ -42,6 +42,7 @@ export const listInventoryStockGrouped = async (
 
   const tester = InventoryStock.aggregate([
     { $sort: { product_id: 1 } },
+    { $match: _filter },
     {
       $group: {
         _id: { product_id: "$product_id", product_code: "$product_code" },
