@@ -40,7 +40,7 @@ const customerProductSchema = new mongoose.Schema({
     code: String,
   },
   customer_sku: String,
-  customer_prod_name: String,
+  customer_p_name: String,
   product_code: String,
   name: String,
   cost: Number,
@@ -51,8 +51,7 @@ const customerProductSchema = new mongoose.Schema({
 
 customerProductSchema.plugin(paginate);
 
-export default mongoose.model<ICustomerProduct>(
-  "CustomerProduct",
-  customerProductSchema,
-  "customer_product"
-);
+export default mongoose.model<
+  ICustomerProduct,
+  mongoose.PaginateModel<ICustomerProduct>
+>("CustomerProduct", customerProductSchema, "customer_products");

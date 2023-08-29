@@ -1,10 +1,12 @@
-import { IBatchingContainer } from './../models/batching.model';
+import { IBatchingContainer } from "./../models/batching.model";
 import { IListParams, ILogicResponse } from "./interfaces.logic";
 import { reply, status } from "../config/config.status";
 import Inventory from "../models/inventory.model";
 import Batching, { IBatching, batchingStatus } from "../models/batching.model";
 import Formula, { IFormula } from "../models/formula.model";
-import InventoryStock, { IInventoryStock } from "../models/inventory-stock.model";
+import InventoryStock, {
+  IInventoryStock,
+} from "../models/inventory-stock.model";
 import mongoose, { FilterQuery } from "mongoose";
 import { IProcessedQuery, processQuery } from "./utils";
 import { calculateMaterials } from "./forecast.logic";
@@ -52,8 +54,11 @@ export const createBOM = async (
   ]);
   for (const material of materials) {
     const newId = new mongoose.Types.ObjectId();
-    const containerFill = await fillContainers(material.product_id, material.required_amount);
-    console.log(containerFill, 'contFill')
+    const containerFill = await fillContainers(
+      material.product_id,
+      material.required_amount
+    );
+    console.log(containerFill, "contFill");
     batching.ingredients = [
       ...batching.ingredients,
       {
@@ -64,7 +69,7 @@ export const createBOM = async (
         required_amount: material.required_amount,
         used_containers: containerFill.containers,
         used_amount: 0,
-        has_enough: containerFill.has_enough
+        has_enough: containerFill.has_enough,
       },
     ];
     moveInventory({
@@ -133,30 +138,48 @@ export const finishBatching = async (
   };
 };
 
-
 const fillContainers = async (product_id: string, amount: number) => {
-  let cont_array: IBatchingContainer[] = []
+  let cont_array: IBatchingContainer[] = [];
   let rem_amount = amount;
-  const containers = await InventoryStock.find({ 'product_id': product_id });
-  console.log(product_id, containers, 'CONTAINERS AAAAAAAAAAA')
+  const containers = await InventoryStock.find({ product_id: product_id });
+  console.log(product_id, containers, "CONTAINERS AAAAAAAAAAA");
   if (containers) {
     for (const container of containers) {
-      container.remaining_amount += (Math.random() * 12.145) * 7 / 6
-      const available_amount = container.remaining_amount - container.allocated_amount;
+      container!.remaining_amount += parseFloat(
+        ((Math.random() * 12 * 7) / 6).toFixed(2) //this is to be removed, for testing right now.
+      );
+      const available_amount =
+        container.remaining_amount - container.allocated_amount;
       const has_enough = rem_amount <= available_amount;
 
-      console.log(rem_amount, 'Test123', available_amount, 'Container Amount: ', container.remaining_amount, 'Allocated Amount: ', container.allocated_amount)
+      console.log(
+        rem_amount,
+        "Test123",
+        available_amount,
+        "Container Amount: ",
+        container.remaining_amount,
+        "Allocated Amount: ",
+        container.allocated_amount
+      );
       if (available_amount > 0) {
-        cont_array = [...cont_array, { _id: container._id, lot_number: container.lot_number, amount_to_use: has_enough ? rem_amount : available_amount, used_amount: 0 }]
-        container.allocated_amount = has_enough ? rem_amount : available_amount; //TODO:deallocate this amount .. somehow..
-        rem_amount = rem_amount - (has_enough ? rem_amount : available_amount)
+        cont_array = [
+          ...cont_array,
+          {
+            _id: container._id,
+            lot_number: container.lot_number,
+            amount_to_use: has_enough ? rem_amount : available_amount,
+            used_amount: 0,
+          },
+        ];
+        // container.allocated_amount = has_enough ? rem_amount : available_amount; //TODO:deallocate this amount .. somehow..
+        // rem_amount = rem_amount - (has_enough ? rem_amount : available_amount);
         container.save();
       }
       if (has_enough || rem_amount <= 0) break;
     }
-
   }
   return {
-    containers: cont_array, has_enough: rem_amount <= 0
+    containers: cont_array,
+    has_enough: rem_amount <= 0,
   };
-}
+};

@@ -28,9 +28,12 @@ export class SupplierProductController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async listSupplierProductRequest(
     @Request() req: eRequest,
-    @Query() query: string
+    @Query() query: string,
+    @Query() supplier_id?: string,
+    @Query() product_id?: string
   ) {
-    const res = await listSupplierProduct(query);
+    const res = await listSupplierProduct(query, supplier_id, product_id);
+    console.log(res, "list supplier product");
     this.setStatus(res.status);
     return res.data;
   }

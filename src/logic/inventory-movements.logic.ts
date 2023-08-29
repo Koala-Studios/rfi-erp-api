@@ -78,6 +78,7 @@ export const moveInventory = async (
         module_source: movement.module_source,
         movement_target_type: movement_source.movement_source_type,
         amount: -movement.amount,
+        lot_number: movement.lot_number ?? "",
         movement_date: movement.movement_date,
       };
 

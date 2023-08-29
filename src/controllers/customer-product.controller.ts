@@ -22,7 +22,7 @@ import CustomerProduct, {
   ICustomerProduct,
 } from "../models/customer-product.model";
 import {
-  customerProductList,
+  listCustomerProduct,
   customerProductLookup,
 } from "../logic/customer-product.logic";
 
@@ -34,9 +34,11 @@ export class CustomerProductController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async listCustomerProductRequest(
     @Request() req: eRequest,
-    @Query() customer_id: string
+    @Query() query: string,
+    @Query() customer_id?: string,
+    @Query() product_id?: string
   ) {
-    const res = await customerProductList(customer_id);
+    const res = await listCustomerProduct(query, customer_id);
     this.setStatus(res.status);
     return res.data;
   }

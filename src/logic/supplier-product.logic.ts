@@ -6,16 +6,27 @@ import { reply, status } from "../config/config.status";
 import { IProcessedQuery, processQuery } from "./utils";
 
 export const listSupplierProduct = async (
-  query: string
+  query: string,
+  supplier_id?: string,
+  product_id?: string
 ): Promise<ILogicResponse> => {
   const { _filter, _page, _count }: IProcessedQuery = processQuery(query);
-
-  const list = await SupplierProduct.paginate(_filter, {
-    page: _page,
-    limit: _count,
-    leanWithId: true,
-    // sort: { date_created: 'desc' }
-  });
+  let n_query = {};
+  if (supplier_id != undefined) {
+    n_query = { ...n_query, "supplier._id": supplier_id };
+  }
+  if (product_id != undefined) {
+    n_query = { ...n_query, product_id: product_id }; //TODO: Unfinished..
+  }
+  const list = await SupplierProduct.paginate(
+    { ..._filter, n_query },
+    {
+      page: _page,
+      limit: _count,
+      leanWithId: true,
+      // sort: { date_created: 'desc' }
+    }
+  );
   return {
     status: status.OK,
     data: { message: "", res: list },
