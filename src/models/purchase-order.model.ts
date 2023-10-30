@@ -34,8 +34,8 @@ export interface IPurchaseOrder extends mongoose.Document {
   order_code: string;
   shipping_code: string;
   supplier: {
-    supplier_id: string;
-    name: string;
+    _id: string;
+    code: string;
   };
   status: number;
   order_items: [IOrderItem];
@@ -48,8 +48,8 @@ const purchaseOrderSchema = new mongoose.Schema({
   date_arrived: String,
   shipping_code: String,
   supplier: {
-    supplier_id: ObjectId,
-    name: String,
+    _id: String,
+    code: String,
   },
   status: Number,
   order_items: [

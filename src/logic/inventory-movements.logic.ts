@@ -71,6 +71,7 @@ export const moveInventory = async (
       { _id: movement.product_id },
       { $inc: { [movement_source_variable]: -movement.amount } }
     ).then(() => {
+      const new_date = new Date(+movement.movement_date - 10);
       const source_movement = {
         product_id: movement.product_id,
         product_code: movement.product_code,
@@ -79,14 +80,16 @@ export const moveInventory = async (
         movement_target_type: movement_source.movement_source_type,
         amount: -movement.amount,
         lot_number: movement.lot_number ?? "",
-        movement_date: movement.movement_date,
+        movement_date: new_date,
       };
+      console.log(movement.movement_date, " NEW DATE:", new_date);
 
       InventoryMovement.create(source_movement);
     });
   }
+  // await new Promise((resolve) => setTimeout(resolve, 000));
   return await Inventory.findOneAndUpdate(
-    { _id: movement.product_id }, //prob gonna return something different like a confirmation
+    { _id: movement.product_id }, //prob g  onna return something different like a confirmation
     { $inc: { [movement_target_variable]: movement.amount } }
   ).then(() => {
     InventoryMovement.create(movement);

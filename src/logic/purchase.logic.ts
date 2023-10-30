@@ -184,8 +184,8 @@ export const proccessPurchaseRow = async (
     quarantined_containers: 0,
     received_date: new Date(),
     expiry_date: row.expiry_date,
-    supplier_code: purchase_order.supplier.name, //TODO: change to code.
-    supplier_id: purchase_order.supplier.supplier_id,
+    supplier_code: purchase_order.supplier.code, //TODO: change to code.
+    supplier_id: purchase_order.supplier._id,
     supplier_sku: "",
     notes: purchase_order.notes,
     extensions: [],
