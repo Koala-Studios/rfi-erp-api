@@ -13,16 +13,16 @@ module.exports = {
             is_raw: checkIfRaw(InventoryItem.CODE),
             is_solid: false,
             cost: parseFloat(InventoryItem.PRICE),
-            stock: 
-              {
-                on_hand: 0,
-                on_hold: 0,
-                ordered: 0,
-                quarantined: 0,
-                allocated: 0,
-                average_price: 0,
-                reorder_amount:InventoryItem.REORDER_AMT ? parseFloat(InventoryItem.REORDER_AMT) : 0,
-              }
+            stock:
+            {
+              on_hand: 0,
+              on_hold: 0,
+              ordered: 0,
+              quarantined: 0,
+              allocated: 0,
+              average_price: 0,
+              reorder_amount: InventoryItem.REORDER_AMT ? parseFloat(InventoryItem.REORDER_AMT) : 0,
+            }
             ,
             regulatory:
             {
@@ -38,15 +38,15 @@ module.exports = {
               vegan: false,
               organic: false,
               halal: false,
-              non_gmo:false
+              non_gmo: false
             },
             cas_number: InventoryItem.CAS,
           });
         }
       });
 
-    
-    
+
+
 
     function checkIfRaw(code) {
       return code.includes("RM") ? true : false;

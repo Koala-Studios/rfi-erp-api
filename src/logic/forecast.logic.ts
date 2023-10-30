@@ -86,7 +86,7 @@ const recursiveFinder = async (product: IForecast) => {
   // console.log(formula, product.product_code)
   if (formula) {
     const f = formula.formula_items;
-    product.amount = (product.amount / 100) * formula.base * formula.yield; //TODO: Might pose problems if we don't want to adjust within recursive ingredients.
+    product.amount = product.amount; //TODO: Might pose problems if we don't want to adjust within recursive ingredients. (Don't think so, it will adjust accordingly.)
 
     const materialTypes = await ProductType.find();
     for (const element of f) {
@@ -112,9 +112,10 @@ const recursiveFinder = async (product: IForecast) => {
           });
           //console.log(f[i].material_id, f[i].material_code, 'bruh')
           if (
-            inv_material &&
-            inv_material.stock.on_hand - inv_material.stock.allocated >=
-            (product.amount * element.amount) / 100.0 || mat_type.avoid_recur //!maybe split into two!
+            (inv_material &&
+              inv_material.stock.on_hand - inv_material.stock.allocated >=
+                (product.amount * element.amount) / 100.0) ||
+            mat_type.avoid_recur //!maybe split into two!
           ) {
             //if enough in inventory, send straight to production
             //console.log(inv_material.stock.on_hand - inv_material.stock.allocated, (product.amount * f[i].amount) / 100.000000, 'FK calc: ', inv_material.product_code, ' ', mat_type)

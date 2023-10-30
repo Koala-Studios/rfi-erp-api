@@ -4,6 +4,7 @@ import Inventory from "../models/inventory.model";
 import InventoryStock from "../models/inventory-stock.model";
 import StockCount, {
   IStockCount,
+  IStockCountLocation,
   stockCountStatus,
 } from "../models/stock-count.model";
 import Formula, { IFormula } from "../models/formula.model";
@@ -11,6 +12,7 @@ import { FilterQuery } from "mongoose";
 import { IProcessedQuery, processQuery } from "./utils";
 import { movementTypes } from "../models/inventory-movements.model";
 import { moveInventory } from "./inventory-movements.logic";
+import { ILocation } from "../models/location.model";
 
 //TODO:LISTING PARAMETER GENERALIZING
 export const listStockCount = async (
@@ -118,6 +120,19 @@ export const fillCountAllContainers = async (): Promise<ILogicResponse> => {
 
   return {
     status: status.OK,
-    data: { message: "Stock Count Abandoned", res: _containers },
+    data: { message: "All Containers Imported", res: _containers },
+  };
+};
+
+export const fillLocationContainers = async (
+  location_id: string
+): Promise<ILogicResponse> => {
+  const _containers = await InventoryStock.find({
+    "location._id": "652e8d106c82e2ccd186ee69",
+  });
+  console.log(_containers);
+  return {
+    status: status.OK,
+    data: { message: "Location Containers Imported", res: _containers },
   };
 };

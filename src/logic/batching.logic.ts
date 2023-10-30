@@ -171,6 +171,7 @@ const fillContainers = async (product_id: string, amount: number) => {
             used_amount: 0,
           },
         ];
+        rem_amount -= available_amount;
         // container.allocated_amount = has_enough ? rem_amount : available_amount; //TODO:deallocate this amount .. somehow..
         // rem_amount = rem_amount - (has_enough ? rem_amount : available_amount);
         container.save();

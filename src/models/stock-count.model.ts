@@ -17,6 +17,10 @@ export const stockCountStatus = {
   APPROVED: 3,
   ABANDONED: 4,
 };
+export interface IStockCountLocation {
+  _id: string;
+  name: string;
+}
 export interface ICountItem {
   _id: string;
   product_id: string;

@@ -37,7 +37,7 @@ export const listInventoryMovement = async (
       page: _page,
       limit: _count,
       leanWithId: true,
-      sort: { date_created: "desc" },
+      sort: { movement_date: "desc" },
     }
   );
 
@@ -59,7 +59,7 @@ export const moveInventory = async (
       { _id: movement.container_id },
       { $inc: { remaining_amount: +movement.amount } },
       { new: true }
-    ); //!!Value is flipped since we're updating the USED amt
+    ); //!!Value is flipped since we're updating the USED amt //TODO:this doesn't apply anymore?
   }
 
   const movement_source_variable = movement_source

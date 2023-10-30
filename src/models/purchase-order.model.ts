@@ -3,9 +3,10 @@ import mongoose from "mongoose";
 import paginate from "mongoose-paginate-v2";
 
 interface IOrderItem {
-  _id: ObjectId;
+  _id: String;
   product_id: ObjectId;
   product_code: string;
+  sample: boolean;
   purchased_amount: number;
   received_amount: number;
   unit_price: number;
@@ -53,9 +54,10 @@ const purchaseOrderSchema = new mongoose.Schema({
   status: Number,
   order_items: [
     {
-      _id: ObjectId,
+      _id: String,
       product_id: ObjectId,
       product_code: String,
+      sample: Boolean,
       purchased_amount: Number,
       received_amount: Number,
       unit_price: Number,

@@ -126,3 +126,25 @@ export const inventoryStockLookup = async (s_value) => {
 
   return { status: status.OK, data: { message: "", res: list } };
 };
+
+export const listInventoryContainers = async (
+  query: string,
+  product_id?: string
+): Promise<ILogicResponse> => {
+  const { _filter, _page, _count }: IProcessedQuery = processQuery(query);
+  const filter = product_id
+    ? { product_id: new ObjectId(product_id) }
+    : _filter;
+  const tester = InventoryStock.aggregate([
+    { $sort: { product_id: 1 } },
+    { $match: filter },
+  ]);
+
+  const list = await InventoryStock.aggregatePaginate(tester, {
+    page: _page,
+    limit: _count,
+    leanWithId: true,
+  });
+  console.log(list);
+  return { status: status.OK, data: { message: null, res: list } };
+};

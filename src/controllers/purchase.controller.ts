@@ -11,23 +11,33 @@ import { Route } from "@tsoa/runtime";
 import { Request } from "@tsoa/runtime";
 import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
-import PurchaseOrder, { IOrderItemProcess, IPurchaseOrder, orderStatus } from "../models/purchase-order.model";
+import PurchaseOrder, {
+  IOrderItemProcess,
+  IPurchaseOrder,
+  orderStatus,
+} from "../models/purchase-order.model";
 import { reply, status } from "../config/config.status";
-import { getPO, listPurchases, proccessPurchaseRow, confirmPurchase, setAsReceived, setAsCancelled, handlePurchaseShipment } from "../logic/purchase.logic";
+import {
+  getPO,
+  listPurchases,
+  proccessPurchaseRow,
+  confirmPurchase,
+  setAsReceived,
+  setAsCancelled,
+  handlePurchaseShipment,
+  listSupplierOrders,
+} from "../logic/purchase.logic";
 import { InventoryController } from "./inventory.controller";
-
-
 
 @Route("purchase-orders")
 @Tags("PurchaseOrder")
 @Security("jwt")
 export class PurchaseController extends Controller {
-
   @Get("list")
   @SuccessResponse(status.OK, reply.success)
   public async listPurchasesRequest(
     @Request() req: eRequest,
-    @Query() query:string
+    @Query() query: string
   ) {
     //filters: all
     const res = await listPurchases(query);
@@ -35,20 +45,31 @@ export class PurchaseController extends Controller {
     return res.data;
   }
 
+  @Get("list-supplier-orders")
+  @SuccessResponse(status.OK, reply.success)
+  public async listSupplierOrders(
+    @Request() req: eRequest,
+    @Query() query: string,
+    @Query() supplier_id?: string
+  ) {
+    const res = await listSupplierOrders(query, supplier_id);
+    this.setStatus(res.status);
+
+    return res.data;
+  }
+
   @Get("get")
   @SuccessResponse(status.OK, reply.success)
   public async getPurchaseRequest(
     @Request() req: eRequest,
-    @Query() id: string,
+    @Query() id: string
   ) {
     const _res = await getPO(id);
 
     this.setStatus(_res.status);
-    console.log(_res)
+    console.log(_res);
     return _res.data;
   }
-
-
 
   @Post("create")
   @SuccessResponse(status.CREATED, reply.success)
@@ -58,6 +79,7 @@ export class PurchaseController extends Controller {
   ) {
     const mongoose = require("mongoose");
     body._id = new mongoose.Types.ObjectId();
+    console.log(body, "POTEST");
     const newPurchase = new PurchaseOrder(body);
     newPurchase.save();
     this.setStatus(status.CREATED);
@@ -72,9 +94,9 @@ export class PurchaseController extends Controller {
   ) {
     console.log("update", p);
     if (p.status == orderStatus.AWAITING_SHIPPING) {
-      if(p.shipping_code != null && p.shipping_code != "") {
-        p.status = orderStatus.AWAITING_ARRIVAL //later will have to do individual "in_transit" items
-        await handlePurchaseShipment(p)
+      if (p.shipping_code != null && p.shipping_code != "") {
+        p.status = orderStatus.AWAITING_ARRIVAL; //later will have to do individual "in_transit" items
+        await handlePurchaseShipment(p);
       }
     }
     await PurchaseOrder.findOneAndUpdate({ _id: p._id }, p);
@@ -87,19 +109,18 @@ export class PurchaseController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async confirmOrderRequest(
     @Request() req: eRequest,
-    @Body() purchase: IPurchaseOrder,
+    @Body() purchase: IPurchaseOrder
   ) {
     const res = await confirmPurchase(purchase);
     this.setStatus(res.status);
     return res.data;
   }
 
-
   @Post("mark-received")
   @SuccessResponse(status.OK, reply.success)
   public async markPurchaseReceived(
     @Request() req: eRequest,
-    @Query() po_id: string,
+    @Query() po_id: string
   ) {
     const res = await setAsReceived(po_id);
     this.setStatus(res.status);
@@ -110,7 +131,7 @@ export class PurchaseController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async markPurchaseCancelled(
     @Request() req: eRequest,
-    @Query() po_id: string,
+    @Query() po_id: string
   ) {
     const res = await setAsCancelled(po_id);
     this.setStatus(res.status);
@@ -121,15 +142,11 @@ export class PurchaseController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async receivePurchaseItemRequest(
     @Request() req: eRequest,
-    @Body() item: IOrderItemProcess,
+    @Body() item: any, //IOrderItemProcess, gives route error annoying..
     @Query() quarantine: boolean
   ) {
-    const res = await proccessPurchaseRow(item, quarantine)
+    const res = await proccessPurchaseRow(item, quarantine);
     this.setStatus(status.OK);
     return res.data;
   }
-
-
-
-
 }

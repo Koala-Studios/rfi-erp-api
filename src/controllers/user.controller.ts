@@ -14,7 +14,12 @@ import { Request as eRequest } from "express";
 import { Query } from "tsoa";
 import User, { IUser } from "../models/user.model";
 import { reply, status } from "../config/config.status";
-import { listUser, loadUserInfo, userLookup } from "../logic/user.logic";
+import {
+  listUser,
+  loadUserInfo,
+  roleLookup,
+  userLookup,
+} from "../logic/user.logic";
 import Notification, { INotification } from "../models/notification.model";
 import { ObjectId } from "mongoose";
 import UserRole, { IUserRole } from "../models/user-role.model";
@@ -78,6 +83,18 @@ export class UserController extends Controller {
     @Query() search_value: string
   ) {
     const res = await userLookup(search_value);
+    this.setStatus(res.status);
+
+    return res.data;
+  }
+
+  @Get("role-lookup")
+  @SuccessResponse(status.OK, reply.success)
+  public async roleLookupRequest(
+    @Request() req: eRequest,
+    @Query() search_value: string
+  ) {
+    const res = await roleLookup(search_value);
     this.setStatus(res.status);
 
     return res.data;

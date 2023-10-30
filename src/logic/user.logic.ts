@@ -39,6 +39,15 @@ export const userLookup = async (s_value) => {
   return { status: status.OK, data: { message: "", res: list } };
 };
 
+export const roleLookup = async (s_value) => {
+  const searchValue = s_value.toString();
+  const list = await UserRole.find({
+    name: new RegExp(searchValue, "i"),
+  }).limit(15);
+
+  return { status: status.OK, data: { message: "", res: list } };
+};
+
 export const loadUserInfo = async (_user: IUser): Promise<IGetUserResponse> => {
   const roles = await UserRole.find().where("_id").in(_user.roles).exec();
 

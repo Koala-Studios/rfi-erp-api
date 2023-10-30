@@ -14,7 +14,7 @@ module.exports = {
         }
       }).filter(n => n)
       const inv_product = await db.collection("inventory").findOne({ "product_code": InvStockItem.product_code })
-      const supplier = await db.collection("suppliers").findOne({ "code": InvStockItem.supplier_code })
+      const supplier = await db.collection("suppliers").findOne({ "code": getSupplier(InvStockItem.supplier_code) })
 
       if (inv_product) {
         db.collection("inventory_stock").insertOne({
@@ -31,7 +31,7 @@ module.exports = {
           received_date: InvStockItem.received_date,
           expiry_date: InvStockItem.exp_date,
           supplier_code: InvStockItem.supplier,
-          supplier_id: supplier ? ObjectId(supplier._id) : "ERROR",
+          supplier_id: supplier ? supplier._id : "ERROR",
           supplier_sku: InvStockItem.s_product_code ? InvStockItem.s_product_code : "ERROR",
           notes: InvStockItem.notes ? InvStockItem.notes : "",
           extensions: ext_list,
@@ -48,4 +48,44 @@ module.exports = {
   async down(db, client) {
     db.collection("inventory_stock").drop();
   },
+
 };
+
+
+const getSupplier = (code) => {
+  switch (code) {
+    case 'MIRITZ':
+      return 'MCI';
+
+    case 'VIGON':
+    case "Vigon":
+      return 'VIG';
+
+    case 'FMI':
+      return 'FMI';
+
+    case 'EXLLENTIA':
+    case "EXELLENTIA":
+      return 'EXC';
+
+    // case x:
+    //   return 'REA';
+
+    case "VENTOS":
+      return 'VEN';
+
+    case "Bedoukian":
+      return 'BED';
+
+    // case x:
+    //   return 'MU1';
+
+    case 'PENTA':
+      return 'PEN';
+
+    case "ADVANCEDBIOTECH":
+      return 'ADB';
+    default:
+      return 'ERROR';
+  }
+}

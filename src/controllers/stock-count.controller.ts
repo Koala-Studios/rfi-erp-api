@@ -11,7 +11,10 @@ import { Route } from "@tsoa/runtime";
 import { Request } from "@tsoa/runtime";
 import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
-import StockCount, { IStockCount } from "../models/stock-count.model";
+import StockCount, {
+  IStockCount,
+  IStockCountLocation,
+} from "../models/stock-count.model";
 import { reply, status } from "../config/config.status";
 import {
   abandonStockCount,
@@ -19,10 +22,12 @@ import {
   createStockCount,
   disapproveStockCount,
   fillCountAllContainers,
+  fillLocationContainers,
   listStockCount,
   submitStockCount,
 } from "../logic/stock-count.logic";
 import mongoose from "mongoose";
+import { ILocation } from "../models/location.model";
 
 @Route("stock-counts")
 @Tags("StockCount")
@@ -57,6 +62,16 @@ export class StockCountController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async fillAllStockCountRequest(@Request() req: eRequest) {
     const _res = await fillCountAllContainers();
+    this.setStatus(_res.status);
+    return _res.data;
+  }
+  @Get("fill-location")
+  @SuccessResponse(status.OK, reply.success)
+  public async fillLocationRequest(
+    @Request() req: eRequest,
+    @Query() location_id: string
+  ) {
+    const _res = await fillLocationContainers(location_id);
     this.setStatus(_res.status);
     return _res.data;
   }

@@ -26,6 +26,7 @@ interface IInventoryStockGrouped {
   product_code: string;
   name: string;
   average_cost: number;
+  sample: boolean;
   received_amount: number;
   remaining_amount: number;
   adjusted_amount: number;
@@ -59,6 +60,7 @@ export interface IInventoryStock extends mongoose.Document {
   name: string;
   unit_cost: number;
   container_size: number;
+  sample: boolean;
   received_amount: number;
   remaining_amount: number;
   allocated_amount: number;
@@ -81,11 +83,14 @@ const inventoryStockSchema = new mongoose.Schema({
   name: String,
   unit_cost: Number,
   container_size: Number,
+  sample: Boolean,
+  location: { _id: ObjectId, name: String },
   received_amount: Number,
   remaining_amount: Number,
   allocated_amount: Number,
   quarantined_containers: Number,
   lot_number: String,
+  received_date: Date,
   expiry_date: Date,
   notes: String,
   extensions: [

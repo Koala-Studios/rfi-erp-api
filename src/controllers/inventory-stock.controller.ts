@@ -11,9 +11,15 @@ import { Route } from "@tsoa/runtime";
 import { Request } from "@tsoa/runtime";
 import { Request as eRequest, Response } from "express";
 import logger from "../logger/logger";
-import InventoryStock, { IInventoryStock } from "../models/inventory-stock.model";
+import InventoryStock, {
+  IInventoryStock,
+} from "../models/inventory-stock.model";
 import { reply, status } from "../config/config.status";
-import { inventoryStockLookup, listInventoryStockGrouped } from "../logic/inventory-stock.logic";
+import {
+  inventoryStockLookup,
+  listInventoryContainers,
+  listInventoryStockGrouped,
+} from "../logic/inventory-stock.logic";
 
 interface ICreateInventoryStockRequest {
   name: string;
@@ -31,7 +37,7 @@ export class InventoryStockStockController extends Controller {
     @Query() grouped: boolean
   ) {
     let res;
-    if(grouped) {
+    if (grouped) {
       res = await listInventoryStockGrouped(query);
     } else {
       // res = await listInventoryStock(query);
@@ -39,6 +45,19 @@ export class InventoryStockStockController extends Controller {
       return null;
     }
     this.setStatus(res.status);
+    return res.data;
+  }
+
+  @Get("list-containers")
+  @SuccessResponse(status.OK, reply.success)
+  public async listInventoryContainersRequest(
+    @Request() req: eRequest,
+    @Query() query: string,
+    @Query() product_id?: string
+  ) {
+    const res = await listInventoryContainers(query, product_id);
+    this.setStatus(res.status);
+
     return res.data;
   }
 
@@ -80,5 +99,3 @@ export class InventoryStockStockController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async editInventoryStock() {}
 }
-
-

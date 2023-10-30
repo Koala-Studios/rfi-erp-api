@@ -36,6 +36,6 @@ module.exports = {
   },
 
   async down(db, client) {
-    await db.dropCollection('supplier_products');
+    // await db.dropCollection('supplier_products');
   }
 };
