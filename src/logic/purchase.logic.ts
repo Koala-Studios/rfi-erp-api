@@ -237,6 +237,7 @@ export const receiveItem = async (
     module_source: PurchaseOrder.modelName,
     movement_target_type: movementTypes.ON_HAND,
     amount: row.process_amount,
+    lot_number: row.lot_number,
     movement_date: new Date(),
   };
   const movement_source = {
