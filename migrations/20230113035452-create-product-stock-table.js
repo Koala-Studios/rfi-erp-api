@@ -23,6 +23,8 @@ module.exports = {
           name: inv_product ? inv_product.name : InvStockItem.product_name,
           unit_cost: Math.random() * Math.random() * (10 / Math.random()), //!!!! REMOVE THIS LATER, JUST FOR TESTING PURPOSES
           lot_number: InvStockItem.lot_number,
+          sample: Math.round(Math.random(0, 1)), //TODO: CHANGE THIS TO NOT BE RANDOM LOL.
+          is_open: Math.round(Math.random(0, 1)), //TODO: CHANGE THIS TO NOT BE RANDOM LOL.
           container_size: InvStockItem.qty_per_cont || 0,
           received_amount: InvStockItem.Rec_qty || ((InvStockItem.qty_per_cont * InvStockItem.cont_num) || 0),
           remaining_amount: InvStockItem.Rec_qty || ((InvStockItem.qty_per_cont * InvStockItem.cont_num) || 0),

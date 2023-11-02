@@ -27,6 +27,7 @@ interface IInventoryStockGrouped {
   name: string;
   average_cost: number;
   sample: boolean;
+  is_solid: boolean;
   received_amount: number;
   remaining_amount: number;
   adjusted_amount: number;
@@ -61,6 +62,8 @@ export interface IInventoryStock extends mongoose.Document {
   unit_cost: number;
   container_size: number;
   sample: boolean;
+  is_solid: boolean;
+  is_open: boolean;
   received_amount: number;
   remaining_amount: number;
   allocated_amount: number;
@@ -82,6 +85,8 @@ const inventoryStockSchema = new mongoose.Schema({
   product_code: String,
   name: String,
   unit_cost: Number,
+  is_solid: Boolean,
+  is_open: Boolean,
   container_size: Number,
   sample: Boolean,
   location: { _id: ObjectId, name: String },
