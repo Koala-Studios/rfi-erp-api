@@ -1,10 +1,11 @@
-import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
 import paginate from "mongoose-paginate-v2";
+const Schema = mongoose.Schema;
+const ObjectId = Schema.Types.ObjectId;
 
 interface IOrderItem {
   _id: String;
-  product_id: ObjectId;
+  product_id: String;
   product_code: string;
   sample: boolean;
   purchased_amount: number;
@@ -48,7 +49,7 @@ const purchaseOrderSchema = new mongoose.Schema({
   date_arrived: String,
   shipping_code: String,
   supplier: {
-    _id: String,
+    _id: ObjectId,
     code: String,
   },
   status: Number,

@@ -33,7 +33,12 @@ export class SupplierProductController extends Controller {
     @Query() product_id?: string
   ) {
     const res = await listSupplierProduct(query, supplier_id, product_id);
-    console.log(res, "list supplier product");
+    console.log(
+      "product id " + product_id,
+      "supplier id " + supplier_id,
+      res.data.res.docs,
+      "list supplier product"
+    );
     this.setStatus(res.status);
     return res.data;
   }

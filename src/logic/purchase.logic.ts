@@ -35,17 +35,17 @@ export const listSupplierOrders = async (
   query: string,
   supplier_id?: string
 ): Promise<ILogicResponse> => {
-  const { _filter, _page, _count }: IProcessedQuery = processQuery(query);
-  const list = await PurchaseOrder.paginate(
-    supplier_id != undefined ? { supplier_id: supplier_id } : _filter,
-    {
-      page: _page,
-      limit: _count,
-      leanWithId: true,
-      sort: { movement_date: "desc" },
-    }
-  );
-
+  let { _filter, _page, _count }: IProcessedQuery = processQuery(query);
+  if (supplier_id != undefined) {
+    _filter = { ..._filter, "supplier._id": new ObjectId(supplier_id) };
+  }
+  const list = await PurchaseOrder.paginate(_filter, {
+    page: _page,
+    limit: _count,
+    leanWithId: true,
+    sort: { date_purchased: "desc" },
+  });
+  console.log(list, "supplier orders");
   return { status: status.OK, data: { message: null, res: list } };
 };
 
