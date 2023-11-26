@@ -1,11 +1,20 @@
 import mongoose from "mongoose";
 import paginate from "mongoose-paginate-v2";
 
+export const orderStatus = {
+  AWAITING_PRODUCTION: 1,
+  AWAITING_SHIPPING: 2,
+  PARTIALLY_FINISHED: 3,
+  FINISHED: 4,
+  ABANDONED: 5,
+  DRAFT: 6,
+};
+
 interface ISalesOrderItem {
   product_code: string;
   customer_p_code: string;
-  amount: number;
-  price: number;
+  sold_amount: number;
+  unit_price: number;
   status: number;
   product_id: string;
   product_name: string;
@@ -13,6 +22,7 @@ interface ISalesOrderItem {
 }
 interface ISalesCustomer {
   _id: string;
+  code: string;
   name: string;
 }
 
@@ -30,16 +40,17 @@ export interface ISalesOrder extends mongoose.Document {
 const salesOrderSchema = new mongoose.Schema({
   date_purchased: Date,
   date_arrived: Date,
-  customer: { _id: String, name: String },
+  customer: { _id: String, code: String, name: String },
   shipping_code: String,
   order_code: { type: String, required: true, unique: true },
   status: Number,
+  notes: String,
   order_items: [
     {
       product_code: String,
       customer_p_code: String,
-      amount: Number,
-      price: Number,
+      sold_amount: Number,
+      unit_price: Number,
       status: Number,
       product_id: String,
       product_name: String,
