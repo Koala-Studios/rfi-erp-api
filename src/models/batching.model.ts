@@ -2,18 +2,19 @@ import mongoose, { ObjectId } from "mongoose";
 import paginate from "mongoose-paginate-v2";
 
 export const batchingStatus = {
-  SCHEDULED: 1,
-  IN_PROGRESS: 2,
-  FINISHED: 3, //TODO: update db status of 2 to 3
-  ABANDONED: 4,
-  CANCELLED: 5,
-  DRAFT: 6,
+  DRAFT: 1,
+  SCHEDULED: 2,
+  IN_PROGRESS: 3,
+  FINISHED: 4, //TODO: update db status of 2 to 3
+  ABANDONED: 5,
+  CANCELLED: 6,
 };
 
 export interface IBatching extends mongoose.Document {
   product_id: string;
   product_code: string;
   name?: string;
+  sales_id?: string;
   quantity: number;
   date_created: Date;
   date_needed: Date;
@@ -56,13 +57,14 @@ const ingredientSchema = new mongoose.Schema({
     },
   ],
   used_amount: Number,
-  has_enough: Boolean
+  has_enough: Boolean,
 });
 
 const batchingSchema = new mongoose.Schema({
   product_id: String,
   product_code: String,
   name: String,
+  sales_id: String,
   quantity: Number,
   date_created: Date,
   date_needed: Date,

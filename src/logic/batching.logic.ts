@@ -82,10 +82,11 @@ export const createBOM = async (
       movement_date: new Date(),
     });
   }
+  batching.status = batchingStatus.IN_PROGRESS;
   batching.save();
   return {
     status: status.OK,
-    data: { message: "Batch Created", res: batching },
+    data: { message: "BOM Created", res: batching },
   };
 };
 

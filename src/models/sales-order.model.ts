@@ -10,16 +10,36 @@ export const orderStatus = {
   DRAFT: 6,
 };
 
+export const orderItemStatus = {
+  PENDING: 1,
+  SCHEDULED: 2,
+  IN_PROGRESS: 3,
+  WAITING_QC: 4,
+  WAITING_SHIPPING: 5,
+  SHIPPED: 6,
+};
+
 interface ISalesOrderItem {
+  _id: string;
   product_code: string;
   customer_p_code: string;
   sold_amount: number;
   unit_price: number;
   status: number;
   product_id: string;
+  batch_id: string;
+  batch_code: string;
   product_name: string;
   lot_number: string;
 }
+
+export interface ISalesOrderItemProcess extends ISalesOrderItem {
+  date_needed: string;
+  process_amount: number;
+  container_size: number;
+  // expiry_date: Date;
+}
+
 interface ISalesCustomer {
   _id: string;
   code: string;
@@ -27,18 +47,18 @@ interface ISalesCustomer {
 }
 
 export interface ISalesOrder extends mongoose.Document {
-  date_of_purchase: Date;
+  date_sold: string;
   date_sent?: Date;
   order_code: string;
   shipping_code: string;
   customer: ISalesCustomer;
   notes: string;
   status: number;
-  order_items: [ISalesOrderItem];
+  order_items: ISalesOrderItem[];
 }
 
 const salesOrderSchema = new mongoose.Schema({
-  date_purchased: Date,
+  date_sold: Date,
   date_arrived: Date,
   customer: { _id: String, code: String, name: String },
   shipping_code: String,
@@ -47,12 +67,15 @@ const salesOrderSchema = new mongoose.Schema({
   notes: String,
   order_items: [
     {
+      _id: String,
       product_code: String,
       customer_p_code: String,
       sold_amount: Number,
       unit_price: Number,
       status: Number,
       product_id: String,
+      batch_id: String,
+      batch_code: String,
       product_name: String,
       lot_number: String,
     },

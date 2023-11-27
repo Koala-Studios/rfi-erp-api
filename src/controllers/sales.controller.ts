@@ -16,6 +16,7 @@ import {
   confirmSales,
   getSalesOrder,
   listSalesOrders,
+  proccessSalesRow,
 } from "../logic/sales.logic";
 import SalesOrder, { ISalesOrder } from "../models/sales-order.model";
 
@@ -95,6 +96,18 @@ export class SalesController extends Controller {
   ) {
     const res = await confirmSales(purchase);
     this.setStatus(res.status);
+    return res.data;
+  }
+
+  @Post("handle-item")
+  @SuccessResponse(status.OK, reply.success)
+  public async receivePurchaseItemRequest(
+    @Request() req: eRequest,
+    @Body() item: any, //IOrderItemProcess, gives route error annoying..
+    @Query() order_id: string
+  ) {
+    const res = await proccessSalesRow(item, order_id);
+    this.setStatus(status.OK);
     return res.data;
   }
 }
