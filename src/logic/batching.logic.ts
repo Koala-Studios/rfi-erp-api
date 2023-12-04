@@ -168,7 +168,7 @@ const fillContainers = async (product_id: string, amount: number) => {
           {
             _id: container._id,
             lot_number: container.lot_number,
-            amount_to_use: has_enough ? rem_amount : available_amount,
+            confirm_lot_number: "",
             used_amount: 0,
           },
         ];

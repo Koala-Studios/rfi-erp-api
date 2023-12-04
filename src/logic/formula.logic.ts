@@ -137,9 +137,15 @@ export const submitFormula = async (
   product.description = description;
   //*If flavorist is setting product as ready for approval
   if (approved || product.status === 3) {
-    product.status = 3;
+    if (!product.for_sale) {
+      product.status = 4;
+      _message = "Formula Submitted & Approved!";
+      //TODO: MAKE QC SPEC SHEET ORDER HERE!
+    } else {
+      product.status = 3;
+      _message = "Formula Submitted & Ready For Manager Approval!";
+    }
     product.approved_version = product.versions;
-    _message = "Formula Submitted & Ready For Manager Approval!";
   } else {
     _message = "Formula Submitted!";
   }
@@ -185,6 +191,7 @@ export const approveFormula = async (
   _product.approved_version = _product.versions;
   _product.save();
 
+  //TODO: MAKE QC SPEC SHEET ORDER HERE!
   return { status: _status, data: { message: _message, res: _product } };
 };
 
