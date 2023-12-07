@@ -38,7 +38,6 @@ export interface IBatchingIngredient {
   product_name: string;
   required_amount: number;
   used_containers: IBatchingContainer[];
-  used_amount: number;
   total_used_amount: number;
   has_enough?: boolean;
 }
@@ -57,7 +56,6 @@ const ingredientSchema = new mongoose.Schema({
       used_amount: Number,
     },
   ],
-  used_amount: Number,
   total_used_amount: Number,
   has_enough: Boolean,
 });

@@ -68,7 +68,7 @@ export const createBOM = async (
         product_name: material.product_name,
         required_amount: material.required_amount,
         used_containers: containerFill.containers,
-        used_amount: 0,
+        total_used_amount: 0,
         has_enough: containerFill.has_enough,
       },
     ];
@@ -103,8 +103,8 @@ export const finishBatching = async (
         product_code: material.product_code,
         product_name: material.product_name,
         required_amount: material.required_amount,
+        total_used_amount: material.total_used_amount,
         used_containers: material.used_containers,
-        used_amount: 0,
       },
     ];
     moveInventory({
