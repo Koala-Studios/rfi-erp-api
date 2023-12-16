@@ -75,7 +75,7 @@ const recursivePriceUpdater = async (
   totalCost: number
 ) => {
   const product = await Product.findById(product_id);
-  if (product.is_raw) {
+  if (product.is_raw === null || product.is_raw) {
     return product.cost * amount;
   } else {
     const formula = await Formula.findOne({

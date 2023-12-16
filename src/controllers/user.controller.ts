@@ -52,7 +52,8 @@ export class UserController extends Controller {
   //   this.setStatus(status.OK);
   //   return user.notifications;
   // }
-  @Get("loadUser")
+
+  @Get("getUser")
   @SuccessResponse(status.OK, reply.success)
   public async loadUser(@Request() req: eRequest) {
     const _user = <IUser>req.user;

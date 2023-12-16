@@ -116,11 +116,16 @@ export class IdentityController extends Controller {
     }
 
     const identity = await Identity.findOne({ user: user.id });
-    const passwordMatch = await identity.comparePassword(req.password);
 
-    if (passwordMatch) {
-      this.setStatus(status.OK);
+    if (identity) {
+      const passwordMatch = await identity.comparePassword(req.password);
 
+      if (passwordMatch) {
+        this.setStatus(status.OK);
+      } else {
+        this.setStatus(status.UNAUTHORIZED);
+        return;
+      }
       const getUserResponse = await loadUserInfo(user);
 
       return {

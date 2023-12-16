@@ -29,6 +29,7 @@ interface IInventoryStockGrouped {
   sample: boolean;
   is_solid: boolean;
   received_amount: number;
+  gross_amount: number;
   remaining_amount: number;
   adjusted_amount: number;
   allocated_amount: number;
@@ -36,23 +37,6 @@ interface IInventoryStockGrouped {
   location: IStockLocation;
   items: [IInventoryStock];
 }
-// items: [{
-//    _id: string,
-//    name:  string,
-//    unit_cost: number,
-//    received_amount: number,
-//    used_amount: number,
-//    allocated_amount: number,
-//    quarantined_containers: number,
-//    received_date:Date,
-//    expiry_date: Date,
-//    supplier_code: string,
-//    supplier_id: string,
-//    supplier_sku: string,
-//    notes: string,
-//    extensions:
-//    qc_tests:
-//  }]
 
 export interface IInventoryStock extends mongoose.Document {
   purchase_id?: string;
@@ -65,9 +49,10 @@ export interface IInventoryStock extends mongoose.Document {
   is_solid: boolean;
   is_open: boolean;
   received_amount: number;
+  gross_amount: number;
   remaining_amount: number;
   allocated_amount: number;
-  quarantined_containers: number;
+  quarantined: boolean;
   lot_number: string;
   supplier_code: string;
   supplier_id: string;
@@ -91,9 +76,10 @@ const inventoryStockSchema = new mongoose.Schema({
   sample: Boolean,
   location: { _id: ObjectId, name: String },
   received_amount: Number,
+  gross_amount: Number,
   remaining_amount: Number,
   allocated_amount: Number,
-  quarantined_containers: Number,
+  quarantined: Boolean,
   lot_number: String,
   received_date: Date,
   expiry_date: Date,

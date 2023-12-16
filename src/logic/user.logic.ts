@@ -49,8 +49,16 @@ export const roleLookup = async (s_value) => {
 };
 
 export const loadUserInfo = async (_user: IUser): Promise<IGetUserResponse> => {
-  const roles = await UserRole.find().where("_id").in(_user.roles).exec();
-
+  // const roleIds = [
+  //   _user.roles.forEach((x) => {
+  //     return x._id;
+  //   }),
+  // ];
+  console.log(_user, "bruh.");
+  const roles = await UserRole.find()
+    .where({ "role._id": { $in: _user.roles } })
+    .exec();
+  console.log(roles, " THIS IS NOT WORKING CLEARLY");
   let user: IGetUserResponse = {
     _id: _user._id,
     email: _user.email,
