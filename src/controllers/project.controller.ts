@@ -18,7 +18,7 @@ import { ObjectId } from "mongodb";
 import { Deprecated } from "tsoa";
 import { notify } from "../logic/notification.logic";
 import { IUser } from "../models/user.model";
-import { alog } from "../logic/activity-log.logic";
+import { A_LOG, A_MODULE } from "../logic/activity-log.logic";
 
 interface ICreateProjectRequest {
   project_name: string;
@@ -32,10 +32,8 @@ export class ProjectController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async listProjectRequest(
     @Request() req: eRequest,
-    @Query() query:string
+    @Query() query: string
   ) {
-
-
     const res = await listProject(query);
     this.setStatus(res.status);
     return res.data;
@@ -70,7 +68,8 @@ export class ProjectController extends Controller {
     newProject.save();
     this.setStatus(status.CREATED);
 
-    alog({})
+    const currUser = <IUser>req.user;
+    A_LOG(currUser, "create", A_MODULE.PROJECTS, newProject.name);
 
     return newProject._id;
   }

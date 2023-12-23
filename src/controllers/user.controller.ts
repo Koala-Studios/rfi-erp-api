@@ -55,6 +55,19 @@ export class UserController extends Controller {
 
   @Get("getUser")
   @SuccessResponse(status.OK, reply.success)
+  public async getUser(@Request() req: eRequest) {
+    const _user = <IUser>req.user;
+
+    console.log("get user");
+
+    const getUserResponse = await loadUserInfo(_user);
+
+    this.setStatus(status.OK);
+    return getUserResponse;
+  }
+
+  @Get("loadUser")
+  @SuccessResponse(status.OK, reply.success)
   public async loadUser(@Request() req: eRequest) {
     const _user = <IUser>req.user;
 
@@ -112,7 +125,7 @@ export class UserController extends Controller {
     const newUser = new User(body);
 
     newUser.save();
-    console.log("create", newUser);
+    // console.log("create", newUser);
     this.setStatus(status.CREATED);
     return newUser._id;
   }
@@ -120,7 +133,7 @@ export class UserController extends Controller {
   @Post("update")
   @SuccessResponse(status.OK, reply.success)
   public async updateUserRequest(@Request() req: eRequest, @Body() u: IUser) {
-    console.log("update", u);
+    console.log("update", u.roles);
     await User.findOneAndUpdate({ _id: u._id }, u);
 
     this.setStatus(status.OK);

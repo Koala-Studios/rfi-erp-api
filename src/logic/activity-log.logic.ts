@@ -4,7 +4,9 @@ import { IListParams, ILogicResponse } from "./interfaces.logic";
 import { IProcessedQuery, processQuery } from "./utils";
 import { IUser } from "../models/user.model";
 
-export const listActivityLogs = async (query: string): Promise<ILogicResponse> => {
+export const listActivityLogs = async (
+  query: string
+): Promise<ILogicResponse> => {
   const { _filter, _page, _count }: IProcessedQuery = processQuery(query);
 
   const list = await Log.paginate(_filter, {
@@ -29,20 +31,36 @@ export const getActivityLog = async (
   };
 };
 
-export const alog = (user:IUser, action: "delete" | "edit" | "create", _module:string, itemTitle?:string, newItem?:JSON) => {
-  
+export const aMODULE = {
+  PROJECTS: "projects",
+  BATCHING: "batching",
+};
+
+export const aLog = (
+  user: IUser | "System",
+  action: "delete" | "edit" | "create",
+  _module: string,
+  itemTitle?: string,
+  newItem?: JSON
+) => {
+  let _user: { id: string; username: string };
+
+  if (user === "System") {
+    _user = { id: "", username: "System" };
+  } else {
+    _user = { username: user.username, id: user._id };
+  }
+
   let newActivity = new Log(<IActivityLog>{
-    user: {user._id, username:user.username},
+    user: { _id: _user.id, username: _user.username },
     action: action,
-    module:_module,
-    itemTitle:itemTitle,
-    newItem:newItem,
-    timestamp: new Date().toString()
+    module: _module,
+    itemTitle: itemTitle,
+    newItem: newItem,
+    timestamp: new Date().toString(),
   });
 
-  activity.timestamp = new Date().toString();
+  newActivity.timestamp = new Date().toString();
 
-  activity.save();
-
-}
-
+  newActivity.save();
+};
