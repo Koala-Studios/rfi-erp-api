@@ -18,6 +18,7 @@ import { ObjectId } from "mongodb";
 import { Deprecated } from "tsoa";
 import { notify } from "../logic/notification.logic";
 import { IUser } from "../models/user.model";
+import { alog } from "../logic/activity-log.logic";
 
 interface ICreateProjectRequest {
   project_name: string;
@@ -68,6 +69,9 @@ export class ProjectController extends Controller {
 
     newProject.save();
     this.setStatus(status.CREATED);
+
+    alog({})
+
     return newProject._id;
   }
 
