@@ -82,6 +82,9 @@ export class ProjectController extends Controller {
   ) {
     await Project.findOneAndUpdate({ _id: p._id }, p);
 
+    const currUser = <IUser>req.user;
+    A_LOG(currUser, "edit", A_MODULE.PROJECTS, p.name);
+
     this.setStatus(status.OK);
     return true;
   }

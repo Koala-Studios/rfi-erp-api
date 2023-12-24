@@ -31,36 +31,34 @@ export const getActivityLog = async (
   };
 };
 
-export const aMODULE = {
+export const A_MODULE = {
   PROJECTS: "projects",
   BATCHING: "batching",
 };
 
-export const aLog = (
+export const A_LOG = (
   user: IUser | "System",
   action: "delete" | "edit" | "create",
   _module: string,
   itemTitle?: string,
   newItem?: JSON
 ) => {
-  let _user: { id: string; username: string };
+  let _user: { _id: string; username: string };
 
   if (user === "System") {
-    _user = { id: "", username: "System" };
+    _user = { _id: "", username: "System" };
   } else {
-    _user = { username: user.username, id: user._id };
+    _user = { username: user.username, _id: user._id };
   }
 
   let newActivity = new Log(<IActivityLog>{
-    user: { _id: _user.id, username: _user.username },
+    user: { _id: _user._id, username: _user.username },
     action: action,
     module: _module,
     itemTitle: itemTitle,
     newItem: newItem,
-    timestamp: new Date().toString(),
+    timestamp: new Date(),
   });
-
-  newActivity.timestamp = new Date().toString();
 
   newActivity.save();
 };

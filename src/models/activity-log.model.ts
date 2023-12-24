@@ -11,7 +11,7 @@ export interface IActivityLog extends mongoose.Document {
   module: string;
   itemTitle: string;
   newItem: JSON;
-  timestamp?: string;
+  timestamp?: Date;
 }
 
 const activityLogSchema = new mongoose.Schema({
@@ -23,7 +23,7 @@ const activityLogSchema = new mongoose.Schema({
   module: String,
   itemTitle: String,
   newItem: JSON,
-  timestamp: String,
+  timestamp: Date,
 });
 
 activityLogSchema.plugin(paginate);
