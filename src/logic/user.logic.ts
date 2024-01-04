@@ -6,12 +6,16 @@ import UserRole, { IUserRole } from "../models/user-role.model";
 import Notification, { INotification } from "../models/notification.model";
 
 export interface IGetUserResponse {
+  user: IGetUser;
+  user_roles: IUserRole[];
+}
+export interface IGetUser {
   _id: any;
   email: string;
   username: string;
   // photo: string;
   // identities: string[];
-  roles: { name: string; permissions: string[] }[];
+  roles: { _id: string; name: string }[];
   notifications: INotification[];
 }
 
@@ -48,22 +52,22 @@ export const roleLookup = async (s_value) => {
   return { status: status.OK, data: { message: "", res: list } };
 };
 
+//ONLY FOR SESSION USER
 export const loadUserInfo = async (_user: IUser): Promise<IGetUserResponse> => {
   // const roleIds = [
   //   _user.roles.forEach((x) => {
   //     return x._id;
   //   }),
   // ];
-  console.log(_user, "bruh.");
   const roles = await UserRole.find()
     .where({ "role._id": { $in: _user.roles } })
     .exec();
-  console.log(roles, " THIS IS NOT WORKING CLEARLY");
-  let user: IGetUserResponse = {
+  // console.log(roles, " THIS IS NOT WORKING CLEARLY");
+  let user: IGetUser = {
     _id: _user._id,
     email: _user.email,
     username: _user.username,
-    roles: roles,
+    roles: _user.roles,
     notifications: [],
   };
 
@@ -71,8 +75,9 @@ export const loadUserInfo = async (_user: IUser): Promise<IGetUserResponse> => {
 
   if (nc) {
     user.notifications = nc.notifications;
-    console.log(nc.notifications, user);
+    // console.log(nc.notifications, user);
   }
 
-  return user;
+  console.log(roles);
+  return { user: user, user_roles: roles };
 };

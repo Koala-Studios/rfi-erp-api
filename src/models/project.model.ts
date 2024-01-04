@@ -11,6 +11,7 @@ interface IProjectItem {
   external_code: string;
   target_price: number;
   notes: string;
+  
   target_cost: number | null;
   assigned_user: {
     _id: string;
