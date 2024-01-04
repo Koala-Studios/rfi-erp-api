@@ -59,6 +59,7 @@ export const createBOM = async (
       material.required_amount
     );
     console.log(containerFill, "contFill");
+
     batching.ingredients = [
       ...batching.ingredients,
       {
@@ -70,6 +71,7 @@ export const createBOM = async (
         used_containers: containerFill.containers,
         total_used_amount: 0,
         has_enough: containerFill.has_enough,
+        avoid_recur: material.avoid_recur ?? false,
       },
     ];
     moveInventory({

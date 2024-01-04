@@ -64,6 +64,7 @@ export const calculateMaterials = async (
             inv_item.stock.on_hand - inv_item.stock.allocated,
             inv_item.stock.ordered
           ),
+          avoid_recur: inv_item.avoid_recur,
         },
       ];
     } else {
@@ -76,7 +77,7 @@ export const calculateMaterials = async (
 
   return rawIngredientsFinal;
 };
-
+//TODO: MAKE A SECOND FINDER FOR FORECAST THAT IGNORES RECURSIVE AVOIDANCE
 const recursiveFinder = async (product: IForecast) => {
   let rawIngredients: IForecast[] = [];
 

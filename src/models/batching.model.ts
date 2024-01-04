@@ -14,7 +14,8 @@ export interface IBatching extends mongoose.Document {
   product_id: string;
   product_code: string;
   name?: string;
-  sales_id?: string;
+  source_id?: string;
+  source_type?: string;
   quantity: number;
   date_created: Date;
   date_needed: Date;
@@ -40,6 +41,7 @@ export interface IBatchingIngredient {
   used_containers: IBatchingContainer[];
   total_used_amount: number;
   has_enough?: boolean;
+  avoid_recur?: boolean;
 }
 
 const ingredientSchema = new mongoose.Schema({
@@ -58,6 +60,7 @@ const ingredientSchema = new mongoose.Schema({
   ],
   total_used_amount: Number,
   has_enough: Boolean,
+  avoid_recur: Boolean,
 });
 
 const batchingSchema = new mongoose.Schema({

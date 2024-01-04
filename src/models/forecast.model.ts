@@ -27,6 +27,7 @@ export interface IForecastResults {
   in_transit_amount: number;
   reorder_amount: number;
   amt_status: number;
+  avoid_recur?: boolean;
 }
 
 export interface IForecast extends mongoose.Document {
