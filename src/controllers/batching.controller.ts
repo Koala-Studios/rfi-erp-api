@@ -15,8 +15,10 @@ import Batching, { batchingStatus, IBatching } from "../models/batching.model";
 import { reply, status } from "../config/config.status";
 import Inventory, { IInventory } from "../models/inventory.model";
 import {
-  createBOM,
+  confirmBatching,
+  createBatching,
   finishBatching,
+  generateBOM,
   getBatching,
   listBatching,
 } from "../logic/batching.logic";
@@ -55,13 +57,9 @@ export class BatchingController extends Controller {
     @Request() req: eRequest,
     @Body() body: IBatching
   ) {
-    body._id = new mongoose.Types.ObjectId();
-    body.ingredients = [];
-    body.date_created = new Date();
-    const _batching = new Batching(body);
-    _batching.save();
+    const _res = await createBatching(body);
     this.setStatus(status.CREATED);
-    return _batching._id;
+    return { message: _res.data.message, res: _res.data.res };
   }
 
   @Post("update")
@@ -82,12 +80,9 @@ export class BatchingController extends Controller {
     @Request() req: eRequest,
     @Body() b: IBatching
   ) {
-    b.status = batchingStatus.SCHEDULED;
-    const _batching = await Batching.findOneAndUpdate({ _id: b._id }, b, {
-      new: true,
-    });
+    const _res = await confirmBatching(b);
     this.setStatus(status.OK);
-    return { message: "Successfully Confirmed", res: _batching };
+    return { message: "Successfully Confirmed", res: _res.data.res };
   }
 
   @Post("generate-bom")
@@ -97,7 +92,7 @@ export class BatchingController extends Controller {
     @Query() batching_id
   ) {
     const _batching = await Batching.findById(batching_id);
-    const _res = await createBOM(_batching);
+    const _res = await generateBOM(_batching);
     this.setStatus(_res.status);
     return _res.data;
   }
@@ -123,5 +118,5 @@ export class BatchingController extends Controller {
 
   @Put("edit")
   @SuccessResponse(status.OK, reply.success)
-  public async editBatching() { }
+  public async editBatching() {}
 }

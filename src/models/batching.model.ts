@@ -23,6 +23,7 @@ export interface IBatching extends mongoose.Document {
   batch_code: string;
   status: number;
   notes: string;
+  has_enough?: boolean;
 }
 
 export interface IBatchingContainer {
@@ -75,6 +76,7 @@ const batchingSchema = new mongoose.Schema({
   batch_code: String,
   status: Number,
   notes: String,
+  has_enough: Boolean,
 });
 
 batchingSchema.plugin(paginate);

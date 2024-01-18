@@ -26,6 +26,48 @@ export const listBatching = async (query: string): Promise<ILogicResponse> => {
 
   return { status: status.OK, data: { message: null, res: list } };
 };
+export const createBatching = async (
+  batching: IBatching
+): Promise<ILogicResponse> => {
+  batching._id = new mongoose.Types.ObjectId();
+  batching.date_created = new Date();
+  let has_enough_overall = true;
+
+  batching.status = batchingStatus.DRAFT;
+  const materials = await calculateMaterials([
+    { product_code: batching.product_code, amount: batching.quantity },
+  ]);
+  for (const material of materials) {
+    const test = await Inventory.findById(material.product_id); //If draft check available quantity, otherwise check on hand quantity; with the required quantity to figure out if we have enough
+
+    let has_enough =
+      test.stock.on_hand - test.stock.allocated >= material.required_amount;
+    if (has_enough === false) {
+      has_enough_overall = false;
+    }
+    batching.ingredients = [
+      ...batching.ingredients,
+      {
+        _id: new mongoose.Types.ObjectId().toHexString(),
+        product_id: material.product_id,
+        product_code: material.product_code,
+        product_name: material.product_name,
+        required_amount: material.required_amount,
+        used_containers: [],
+        total_used_amount: 0,
+        avoid_recur: material.avoid_recur ?? false,
+        has_enough: has_enough,
+      },
+    ];
+  }
+  batching.has_enough = has_enough_overall;
+  const _batching = new Batching(batching);
+  _batching.save();
+  return {
+    status: status.OK,
+    data: { message: "Batching Created", res: _batching },
+  };
+};
 
 export const getBatching = async (_id): Promise<ILogicResponse> => {
   let _status: number;
@@ -38,6 +80,20 @@ export const getBatching = async (_id): Promise<ILogicResponse> => {
       data: { message: "No Batching Order Found", res: null },
     };
   }
+  let temp = [];
+  for (const ingr of _batching.ingredients) {
+    const test = await Inventory.findById(ingr.product_id); //If draft check available quantity, otherwise check on hand quantity; with the required quantity to figure out if we have enough
+    let has_enough =
+      _batching.status === batchingStatus.DRAFT
+        ? test.stock.on_hand - test.stock.allocated >= ingr.required_amount
+        : test.stock.on_hand >= ingr.required_amount;
+    /*Explanation:
+    0: not enough,
+    1: enough,
+    */
+    temp = [...temp, { ...ingr, has_enough: has_enough }];
+  }
+  _batching.ingredients = temp;
   _status = status.OK;
 
   return {
@@ -46,35 +102,19 @@ export const getBatching = async (_id): Promise<ILogicResponse> => {
   };
 };
 
-export const createBOM = async (
+export const confirmBatching = async (
   batching: IBatching
 ): Promise<ILogicResponse> => {
-  const materials = await calculateMaterials([
-    { product_code: batching.product_code, amount: batching.quantity },
-  ]);
-  for (const material of materials) {
-    const newId = new mongoose.Types.ObjectId();
-    const containerFill = await fillContainers(
-      material.product_id,
-      material.required_amount
-    );
-    console.log(containerFill, "contFill");
+  let has_enough_overall = true;
+  for (const material of batching.ingredients) {
+    const test = await Inventory.findById(material.product_id); //If draft check available quantity, otherwise check on hand quantity; with the required quantity to figure out if we have enough
 
-    batching.ingredients = [
-      ...batching.ingredients,
-      {
-        _id: new mongoose.Types.ObjectId().toHexString(),
-        product_id: material.product_id,
-        product_code: material.product_code,
-        product_name: material.product_name,
-        required_amount: material.required_amount,
-        used_containers: containerFill.containers,
-        total_used_amount: 0,
-        has_enough: containerFill.has_enough,
-        avoid_recur: material.avoid_recur ?? false,
-      },
-    ];
-    moveInventory({
+    let has_enough =
+      test.stock.on_hand - test.stock.allocated >= material.required_amount;
+    if (has_enough === false) {
+      has_enough_overall = false;
+    }
+    await moveInventory({
       product_id: material.product_id, //ALLOCATING THE PRODUCTION #
       product_code: material.product_code,
       name: material.product_name,
@@ -84,6 +124,36 @@ export const createBOM = async (
       movement_date: new Date(),
     });
   }
+  batching.status = batchingStatus.SCHEDULED;
+  batching.has_enough = has_enough_overall;
+  // Batching.updateOne({ _id: batching._id }, { batching });
+  await Batching.findOneAndUpdate({ _id: batching._id }, batching);
+  // batching.save(); //!not working for some dumb reason???
+  return {
+    status: status.OK,
+    data: { message: "Batching Scheduled", res: batching },
+  };
+};
+
+export const generateBOM = async (
+  batching: IBatching
+): Promise<ILogicResponse> => {
+  let materials = [];
+  for (const material of batching.ingredients) {
+    const containerFill = await fillContainers(
+      material.product_id,
+      material.required_amount
+    );
+
+    materials = [
+      ...materials,
+      {
+        ...material,
+        used_containers: containerFill.containers,
+      },
+    ];
+  }
+  batching.ingredients = materials;
   batching.status = batchingStatus.IN_PROGRESS;
   batching.save();
   return {
@@ -96,19 +166,6 @@ export const finishBatching = async (
   batching: IBatching
 ): Promise<ILogicResponse> => {
   for (const material of batching.ingredients) {
-    const newId = new mongoose.Types.ObjectId();
-    batching.ingredients = [
-      ...batching.ingredients,
-      {
-        _id: new mongoose.Types.ObjectId().toHexString(),
-        product_id: material.product_id,
-        product_code: material.product_code,
-        product_name: material.product_name,
-        required_amount: material.required_amount,
-        total_used_amount: material.total_used_amount,
-        used_containers: material.used_containers,
-      },
-    ];
     moveInventory({
       product_id: material.product_id,
       product_code: material.product_code,
@@ -141,11 +198,57 @@ export const finishBatching = async (
   };
 };
 
+// //!OLD
+// export const createBOM = async (
+//   batching: IBatching
+// ): Promise<ILogicResponse> => {
+//   const materials = await calculateMaterials([
+//     { product_code: batching.product_code, amount: batching.quantity },
+//   ]);
+//   for (const material of materials) {
+//     const newId = new mongoose.Types.ObjectId();
+//     const containerFill = await fillContainers(
+//       material.product_id,
+//       material.required_amount
+//     );
+//     console.log(containerFill, "contFill");
+
+//     batching.ingredients = [
+//       ...batching.ingredients,
+//       {
+//         _id: new mongoose.Types.ObjectId().toHexString(),
+//         product_id: material.product_id,
+//         product_code: material.product_code,
+//         product_name: material.product_name,
+//         required_amount: material.required_amount,
+//         used_containers: containerFill.containers,
+//         total_used_amount: 0,
+//         avoid_recur: material.avoid_recur ?? false,
+//       },
+//     ];
+//     moveInventory({
+//       product_id: material.product_id, //ALLOCATING THE PRODUCTION #
+//       product_code: material.product_code,
+//       name: material.product_name,
+//       module_source: Batching.modelName,
+//       movement_target_type: movementTypes.ALLOCATED,
+//       amount: material.required_amount,
+//       movement_date: new Date(),
+//     });
+//   }
+//   batching.status = batchingStatus.IN_PROGRESS;
+//   batching.save();
+//   return {
+//     status: status.OK,
+//     data: { message: "BOM Created", res: batching },
+//   };
+// };
+
 const fillContainers = async (product_id: string, amount: number) => {
   let cont_array: IBatchingContainer[] = [];
   let rem_amount = amount;
   const containers = await InventoryStock.find({ product_id: product_id });
-  console.log(product_id, containers, "CONTAINERS AAAAAAAAAAA");
+  // console.log(product_id, containers, "CONTAINERS AAAAAAAAAAA");
   if (containers) {
     for (const container of containers) {
       container!.remaining_amount += parseFloat(
@@ -184,6 +287,5 @@ const fillContainers = async (product_id: string, amount: number) => {
   }
   return {
     containers: cont_array,
-    has_enough: rem_amount <= 0,
   };
 };

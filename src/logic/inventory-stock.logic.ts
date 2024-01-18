@@ -109,15 +109,21 @@ export const listInventoryStockGrouped = async (
   };
 };
 
-export const inventoryStockLookup = async (s_value) => {
+export const inventoryStockLookup = async (s_value, p_id) => {
   const searchValue = s_value.toString();
-  const list = await InventoryStock.find({
+  const prod_query = { product_id: p_id };
+  console.log(p_id, "TEST");
+  let query = {
     $or: [
       { product_code: new RegExp("^" + searchValue) },
       { name: new RegExp(searchValue, "i") },
       { lot_number: new RegExp(searchValue, "i") },
     ],
-  })
+  };
+  if (p_id) {
+    query = { ...query, ...prod_query };
+  }
+  const list = await InventoryStock.find(query)
     // .populate({ path: "product_id" }) //TODO: this gives an error unfortunately, not sure how to deal with it.
     .limit(15)
     .catch((err) => {

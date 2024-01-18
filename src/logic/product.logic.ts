@@ -2,7 +2,6 @@ import Product, { IProduct } from "../models/product.model";
 import Formula, { IFormula } from "../models/formula.model";
 import { IListParams, IListResponse, ILogicResponse } from "./interfaces.logic";
 import { reply, status } from "../config/config.status";
-import { createBOM } from "./batching.logic";
 import { IProcessedQuery, processQuery } from "./utils";
 
 export const listProduct = async (

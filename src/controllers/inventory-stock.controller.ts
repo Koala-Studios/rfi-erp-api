@@ -65,9 +65,10 @@ export class InventoryStockStockController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async inventoryStockLookupRequest(
     @Request() req: eRequest,
-    @Query() search_value: string
+    @Query() search_value: string,
+    @Query() product_id?: string
   ) {
-    const res = await inventoryStockLookup(search_value);
+    const res = await inventoryStockLookup(search_value, product_id);
     this.setStatus(res.status);
 
     return res.data;
