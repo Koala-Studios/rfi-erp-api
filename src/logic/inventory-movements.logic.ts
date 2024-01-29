@@ -19,11 +19,20 @@ export interface IMovement {
   amount: number;
   container_id?: string;
   lot_number?: string;
+  location?: {
+    _id: string;
+    code: string;
+  } | null;
   movement_date: Date;
 }
 
 export interface IMovementSource {
+  container_id?: string;
   movement_source_type: string;
+  source_location?: {
+    _id: string;
+    code: string;
+  } | null;
 }
 
 export const listInventoryMovement = async (
@@ -79,11 +88,17 @@ export const moveInventory = async (
         module_source: movement.module_source,
         movement_target_type: movement_source.movement_source_type,
         amount: -movement.amount,
+        location: movement_source.source_location ?? null,
         lot_number: movement.lot_number ?? "",
         movement_date: new_date,
       };
-      console.log(movement.movement_date, " NEW DATE:", new_date);
-
+      if (movement_source.container_id) {
+        InventoryStock.findByIdAndUpdate(movement_source.container_id, {
+          $inc: {
+            remaining_amount: -movement.amount, //!we're not checking for movement type because we'll only have a source container if we're really moving something (from it..).
+          },
+        });
+      }
       InventoryMovement.create(source_movement);
     });
   }
@@ -92,6 +107,16 @@ export const moveInventory = async (
     { _id: movement.product_id }, //prob g  onna return something different like a confirmation
     { $inc: { [movement_target_variable]: movement.amount } }
   ).then(() => {
+    if (movement.container_id) {
+      //container quantity, either will be remaining amount or allocated amount.
+      InventoryStock.findByIdAndUpdate(movement.container_id, {
+        $inc: {
+          [movement.movement_target_type === "on_hand"
+            ? "remaining_amount"
+            : "allocated_amount"]: movement.amount,
+        },
+      });
+    }
     InventoryMovement.create(movement);
   });
 };

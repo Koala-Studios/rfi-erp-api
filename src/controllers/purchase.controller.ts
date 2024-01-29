@@ -27,7 +27,6 @@ import {
   handlePurchaseShipment,
   listSupplierOrders,
 } from "../logic/purchase.logic";
-import { InventoryController } from "./inventory.controller";
 
 @Route("purchase-orders")
 @Tags("PurchaseOrder")

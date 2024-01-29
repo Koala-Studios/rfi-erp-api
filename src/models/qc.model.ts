@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import paginate from "mongoose-paginate-v2";
 
-export interface QcRequest extends mongoose.Document {
+export interface IQualityControl extends mongoose.Document {
   product_id: string;
   product_code: string;
   product_name: string;
@@ -10,13 +10,19 @@ export interface QcRequest extends mongoose.Document {
   request_source: String;
   request_type: string;
   created_date: string;
-  completed_date: string;
-  test_id: string;
+  completed_date: string | null;
+  test_id: string | null;
   notes: string;
   status: number;
 }
 
-const qcRequestSchema = new mongoose.Schema({
+export const orderStatus = {
+  PENDING: 0,
+  FAILED: 1,
+  APPROVED: 2,
+};
+
+const qualityControlSchema = new mongoose.Schema({
   product_id: String,
   product_code: String,
   product_name: String,
@@ -30,9 +36,9 @@ const qcRequestSchema = new mongoose.Schema({
   status: Number,
 });
 
-qcRequestSchema.plugin(paginate);
+qualityControlSchema.plugin(paginate);
 
-export default mongoose.model<QcRequest, mongoose.PaginateModel<QcRequest>>(
-  "Quality Control",
-  qcRequestSchema
-);
+export default mongoose.model<
+  IQualityControl,
+  mongoose.PaginateModel<IQualityControl>
+>("Quality Control", qualityControlSchema);

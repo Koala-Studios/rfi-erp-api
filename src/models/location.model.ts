@@ -6,6 +6,7 @@ export interface ILocation extends mongoose.Document {
   code: string;
   description: string;
   total_containers: number;
+  ignore_inventory: boolean;
   created_date: string;
 }
 
@@ -14,6 +15,7 @@ const locationSchema = new mongoose.Schema({
   code: String,
   description: String,
   total_containers: Number,
+  ignore_inventory: Boolean,
   created_date: Date,
 });
 

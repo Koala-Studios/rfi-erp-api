@@ -13,6 +13,8 @@ import InventoryStock, {
 } from "../models/inventory-stock.model";
 import { movementTypes } from "../models/inventory-movements.model";
 import { IProcessedQuery, processQuery } from "./utils";
+import { createQualityControl } from "./qc.logic";
+import QualityControl, { IQualityControl } from "../models/qc.model";
 let ObjectId = require("mongodb").ObjectId;
 
 export const listPurchases = async (query: string): Promise<ILogicResponse> => {
@@ -188,11 +190,27 @@ export const proccessPurchaseRow = async (
     supplier_id: purchase_order.supplier._id,
     supplier_sku: "",
     notes: purchase_order.notes,
+    location: { _id: "65b3fd71e6b69305d00f9eb1", code: "WA" },
     extensions: [],
     qc_tests: [],
   });
+  const qc = new QualityControl({
+    //*QC REQUEST
+    product_id: row.product_id,
+    product_code: inv_item.product_code,
+    product_name: inv_item.name,
+    lot_number: row.lot_number,
+    external_product: false,
+    request_source: row._id, //
+    request_type: PurchaseOrder.modelName,
+    created_date: new Date(),
+    completed_date: null,
+    test_id: null,
+    notes: "",
+    status: 0,
+  });
+  qc.save(); //Should we move this to qc logic? not sure yet.
 
-  const approved_by_qc = true;
   const movement: IMovement = {
     product_id: inv_item._id,
     product_code: inv_item.product_code,
@@ -205,19 +223,21 @@ export const proccessPurchaseRow = async (
     amount: row.process_amount,
     movement_date: new Date(),
     container_id: container._id,
+    location: { _id: "65b3fd71e6b69305d00f9eb1", code: "WA" },
   };
   const movement_source = {
     movement_source_type: movementTypes.ORDERED,
   };
   await moveInventory(movement, movement_source);
+
+  _message = "Sent To QC Successfully";
   if (quarantine) {
     _message = "Sent To Quarantine Successfully";
   } else {
     //TODO: Change this step to ONLY send to QC. QC will then call the receiveItem function on its own
-    if (approved_by_qc) {
-      receiveItem(row, inv_item);
-      _message = "Sent To QC Successfully";
-    }
+    // if (approved_by_qc) {
+    //   receiveItem(row, inv_item);
+    // }
   }
   _status = status.OK;
   return { status: _status, data: { message: _message, res: purchase_order } };
@@ -242,6 +262,7 @@ export const receiveItem = async (
   };
   const movement_source = {
     movement_source_type: movementTypes.ON_HOLD,
+    location: { _id: "65b3fd71e6b69305d00f9eb1", code: "WA" },
   };
   const _res = await moveInventory(movement, movement_source);
 
