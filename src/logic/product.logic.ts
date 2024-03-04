@@ -20,7 +20,7 @@ export const listProduct = async (
       page: _page,
       limit: _count,
       leanWithId: true,
-      sort: { product_code: "desc" },
+      sort: { created_date: -1 },
     }
   );
   return {

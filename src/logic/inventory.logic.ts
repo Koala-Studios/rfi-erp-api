@@ -46,7 +46,6 @@ export const inventoryLookup = async (s_value, f_sale, i_raw, approved) => {
       $in: statusList;
     }
   }
-  console.log(query, " test query merge");
 
   const list = await Inventory.find(query).limit(25);
   return { status: status.OK, data: { message: "", res: list } };

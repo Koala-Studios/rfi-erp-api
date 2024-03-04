@@ -1,5 +1,14 @@
+const ObjectId = require('mongodb').ObjectId;
 module.exports = {
   async up(db, client) {
+
+    const location_id = new ObjectId();
+    const location1 = await db.collection('location').insertOne({
+      _id: location_id, name: "Waiting Bay", code: "WB", description: "Containers without a home go here", total_containers: 0, created_date: new Date()
+    })
+    await db.collection('location').insertOne({
+      _id: location_id, name: "Quarantine Zone", code: "QZ", description: "Quarantined containers", total_containers: 0, created_date: new Date()
+    })
 
     const results = await db
       .collection("Inventory_Stock")
@@ -25,6 +34,7 @@ module.exports = {
           lot_number: InvStockItem.lot_number,
           sample: Math.round(Math.random(0, 1)), //TODO: CHANGE THIS TO NOT BE RANDOM LOL.
           is_open: Math.round(Math.random(0, 1)), //TODO: CHANGE THIS TO NOT BE RANDOM LOL.
+          location: { _id: location_id.toHexString(), code: 'WB' },
           container_size: InvStockItem.qty_per_cont || 0,
           received_amount: InvStockItem.Rec_qty || ((InvStockItem.qty_per_cont * InvStockItem.cont_num) || 0),
           remaining_amount: InvStockItem.Rec_qty || ((InvStockItem.qty_per_cont * InvStockItem.cont_num) || 0),

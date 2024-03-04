@@ -19,12 +19,18 @@ import {
   inventoryStockLookup,
   listInventoryContainers,
   listInventoryStockGrouped,
+  listLocationContainers,
+  moveBulkContainers,
 } from "../logic/inventory-stock.logic";
 
 interface ICreateInventoryStockRequest {
   name: string;
 }
 
+interface ILocation {
+  _id: string;
+  code: string;
+}
 @Route("inventory-stock")
 @Tags("InventoryStock")
 @Security("jwt")
@@ -56,6 +62,18 @@ export class InventoryStockStockController extends Controller {
     @Query() product_id?: string
   ) {
     const res = await listInventoryContainers(query, product_id);
+    this.setStatus(res.status);
+
+    return res.data;
+  }
+
+  @Get("list-location-containers")
+  @SuccessResponse(status.OK, reply.success)
+  public async listLocationContainersRequest(
+    @Request() req: eRequest,
+    @Query() location_id?: string
+  ) {
+    const res = await listLocationContainers(location_id);
     this.setStatus(res.status);
 
     return res.data;
@@ -99,4 +117,16 @@ export class InventoryStockStockController extends Controller {
   @Put("edit")
   @SuccessResponse(status.OK, reply.success)
   public async editInventoryStock() {}
+
+  @Post("move-bulk")
+  @SuccessResponse(status.OK, reply.success)
+  public async inventoryBulkMoveRequest(
+    @Request() req: eRequest,
+    @Query() container_ids: string[],
+    @Body() location: ILocation
+  ) {
+    const res = await moveBulkContainers(container_ids, location);
+    this.setStatus(res.status);
+    return res.data;
+  }
 }

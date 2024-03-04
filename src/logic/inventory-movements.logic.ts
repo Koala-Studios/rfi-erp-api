@@ -15,24 +15,16 @@ export interface IMovement {
   product_code: string;
   name: string;
   module_source: string;
+  movement_source_type?: string;
   movement_target_type: string;
   amount: number;
-  container_id?: string;
+  source_lot_number?: string;
   lot_number?: string;
-  location?: {
-    _id: string;
-    code: string;
-  } | null;
-  movement_date: Date;
-}
-
-export interface IMovementSource {
+  source_container_id?: string;
   container_id?: string;
-  movement_source_type: string;
-  source_location?: {
-    _id: string;
-    code: string;
-  } | null;
+  source_location?: { _id: string; code: string };
+  target_location: { _id: string; code: string };
+  movement_date: Date;
 }
 
 export const listInventoryMovement = async (
@@ -53,11 +45,11 @@ export const listInventoryMovement = async (
   return { status: status.OK, data: { message: null, res: list } };
 };
 
-export const moveInventory = async (
-  movement: IMovement,
-  movement_source?: IMovementSource
-) => {
-  console.log(movement, movement_source, "TEST MOVEMENTS");
+export const moveInventory = async (movement: IMovement) => {
+  if (movement.amount == 0) {
+    InventoryMovement.create(movement);
+    return;
+  }
 
   if (
     movement.container_id &&
@@ -66,45 +58,31 @@ export const moveInventory = async (
     //TODO: Later will have to revise this, should work for now.
     await InventoryStock.findOneAndUpdate(
       { _id: movement.container_id },
-      { $inc: { remaining_amount: +movement.amount } },
-      { new: true }
-    ); //!!Value is flipped since we're updating the USED amt //TODO:this doesn't apply anymore?
+      { $inc: { remaining_amount: +movement.amount } }
+      // { new: true }
+    );
   }
 
-  const movement_source_variable = movement_source
-    ? "stock." + movement_source.movement_source_type
+  const movement_source_variable = movement.movement_source_type
+    ? "stock." + movement.movement_source_type
     : null;
   const movement_target_variable = "stock." + movement.movement_target_type;
-  if (movement_source) {
+  if (movement.movement_source_type) {
     await Inventory.findOneAndUpdate(
       { _id: movement.product_id },
       { $inc: { [movement_source_variable]: -movement.amount } }
     ).then(() => {
-      const new_date = new Date(+movement.movement_date - 10);
-      const source_movement = {
-        product_id: movement.product_id,
-        product_code: movement.product_code,
-        name: movement.name,
-        module_source: movement.module_source,
-        movement_target_type: movement_source.movement_source_type,
-        amount: -movement.amount,
-        location: movement_source.source_location ?? null,
-        lot_number: movement.lot_number ?? "",
-        movement_date: new_date,
-      };
-      if (movement_source.container_id) {
-        InventoryStock.findByIdAndUpdate(movement_source.container_id, {
+      if (movement.container_id) {
+        InventoryStock.findByIdAndUpdate(movement.source_container_id, {
           $inc: {
-            remaining_amount: -movement.amount, //!we're not checking for movement type because we'll only have a source container if we're really moving something (from it..).
+            remaining_amount: -movement.amount, //not checking type cause will only physically move from source container
           },
         });
       }
-      InventoryMovement.create(source_movement);
     });
   }
-  // await new Promise((resolve) => setTimeout(resolve, 000));
   return await Inventory.findOneAndUpdate(
-    { _id: movement.product_id }, //prob g  onna return something different like a confirmation
+    { _id: movement.product_id }, //prob gonna return something different like a confirmation
     { $inc: { [movement_target_variable]: movement.amount } }
   ).then(() => {
     if (movement.container_id) {

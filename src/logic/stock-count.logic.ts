@@ -87,10 +87,11 @@ export const approveStockCount = async (
       name: count_item.name,
       module_source: StockCount.modelName,
       movement_target_type: movementTypes.ON_HAND,
-      amount: -(count_item.current_amount - count_item.proposed_amount),
+      amount: -(count_item.current_amount - count_item.proposed_amount), //TODO: UPDATE TO NEW SYSTEM
       container_id: count_item.container_id,
       lot_number: count_item.lot_number,
       movement_date: new Date(),
+      target_location: null,
     });
   }
 

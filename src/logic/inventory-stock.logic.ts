@@ -1,10 +1,15 @@
 import InventoryStock, {
   IInventoryStock,
 } from "../models/inventory-stock.model";
+import Location from "../models/location.model";
 import { IListParams, IListResponse, ILogicResponse } from "./interfaces.logic";
 import { reply, status } from "../config/config.status";
 import { IProcessedQuery, processQuery } from "./utils";
 import { ObjectId } from "mongodb";
+import { moveInventory } from "./inventory-movements.logic";
+import InventoryMovement, {
+  movementTypes,
+} from "../models/inventory-movements.model";
 
 // export const listInventory = async():Promise<IInventory[]> => {
 //     //filters: all
@@ -153,4 +158,46 @@ export const listInventoryContainers = async (
   });
   console.log(list);
   return { status: status.OK, data: { message: null, res: list } };
+};
+
+export const listLocationContainers = async (
+  location_id?: string
+): Promise<ILogicResponse> => {
+  console.log(location_id, "TEST");
+  const list = await InventoryStock.find({
+    "location._id": location_id,
+  });
+  console.log(list);
+  return { status: status.OK, data: { message: null, res: list } };
+};
+
+export const moveBulkContainers = async (
+  containers: string[],
+  t_location: { _id: string; code: string }
+): Promise<ILogicResponse> => {
+  for (const container of containers) {
+    const cont = await InventoryStock.findById(container);
+
+    moveInventory({
+      product_id: cont.product_id.toString(),
+      product_code: cont.product_code,
+      name: cont.name,
+      module_source: InventoryMovement.modelName,
+      movement_source_type: movementTypes.MOVED,
+      movement_target_type: movementTypes.MOVED,
+      lot_number: cont.lot_number,
+      amount: 0,
+      container_id: cont._id,
+      source_location: cont.location,
+      target_location: t_location,
+      movement_date: new Date(),
+    });
+    cont.location = t_location;
+    cont.save();
+  }
+
+  return {
+    status: status.OK,
+    data: { message: "Successfully Moved Containers", res: true },
+  };
 };

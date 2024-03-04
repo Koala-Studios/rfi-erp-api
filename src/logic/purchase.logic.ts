@@ -217,18 +217,19 @@ export const proccessPurchaseRow = async (
     name: inv_item.name,
     lot_number: row.lot_number,
     module_source: PurchaseOrder.modelName,
+    movement_source_type: movementTypes.ORDERED,
     movement_target_type: quarantine
       ? movementTypes.QUARANTINED
       : movementTypes.ON_HOLD,
+    container_id: container._id,
     amount: row.process_amount,
     movement_date: new Date(),
-    container_id: container._id,
-    location: { _id: "65b3fd71e6b69305d00f9eb1", code: "WA" },
+    target_location: { _id: "65b3fd71e6b69305d00f9eb1", code: "WA" },
   };
   const movement_source = {
     movement_source_type: movementTypes.ORDERED,
   };
-  await moveInventory(movement, movement_source);
+  await moveInventory(movement);
 
   _message = "Sent To QC Successfully";
   if (quarantine) {
@@ -243,36 +244,8 @@ export const proccessPurchaseRow = async (
   return { status: _status, data: { message: _message, res: purchase_order } };
 };
 
-export const receiveItem = async (
-  row: IOrderItemProcess,
-  inv_item: IInventory
-): Promise<ILogicResponse> => {
-  let _status: number;
-  let _message: string = "";
-
-  const movement = {
-    product_id: inv_item._id,
-    product_code: inv_item.product_code,
-    name: inv_item.name,
-    module_source: PurchaseOrder.modelName,
-    movement_target_type: movementTypes.ON_HAND,
-    amount: row.process_amount,
-    lot_number: row.lot_number,
-    movement_date: new Date(),
-  };
-  const movement_source = {
-    movement_source_type: movementTypes.ON_HOLD,
-    location: { _id: "65b3fd71e6b69305d00f9eb1", code: "WA" },
-  };
-  const _res = await moveInventory(movement, movement_source);
-
-  _status = status.OK;
-  return {
-    status: _status,
-    data: { message: "Successfully Added To Inventory", res: null },
-  };
-};
 export const handlePurchaseShipment = async (
+  //NOT BEING USED, NEEDS REVISION!
   purchase: IPurchaseOrder
 ): Promise<ILogicResponse> => {
   for (const item of purchase.order_items) {
@@ -285,11 +258,12 @@ export const handlePurchaseShipment = async (
       movement_target_type: movementTypes.IN_TRANSIT,
       amount: item.purchased_amount,
       movement_date: new Date(),
+      target_location: null,
     };
     const movement_source = {
       movement_source_type: movementTypes.ORDERED,
     };
-    await moveInventory(movement, movement_source);
+    await moveInventory(movement);
   }
   return {
     status: status.OK,
@@ -322,6 +296,7 @@ export const confirmPurchase = async (
       movement_target_type: movementTypes.ORDERED,
       amount: item.purchased_amount,
       movement_date: new Date(),
+      target_location: null,
     };
     await moveInventory(movement);
   }
@@ -349,6 +324,7 @@ export const setAsReceived = async (po_id): Promise<ILogicResponse> => {
             : movementTypes.IN_TRANSIT,
         amount: -(order_item.purchased_amount - order_item.received_amount),
         movement_date: new Date(),
+        target_location: null,
       };
       await moveInventory(movement);
     }
@@ -382,6 +358,7 @@ export const setAsCancelled = async (po_id): Promise<ILogicResponse> => {
             : movementTypes.IN_TRANSIT,
         amount: -(order_item.purchased_amount - order_item.received_amount),
         movement_date: new Date(),
+        target_location: null,
       };
       await moveInventory(movement);
     }

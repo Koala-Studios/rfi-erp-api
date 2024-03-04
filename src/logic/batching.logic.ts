@@ -10,9 +10,12 @@ import InventoryStock, {
 import mongoose, { FilterQuery } from "mongoose";
 import { IProcessedQuery, processQuery } from "./utils";
 import { calculateMaterials } from "./forecast.logic";
-import { ObjectId } from "mongodb";
+import { ClientSession, ObjectId } from "mongodb";
 import { moveInventory } from "./inventory-movements.logic";
-import { movementTypes } from "../models/inventory-movements.model";
+import {
+  IInventoryMovement,
+  movementTypes,
+} from "../models/inventory-movements.model";
 
 //TODO:LISTING PARAMETER GENERALIZING
 export const listBatching = async (query: string): Promise<ILogicResponse> => {
@@ -119,9 +122,14 @@ export const confirmBatching = async (
       product_code: material.product_code,
       name: material.product_name,
       module_source: Batching.modelName,
+      movement_source_type: movementTypes.ON_HAND,
       movement_target_type: movementTypes.ALLOCATED,
       amount: material.required_amount,
       movement_date: new Date(),
+      target_location: {
+        _id: "",
+        code: "",
+      },
     });
   }
   batching.status = batchingStatus.SCHEDULED;
@@ -174,17 +182,19 @@ export const finishBatching = async (
       movement_target_type: movementTypes.ALLOCATED,
       amount: -material.required_amount, //DEALLOCATING THE AMOUNT THAT WAS SET ASIDE.
       movement_date: new Date(),
+      target_location: null,
     });
     for (const container of material.used_containers) {
       moveInventory({
-        product_id: material.product_id, //UPDATING CONTAINER QTY
+        product_id: material.product_id,
         product_code: material.product_code,
         name: material.product_name,
         module_source: Batching.modelName,
         movement_target_type: movementTypes.ON_HAND,
         lot_number: container.lot_number,
+        amount: -container.used_amount,
         container_id: container._id,
-        amount: -container.used_amount, //REMOVING USED AMT FROM CONTAINERS
+        target_location: null,
         movement_date: new Date(),
       });
     }
@@ -198,51 +208,30 @@ export const finishBatching = async (
   };
 };
 
-// //!OLD
-// export const createBOM = async (
-//   batching: IBatching
-// ): Promise<ILogicResponse> => {
-//   const materials = await calculateMaterials([
-//     { product_code: batching.product_code, amount: batching.quantity },
-//   ]);
-//   for (const material of materials) {
-//     const newId = new mongoose.Types.ObjectId();
-//     const containerFill = await fillContainers(
-//       material.product_id,
-//       material.required_amount
-//     );
-//     console.log(containerFill, "contFill");
+export const cancelBatching = async (
+  batching: IBatching
+): Promise<ILogicResponse> => {
+  for (const material of batching.ingredients) {
+    moveInventory({
+      product_id: material.product_id,
+      product_code: material.product_code,
+      name: material.product_name,
+      module_source: Batching.modelName,
+      movement_source_type: movementTypes.ALLOCATED,
+      movement_target_type: movementTypes.ON_HAND,
+      amount: -material.required_amount, //DEALLOCATING THE AMOUNT THAT WAS SET ASIDE.
+      movement_date: new Date(),
+      target_location: null,
+    });
+  }
+  batching.status = batchingStatus.CANCELLED;
+  batching.save();
 
-//     batching.ingredients = [
-//       ...batching.ingredients,
-//       {
-//         _id: new mongoose.Types.ObjectId().toHexString(),
-//         product_id: material.product_id,
-//         product_code: material.product_code,
-//         product_name: material.product_name,
-//         required_amount: material.required_amount,
-//         used_containers: containerFill.containers,
-//         total_used_amount: 0,
-//         avoid_recur: material.avoid_recur ?? false,
-//       },
-//     ];
-//     moveInventory({
-//       product_id: material.product_id, //ALLOCATING THE PRODUCTION #
-//       product_code: material.product_code,
-//       name: material.product_name,
-//       module_source: Batching.modelName,
-//       movement_target_type: movementTypes.ALLOCATED,
-//       amount: material.required_amount,
-//       movement_date: new Date(),
-//     });
-//   }
-//   batching.status = batchingStatus.IN_PROGRESS;
-//   batching.save();
-//   return {
-//     status: status.OK,
-//     data: { message: "BOM Created", res: batching },
-//   };
-// };
+  return {
+    status: status.OK,
+    data: { message: "Batch Cancelled.", res: batching },
+  };
+};
 
 const fillContainers = async (product_id: string, amount: number) => {
   let cont_array: IBatchingContainer[] = [];

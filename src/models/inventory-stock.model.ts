@@ -48,6 +48,7 @@ export interface IInventoryStock extends mongoose.Document {
   sample: boolean;
   is_solid: boolean;
   is_open: boolean;
+  location: { _id: string; code: string };
   received_amount: number;
   gross_amount: number;
   remaining_amount: number;
@@ -74,7 +75,7 @@ const inventoryStockSchema = new mongoose.Schema({
   is_open: Boolean,
   container_size: Number,
   sample: Boolean,
-  location: { _id: ObjectId, name: String },
+  location: { _id: String, code: String },
   received_amount: Number,
   gross_amount: Number,
   remaining_amount: Number,

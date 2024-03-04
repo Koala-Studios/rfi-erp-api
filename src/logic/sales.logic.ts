@@ -153,6 +153,7 @@ export const confirmSales = async (
       movement_target_type: movementTypes.ORDERED,
       amount: item.sold_amount,
       movement_date: new Date(),
+      target_location: null,
     };
     await moveInventory(movement);
   }

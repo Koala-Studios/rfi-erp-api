@@ -35,9 +35,9 @@ export class QualityControlController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async getQualityControlRequest(
     @Request() req: eRequest,
-    @Query() location_id: string
+    @Query() qc_id: string
   ) {
-    const res = await getQualityControl(location_id);
+    const res = await getQualityControl(qc_id);
     this.setStatus(res.status);
 
     return res.data;

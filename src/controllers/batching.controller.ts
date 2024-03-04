@@ -15,6 +15,7 @@ import Batching, { batchingStatus, IBatching } from "../models/batching.model";
 import { reply, status } from "../config/config.status";
 import Inventory, { IInventory } from "../models/inventory.model";
 import {
+  cancelBatching,
   confirmBatching,
   createBatching,
   finishBatching,
@@ -105,6 +106,19 @@ export class BatchingController extends Controller {
   ) {
     const _batching = await Batching.findById(batching_id);
     const _res = await finishBatching(_batching);
+    this.setStatus(_res.status);
+    return _res.data;
+  }
+
+  @Post("mark-cancelled")
+  @SuccessResponse(status.CREATED, reply.success)
+  public async cancelBatchingRequest(
+    @Request() req: eRequest,
+    @Query() batching_id
+  ) {
+    const _batching = await Batching.findById(batching_id);
+
+    const _res = await cancelBatching(_batching);
     this.setStatus(_res.status);
     return _res.data;
   }
