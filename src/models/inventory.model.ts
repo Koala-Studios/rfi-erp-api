@@ -59,6 +59,7 @@ export interface IInventory extends mongoose.Document {
   cas_number?: string;
   fema_number?: string;
   product_type: { name: string; code: string; _id: string };
+  default_location: { _id: string; code: string; name: string };
 }
 
 const inventorySchema = new mongoose.Schema({
@@ -99,6 +100,7 @@ const inventorySchema = new mongoose.Schema({
   fema_number: String,
   cas_number: String,
   product_type: { name: String, code: String, _id: String },
+  default_location: { _id: String, code: String, name: String },
 });
 
 inventorySchema.plugin(paginate);

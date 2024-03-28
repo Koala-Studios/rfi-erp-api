@@ -13,6 +13,7 @@ import { movementTypes } from "../models/inventory-movements.model";
 import { moveInventory } from "./inventory-movements.logic";
 
 import Batching, { IBatching } from "../models/batching.model";
+import { createBatching } from "./batching.logic";
 let ObjectId = require("mongodb").ObjectId;
 
 export const listSalesOrders = async (
@@ -167,7 +168,22 @@ export const proccessSalesRow = async (
   order_id: string
 ): Promise<ILogicResponse> => {
   const sales_order = await SalesOrder.findById(order_id);
+  var start = new Date();
+  start.setHours(0, 0, 0, 0);
 
+  var end = new Date();
+  end.setHours(23, 59, 59, 999);
+
+  const batches_today =
+    (await Batching.count({
+      "customer._id": sales_order.customer._id,
+      date_created: { $gte: start, $lt: end },
+    })) + 1;
+  const _batch_code =
+    sales_order.customer.code +
+    new Date().toISOString().split("T")[0] +
+    "-" +
+    batches_today;
   const batch: any = {
     _id: new mongoose.Types.ObjectId(),
     ingredients: [],
@@ -175,20 +191,21 @@ export const proccessSalesRow = async (
     product_id: processItem.product_id,
     product_code: processItem.product_code,
     name: processItem.product_name,
+    customer: {
+      _id: sales_order.customer._id,
+      code: sales_order.customer.code,
+    },
     quantity: processItem.process_amount,
     date_needed: processItem.date_needed,
     sales_id: order_id,
-    batch_code: new Date().toString().split(":")[0] + "A", //TODO: CHANGE THIS TO PROPER GENERATION, ALSO MOVE CREATION OF BATCH TO LOGIC OF BATCHING
+    batch_code: _batch_code, //TODO: CHANGE THIS TO PROPER GENERATION, ALSO MOVE CREATION OF BATCH TO LOGIC OF BATCHING
     status: 1,
     notes: "",
   };
-  const _batching = new Batching(batch);
-  _batching.save();
+  const _batching = (await createBatching(batch)).data.res;
   const items = sales_order.order_items;
   let item = items.find((item: any) => item._id === processItem._id);
-  const index = items.findIndex(
-    (item: any) => item._id === processItem._id + 1
-  );
+  const index = items.findIndex((item: any) => item._id === processItem._id);
   sales_order.order_items = [
     ...items.slice(0, index),
 
@@ -202,7 +219,7 @@ export const proccessSalesRow = async (
       unit_price: item.unit_price,
       batch_id: _batching._id,
       batch_code: _batching.batch_code,
-      lot_number: null,
+      lot_number: _batching.batch_code,
       status: orderItemStatus.SCHEDULED,
     },
     ...items.slice(index, items.length),

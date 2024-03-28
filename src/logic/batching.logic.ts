@@ -33,7 +33,11 @@ export const createBatching = async (
   batching: IBatching
 ): Promise<ILogicResponse> => {
   batching._id = new mongoose.Types.ObjectId();
-  batching.date_created = new Date();
+  //Set created date if unset
+  batching.date_created =
+    batching.date_created === undefined
+      ? new Date().toISOString()
+      : batching.date_created;
   let has_enough_overall = true;
 
   batching.status = batchingStatus.DRAFT;
@@ -74,7 +78,6 @@ export const createBatching = async (
 
 export const getBatching = async (_id): Promise<ILogicResponse> => {
   let _status: number;
-
   const _batching = await Batching.findById(_id);
   if (!_batching) {
     _status = status.OK;

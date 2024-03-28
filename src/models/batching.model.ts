@@ -16,9 +16,10 @@ export interface IBatching extends mongoose.Document {
   name?: string;
   source_id?: string;
   source_type?: string;
+  customer?: { _id: string; code: string };
   quantity: number;
-  date_created: Date;
-  date_needed: Date;
+  date_created: string;
+  date_needed: string;
   ingredients: IBatchingIngredient[];
   batch_code: string;
   status: number;
@@ -68,7 +69,9 @@ const batchingSchema = new mongoose.Schema({
   product_id: String,
   product_code: String,
   name: String,
-  sales_id: String,
+  source_id: String,
+  source_type: String,
+  customer: { _id: String, code: String },
   quantity: Number,
   date_created: Date,
   date_needed: Date,

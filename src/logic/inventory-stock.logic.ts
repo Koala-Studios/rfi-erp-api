@@ -173,7 +173,7 @@ export const listLocationContainers = async (
 
 export const moveBulkContainers = async (
   containers: string[],
-  t_location: { _id: string; code: string }
+  t_location: { _id: string; code: string; name: string }
 ): Promise<ILogicResponse> => {
   for (const container of containers) {
     const cont = await InventoryStock.findById(container);

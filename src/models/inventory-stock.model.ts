@@ -18,6 +18,7 @@ export interface IQCTest {
 
 export interface IStockLocation {
   _id: string;
+  code: string;
   name: string;
 }
 
@@ -40,7 +41,7 @@ interface IInventoryStockGrouped {
 
 export interface IInventoryStock extends mongoose.Document {
   purchase_id?: string;
-  product_id: string | IInventory;
+  product_id: string;
   product_code: string;
   name: string;
   unit_cost: number;
@@ -48,7 +49,7 @@ export interface IInventoryStock extends mongoose.Document {
   sample: boolean;
   is_solid: boolean;
   is_open: boolean;
-  location: { _id: string; code: string };
+  location: { _id: string; code: string; name: string };
   received_amount: number;
   gross_amount: number;
   remaining_amount: number;
@@ -61,8 +62,8 @@ export interface IInventoryStock extends mongoose.Document {
   received_date: Date;
   expiry_date: Date;
   notes: string;
-  extensions: [IStockExtension];
-  qc_tests: [IQCTest];
+  extensions: IStockExtension[];
+  qc_tests: IQCTest[];
 }
 
 const inventoryStockSchema = new mongoose.Schema({

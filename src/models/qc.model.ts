@@ -5,6 +5,7 @@ export interface IQualityControl extends mongoose.Document {
   product_id: string;
   product_code: string;
   product_name: string;
+  container_id?: string;
   lot_number?: string;
   external_product: boolean;
   request_source: String;
@@ -16,7 +17,7 @@ export interface IQualityControl extends mongoose.Document {
   status: number;
 }
 
-export const orderStatus = {
+export const qcStatus = {
   PENDING: 0,
   FAILED: 1,
   APPROVED: 2,
