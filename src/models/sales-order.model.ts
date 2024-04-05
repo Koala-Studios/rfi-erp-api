@@ -31,11 +31,12 @@ interface ISalesOrderItem {
   product_id: string;
   batch_id: string;
   lot_number: string;
+  shipped_amount: number;
+  sample: boolean;
 }
 
 export interface ISalesOrderItemProcess extends ISalesOrderItem {
   date_needed: string;
-  process_amount: number;
   container_size: number;
   // expiry_date: Date;
 }
@@ -77,6 +78,8 @@ const salesOrderSchema = new mongoose.Schema({
       product_id: String,
       batch_id: String,
       lot_number: String,
+      shipped_amount: Number,
+      sample: Boolean,
     },
   ],
 });

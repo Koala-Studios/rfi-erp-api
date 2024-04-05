@@ -222,7 +222,7 @@ export const cancelBatching = async (
       module_source: Batching.modelName,
       movement_source_type: movementTypes.ALLOCATED,
       movement_target_type: movementTypes.ON_HAND,
-      amount: -material.required_amount, //DEALLOCATING THE AMOUNT THAT WAS SET ASIDE.
+      amount: material.required_amount, //DEALLOCATING THE AMOUNT THAT WAS SET ASIDE.
       movement_date: new Date(),
       target_location: null,
     });

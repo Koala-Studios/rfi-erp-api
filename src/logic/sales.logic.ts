@@ -145,7 +145,7 @@ export const confirmSales = async (
     { new: true }
   );
   for (const item of _sales_order.order_items) {
-    const inv_item = await Inventory.findById(item.product_id);
+    const inv_item = await Inventory.findById(item.product._id);
     const movement = {
       product_id: inv_item._id,
       product_code: inv_item.product_code,
@@ -189,8 +189,8 @@ export const proccessSalesRow = async (
     _id: new mongoose.Types.ObjectId(),
     ingredients: [],
     date_created: new Date(),
-    product_id: processItem.product_id,
-    product_code: processItem.product_code,
+    product_id: processItem.product._id,
+    product_code: processItem.product.product_code,
     name: processItem.product.name,
     customer: {
       _id: sales_order.customer._id,
@@ -198,7 +198,7 @@ export const proccessSalesRow = async (
     },
     source_id: sales_order._id,
     source_type: batchingSource.SALES_ORDER,
-    quantity: processItem.process_amount,
+    quantity: processItem.sold_amount,
     date_needed: processItem.date_needed,
     sales_id: order_id,
     batch_code: _batch_code, //TODO: CHANGE THIS TO PROPER GENERATION, ALSO MOVE CREATION OF BATCH TO LOGIC OF BATCHING
@@ -207,14 +207,10 @@ export const proccessSalesRow = async (
   };
   const _batching = (await createBatching(batch)).data.res;
   const items = sales_order.order_items;
-  let item = items.find((item: any) => item._id === processItem._id);
   const index = items.findIndex((item: any) => item._id === processItem._id);
-  sales_order[index] = {
-    ...sales_order[index],
-    status: orderItemStatus.SCHEDULED,
-    batch_id: batch._id,
-  };
-
+  items[index].status = orderItemStatus.SCHEDULED;
+  items[index].batch_id = batch._id;
+  sales_order.order_items = items;
   sales_order.save();
 
   return {

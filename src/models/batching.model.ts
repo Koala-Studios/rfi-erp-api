@@ -30,6 +30,7 @@ export interface IBatching extends mongoose.Document {
   status: number;
   notes: string;
   has_enough?: boolean;
+  container_size: number;
 }
 
 export interface IBatchingContainer {

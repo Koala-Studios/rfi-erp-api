@@ -68,7 +68,7 @@ export interface IInventoryStock extends mongoose.Document {
 
 const inventoryStockSchema = new mongoose.Schema({
   purchase_id: ObjectId,
-  product_id: { type: Schema.Types.ObjectId, ref: "Inventory" },
+  product_id: ObjectId,
   product_code: String,
   name: String,
   unit_cost: Number,

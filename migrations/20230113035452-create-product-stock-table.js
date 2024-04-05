@@ -7,7 +7,13 @@ module.exports = {
       _id: location_id, name: "Waiting Bay", code: "WB", description: "Containers without a home go here", total_containers: 0, created_date: new Date()
     })
     await db.collection('location').insertOne({
-      _id: location_id, name: "Quarantine Zone", code: "QZ", description: "Quarantined containers", total_containers: 0, created_date: new Date()
+      _id: new ObjectId(), name: "Quarantine Zone", code: "QZ", description: "Quarantined containers", total_containers: 0, created_date: new Date()
+    })
+    await db.collection('location').insertOne({
+      _id: new ObjectId(), name: "Shipping & Packing", code: "SP", description: "Shipping and Packing", total_containers: 0, created_date: new Date()
+    })
+    await db.collection('location').insertOne({
+      _id: new ObjectId(), name: "Fulfillment Area", code: "FA", description: "Fulfillment Area", total_containers: 0, created_date: new Date()
     })
 
     const results = await db
@@ -34,12 +40,13 @@ module.exports = {
           lot_number: InvStockItem.lot_number,
           sample: Math.round(Math.random(0, 1)), //TODO: CHANGE THIS TO NOT BE RANDOM LOL.
           is_open: Math.round(Math.random(0, 1)), //TODO: CHANGE THIS TO NOT BE RANDOM LOL.
+          is_solid: Math.round(Math.random(0, 1)),//TODO: CHANGE THIS TO NOT BE RANDOM LOL.
           location: { _id: location_id.toHexString(), code: 'WB' },
-          container_size: InvStockItem.qty_per_cont || 0,
-          received_amount: InvStockItem.Rec_qty || ((InvStockItem.qty_per_cont * InvStockItem.cont_num) || 0),
-          remaining_amount: InvStockItem.Rec_qty || ((InvStockItem.qty_per_cont * InvStockItem.cont_num) || 0),
+          container_size: InvStockItem.qty_per_cont || 10,
+          received_amount: InvStockItem.Rec_qty || ((InvStockItem.qty_per_cont * InvStockItem.cont_num) || 100),
+          remaining_amount: InvStockItem.Rec_qty || ((InvStockItem.qty_per_cont * InvStockItem.cont_num) || 100),
           allocated_amount: 0,
-          quarantined_containers: 0,
+          quarantined: false,
           received_date: InvStockItem.received_date,
           expiry_date: InvStockItem.exp_date,
           supplier_code: InvStockItem.supplier,
@@ -51,7 +58,7 @@ module.exports = {
         });
 
 
-        await db.collection("inventory").updateOne({ _id: inv_product._id }, { $inc: { 'stock.on_hand': (InvStockItem.Rec_qty || ((InvStockItem.qty_per_cont * InvStockItem.cont_num) || 0) - InvStockItem.used_qty || 0) } })
+        await db.collection("inventory").updateOne({ _id: inv_product._id }, { $inc: { 'stock.on_hand': InvStockItem.Rec_qty || ((InvStockItem.qty_per_cont * InvStockItem.cont_num) || 100) } })
 
       }
     };
@@ -59,6 +66,7 @@ module.exports = {
   },
   async down(db, client) {
     db.collection("inventory_stock").drop();
+    db.collection("location").drop();
   },
 
 };
