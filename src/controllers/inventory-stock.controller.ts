@@ -30,6 +30,7 @@ interface ICreateInventoryStockRequest {
 interface ILocation {
   _id: string;
   code: string;
+  name: string;
 }
 @Route("inventory-stock")
 @Tags("InventoryStock")

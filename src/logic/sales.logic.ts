@@ -12,7 +12,7 @@ import { IProcessedQuery, processQuery } from "./utils";
 import { movementTypes } from "../models/inventory-movements.model";
 import { moveInventory } from "./inventory-movements.logic";
 
-import Batching, { IBatching } from "../models/batching.model";
+import Batching, { IBatching, batchingSource } from "../models/batching.model";
 import { createBatching } from "./batching.logic";
 let ObjectId = require("mongodb").ObjectId;
 
@@ -133,15 +133,15 @@ export const updateSalesItem = async (placeholder): Promise<ILogicResponse> => {
 };
 
 export const confirmSales = async (
-  purchase: ISalesOrder
+  salesOrder: ISalesOrder
 ): Promise<ILogicResponse> => {
-  const po_id = purchase._id;
+  const so_id = salesOrder._id;
 
-  purchase.status = orderStatus.AWAITING_PRODUCTION;
+  salesOrder.status = orderStatus.AWAITING_PRODUCTION;
 
   const _sales_order = await SalesOrder.findOneAndUpdate(
-    { _id: po_id },
-    purchase,
+    { _id: so_id },
+    salesOrder,
     { new: true }
   );
   for (const item of _sales_order.order_items) {
@@ -179,9 +179,10 @@ export const proccessSalesRow = async (
       "customer._id": sales_order.customer._id,
       date_created: { $gte: start, $lt: end },
     })) + 1;
+
   const _batch_code =
     sales_order.customer.code +
-    new Date().toISOString().split("T")[0] +
+    new Date().toISOString().split("T")[0].replace("-", "") +
     "-" +
     batches_today;
   const batch: any = {
@@ -190,11 +191,13 @@ export const proccessSalesRow = async (
     date_created: new Date(),
     product_id: processItem.product_id,
     product_code: processItem.product_code,
-    name: processItem.product_name,
+    name: processItem.product.name,
     customer: {
       _id: sales_order.customer._id,
       code: sales_order.customer.code,
     },
+    source_id: sales_order._id,
+    source_type: batchingSource.SALES_ORDER,
     quantity: processItem.process_amount,
     date_needed: processItem.date_needed,
     sales_id: order_id,
@@ -206,32 +209,11 @@ export const proccessSalesRow = async (
   const items = sales_order.order_items;
   let item = items.find((item: any) => item._id === processItem._id);
   const index = items.findIndex((item: any) => item._id === processItem._id);
-  sales_order.order_items = [
-    ...items.slice(0, index),
-
-    {
-      _id: new ObjectId().toHexString(),
-      product_id: processItem.product_id,
-      product_code: processItem.product_code,
-      product_name: processItem.product_name,
-      customer_p_code: "",
-      sold_amount: processItem.process_amount,
-      unit_price: item.unit_price,
-      batch_id: _batching._id,
-      batch_code: _batching.batch_code,
-      lot_number: _batching.batch_code,
-      status: orderItemStatus.SCHEDULED,
-    },
-    ...items.slice(index, items.length),
-  ];
-  if (item.sold_amount != processItem.process_amount) {
-    item.sold_amount = item.sold_amount - processItem.process_amount;
-    sales_order.order_items[index - 1] = {
-      ...item,
-    };
-  } else {
-    sales_order.order_items.splice(index, 1);
-  }
+  sales_order[index] = {
+    ...sales_order[index],
+    status: orderItemStatus.SCHEDULED,
+    batch_id: batch._id,
+  };
 
   sales_order.save();
 

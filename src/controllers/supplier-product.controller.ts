@@ -60,9 +60,10 @@ export class SupplierProductController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async supplierProductLookupRequest(
     @Request() req: eRequest,
-    @Query() search_value: string
+    @Query() search_value: string,
+    @Query() customer_id: string
   ) {
-    const res = await supplierProductLookup(search_value);
+    const res = await supplierProductLookup(search_value, customer_id);
     this.setStatus(res.status);
 
     return res.data;

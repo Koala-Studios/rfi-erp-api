@@ -22,14 +22,14 @@ export const orderItemStatus = {
 interface ISalesOrderItem {
   _id: string;
   product_code: string;
-  customer_p_code: string;
+  product: { _id: string; product_code: string; name: string };
+  customer_sku: string;
+  c_prod_name: string;
   sold_amount: number;
   unit_price: number;
   status: number;
   product_id: string;
   batch_id: string;
-  batch_code: string;
-  product_name: string;
   lot_number: string;
 }
 
@@ -68,15 +68,14 @@ const salesOrderSchema = new mongoose.Schema({
   order_items: [
     {
       _id: String,
-      product_code: String,
-      customer_p_code: String,
+      product: { _id: String, product_code: String, name: String },
+      customer_sku: String,
+      c_prod_name: String,
       sold_amount: Number,
       unit_price: Number,
       status: Number,
       product_id: String,
       batch_id: String,
-      batch_code: String,
-      product_name: String,
       lot_number: String,
     },
   ],

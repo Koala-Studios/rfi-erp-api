@@ -62,11 +62,36 @@ export class CustomerProductController extends Controller {
   @SuccessResponse(status.OK, reply.success)
   public async productLookupRequest(
     @Request() req: eRequest,
-    @Query() search_value: string
+    @Query() search_value: string,
+    @Query() customer_id: string
   ) {
-    const res = await customerProductLookup(search_value);
+    const res = await customerProductLookup(search_value, customer_id);
     this.setStatus(res.status);
 
     return res.data;
+  }
+
+  @Post("update")
+  @SuccessResponse(status.CREATED, reply.success)
+  public async updateCustomerProductRequest(
+    @Request() req: eRequest,
+    @Body() body: ICustomerProduct[]
+  ) {
+    let message = "Updated Customer Products";
+    let _status = true;
+    for (const product of body) {
+      await CustomerProduct.findOneAndUpdate({ _id: product._id }, product, {
+        upsert: true,
+      }).catch((e) => {
+        message =
+          "Not Saved. Error: " +
+          e.codeName +
+          " | Value: " +
+          e.keyValue.customer_sku;
+        _status = false;
+      });
+    }
+    this.setStatus(status.OK);
+    return { message: message, res: _status };
   }
 }

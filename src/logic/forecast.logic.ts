@@ -23,14 +23,15 @@ const assignStatus = (
 };
 
 export const calculateMaterials = async (
-  products: [{ product_code: string; amount: number }]
+  products: [{ product_code: string; amount: number }],
+  force_recursion: boolean = false
 ): Promise<IForecastResults[]> => {
   let rawIngredients: IForecast[] = [];
   let rawIngredientsFinal: IForecastResults[] = [];
   for (let i = 0; i < products.length; i++) {
     rawIngredients = [
       ...rawIngredients,
-      ...(await recursiveFinder(products[i])),
+      ...(await recursiveFinder(products[i], force_recursion)),
     ];
   }
   rawIngredients = Array.from(
@@ -78,9 +79,11 @@ export const calculateMaterials = async (
   return rawIngredientsFinal;
 };
 //TODO: MAKE A SECOND FINDER FOR FORECAST THAT IGNORES RECURSIVE AVOIDANCE
-const recursiveFinder = async (product: IForecast) => {
+const recursiveFinder = async (
+  product: IForecast,
+  force_recursion: boolean
+) => {
   let rawIngredients: IForecast[] = [];
-
   const formula = await Formula.findOne({
     product_code: product.product_code,
   }).sort("-version");
@@ -98,13 +101,16 @@ const recursiveFinder = async (product: IForecast) => {
 
       if (mat_type && !mat_type.is_raw) {
         //if not a raw material.
-        if (!mat_type.avoid_recur) {
+        if (!mat_type.avoid_recur || force_recursion) {
           rawIngredients = [
             ...rawIngredients,
-            ...(await recursiveFinder({
-              product_code: element.material_code,
-              amount: (product.amount * element.amount) / 100.0,
-            })),
+            ...(await recursiveFinder(
+              {
+                product_code: element.material_code,
+                amount: (product.amount * element.amount) / 100.0,
+              },
+              force_recursion
+            )),
           ];
         } else {
           const inv_material = await Inventory.findOne({
@@ -128,10 +134,13 @@ const recursiveFinder = async (product: IForecast) => {
             //otherwise break it up into the ingredients
             rawIngredients = [
               ...rawIngredients,
-              ...(await recursiveFinder({
-                product_code: element.material_code,
-                amount: (product.amount * element.amount) / 100.0,
-              })),
+              ...(await recursiveFinder(
+                {
+                  product_code: element.material_code,
+                  amount: (product.amount * element.amount) / 100.0,
+                },
+                force_recursion
+              )),
             ];
           }
         }

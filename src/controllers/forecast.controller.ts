@@ -14,10 +14,10 @@ import logger from "../logger/logger";
 import { calculateMaterials, IForecast } from "../logic/forecast.logic";
 import { reply, status } from "../config/config.status";
 
-interface calculateForecastRequest {
-    products:IForecast[]
+interface calculateForecast {
+  product_list: [{ product_code: string; amount: number }];
 }
-
+//TODO: WHOLE MODULE NEEDS REWORKING LOL
 @Route("forecast")
 @Tags("Forecast")
 @Security("jwt")
@@ -25,11 +25,12 @@ export class ForecastController extends Controller {
   @Post("calculate")
   @SuccessResponse(status.OK, reply.success)
   public async calculateForecast(
-    @Body() req: calculateForecastRequest
+    @Request() req: eRequest,
+    @Body() products: any,
+    @Query() force_recursion: boolean
   ) {
-    const _forecast = await calculateMaterials(<any>req.products);
-
-
+    const _forecast = await calculateMaterials(products, force_recursion);
+    console.log(force_recursion, "test");
     this.setStatus(status.OK);
     return _forecast;
   }

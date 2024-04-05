@@ -99,10 +99,10 @@ export class BatchingController extends Controller {
   }
 
   @Post("finish-batching")
-  @SuccessResponse(status.CREATED, reply.success)
+  @SuccessResponse(status.OK, reply.success)
   public async finishBatchingRequest(
     @Request() req: eRequest,
-    @Query() batching_id
+    @Query() batching_id: string
   ) {
     const _batching = await Batching.findById(batching_id);
     const _res = await finishBatching(_batching);

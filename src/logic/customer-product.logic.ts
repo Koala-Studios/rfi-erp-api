@@ -26,19 +26,17 @@ export const listCustomerProduct = async (
   };
 };
 
-export const customerProductLookup = async (s_value) => {
+export const customerProductLookup = async (s_value, customer_id: string) => {
   const searchValue = s_value.toString();
   let query = {
+    "customer._id": customer_id,
     $or: [
       { customer_sku: new RegExp(searchValue, "i") },
-      { aliases: new RegExp(searchValue, "i") },
-      { product_code: new RegExp("^" + searchValue) },
-      { customer_p_name: new RegExp("^" + searchValue) },
-      { name: new RegExp(searchValue, "i") },
+      { "product.product_code": new RegExp(searchValue, "i") },
+      { c_prod_name: new RegExp(searchValue, "i") },
+      { "product.name": new RegExp(searchValue, "i") },
     ],
   };
   const list = await CustomerProduct.find(query).limit(25);
-
-  console.log(list);
   return { status: status.OK, data: { message: "", res: list } };
 };

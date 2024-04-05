@@ -6,7 +6,7 @@ const ObjectId = Schema.Types.ObjectId;
 
 interface IDiscountRate {
   min_amount: number;
-  disc_percent: number;
+  percent: number;
 }
 
 interface ICustomerItem {
@@ -25,28 +25,26 @@ export interface ICustomerProduct extends mongoose.Document {
   product: IProductItem;
   customer: ICustomerItem;
   customer_sku: string;
-  customer_prod_name: string;
-  cost: number;
+  c_prod_name: string;
+  rec_dose: number;
+  price: number;
   discount_rates: IDiscountRate[];
   description: string;
-  aliases: string;
 }
 
 const customerProductSchema = new mongoose.Schema({
-  product_id: ObjectId,
+  product: { _id: String, product_code: String, name: String },
   customer: {
     _id: ObjectId,
     name: String,
     code: String,
   },
-  customer_sku: String,
-  customer_p_name: String,
-  product_code: String,
-  name: String,
-  cost: Number,
-  discount_rates: [{ min_amount: Number, disc_percent: Number }],
+  rec_dose: Number,
+  customer_sku: { type: String, unique: true },
+  c_prod_name: String,
+  price: Number,
+  discount_rates: [{ min_amount: Number, percent: Number }],
   description: String,
-  aliases: String,
 });
 
 customerProductSchema.plugin(paginate);

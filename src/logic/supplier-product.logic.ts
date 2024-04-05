@@ -32,10 +32,21 @@ export const listSupplierProduct = async (
   };
 };
 
-export const supplierProductLookup = async (s_value) => {
+export const supplierProductLookup = async (s_value, supplier_id) => {
   const searchValue = s_value.toString();
   const list = await SupplierProduct.find({
-    name: new RegExp(searchValue, "i"),
+    "supplier._id": supplier_id,
+    $or: [
+      {
+        name: new RegExp(searchValue, "i"),
+      },
+      {
+        supplier_sku: new RegExp(searchValue, "i"),
+      },
+      {
+        product_code: new RegExp(searchValue, "i"), //TODO: make supplier products actually have this
+      },
+    ],
   }).limit(15);
 
   return { status: status.OK, data: { message: "", res: list } };

@@ -10,12 +10,17 @@ export const batchingStatus = {
   CANCELLED: 6,
 };
 
+export const batchingSource = {
+  BATCHING: "Batching",
+  SALES_ORDER: "SalesOrder",
+};
+
 export interface IBatching extends mongoose.Document {
   product_id: string;
   product_code: string;
   name?: string;
   source_id?: string;
-  source_type?: string;
+  source_type?: number;
   customer?: { _id: string; code: string };
   quantity: number;
   date_created: string;

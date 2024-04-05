@@ -69,7 +69,10 @@ export class SalesController extends Controller {
     body._id = new mongoose.Types.ObjectId();
     console.log(body, "POTEST");
     const newSales = new SalesOrder(body);
-    newSales.save();
+    newSales.save().catch(function (error) {
+      //TODO: FIX ALL OF THESE DUP KEY ISSUES AND MOVE CREATE LOGIC TO LOGIC PAGE
+      console.log(error);
+    });
     this.setStatus(status.CREATED);
     return newSales;
   }
