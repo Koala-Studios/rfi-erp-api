@@ -1,14 +1,15 @@
 module.exports = {
   async up(db, client) {
-    // TODO write your migration here.
-    // See https://github.com/seppevs/migrate-mongo/#creating-a-new-migration-script
-    // Example:
+
+    await db.createCollection('customer_products');
+    await db.createCollection('sales');
   },
 
   async down(db, client) {
     // TODO write the statements to rollback your migration (if possible)
     // Example:
 
-    // await db.dropCollection('locations');
+    await db.dropCollection('sales');
+    await db.dropCollection('customer_products');
   }
 };

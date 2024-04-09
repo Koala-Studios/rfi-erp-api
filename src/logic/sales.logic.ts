@@ -6,6 +6,7 @@ import SalesOrder, {
   orderStatus,
 } from "../models/sales-order.model";
 import Inventory from "../models/inventory.model";
+import Product from "../models/product.model";
 import mongoose from "mongoose";
 import { IListParams, IListResponse, ILogicResponse } from "./interfaces.logic";
 import { IProcessedQuery, processQuery } from "./utils";
@@ -145,7 +146,7 @@ export const confirmSales = async (
     { new: true }
   );
   for (const item of _sales_order.order_items) {
-    const inv_item = await Inventory.findById(item.product._id);
+    const inv_item = await Product.findById(item.product._id);
     const movement = {
       product_id: inv_item._id,
       product_code: inv_item.product_code,
