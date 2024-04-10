@@ -1,7 +1,7 @@
 export default {
   jwtSecret: process.env.JWT_SECRET || "secrettoken",
   DB: {
-    URI: "mongodb+srv://orejas63:M1Y9AldB7CaLWnEG@cluster0.vt25uox.mongodb.net/rfi_db",
+    URI: process.env.MONGO_URI ?? "mongodb://127.0.0.1/rfi_db_2",
   },
-  CLIENT: "https://rfi-client.netlify.app:3000",
+  CLIENT: process.env.CLIENT ?? "http://localhost:3000",
 };
