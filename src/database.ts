@@ -5,15 +5,14 @@ import logger from "./logger/logger";
 //Connect with mongoDB server
 const uri = process.env.MONGODB_URI;
 
-
 mongoose.connect(config.DB.URI);
 const connection = mongoose.connection;
 
 connection.once("open", () => {
-	logger.info("MongoDB connection established");
+  logger.info("MongoDB connection established");
 });
 
 connection.on("error", (err) => {
-	logger.error(err);
-	process.exit(0);
+  logger.error(err);
+  process.exit(0);
 });

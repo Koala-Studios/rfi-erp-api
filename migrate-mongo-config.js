@@ -1,12 +1,11 @@
 // In this file you can configure migrate-mongo
-
 const config = {
   mongodb: {
     // TODO Change (or review) the url to your MongoDB:
-    url: "mongodb://localhost:27017",
+    url: 'mongodb+srv://orejas63:M1Y9AldB7CaLWnEG@cluster0.vt25uox.mongodb.net',
 
     // TODO Change this to your database name:
-    databaseName: "rfi_db_2",
+    databaseName: "rfi_db",
 
     options: {
       useNewUrlParser: true, // removes a deprecation warning when connecting
