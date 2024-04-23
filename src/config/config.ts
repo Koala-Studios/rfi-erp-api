@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+require("dotenv").config({ path: "../../.env" });
+
 export default {
   jwtSecret: process.env.JWT_SECRET || "secrettoken",
   DB: {
